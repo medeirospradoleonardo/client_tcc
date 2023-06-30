@@ -1,9 +1,7 @@
-import Link from 'next/link'
-
 import Heading from 'components/Heading'
-import Layout from 'components/Layout'
-import Logo from 'components/Logo'
 import * as S from './styles'
+import Base from 'templates/Base'
+import { Container } from 'components/Container'
 
 type AuthProps = {
   title: string
@@ -11,25 +9,19 @@ type AuthProps = {
 }
 
 const Auth = ({ title, children }: AuthProps) => (
-  <Layout>
-    <S.Wrapper>
-      <S.Content>
-        <S.ContentWrapper>
-          <Link href="/">
-            <a>
-              <Logo id="content" color="black" size="large" />
-            </a>
-          </Link>
+  <Base>
+    <Container>
+      <S.Wrapper>
+        <S.Content>
           <Heading color="black" lineColor="secondary" lineLeft>
             {title}
           </Heading>
-
-          {children}
-        </S.ContentWrapper>
-        <S.Footer>KamTool 2023 © Todos os Direitos Reservados</S.Footer>
-      </S.Content>
-    </S.Wrapper>
-  </Layout>
+          <S.ContentWrapper>{children}</S.ContentWrapper>
+          {/* <S.Footer>KamTool 2023 © Todos os Direitos Reservados</S.Footer> */}
+        </S.Content>
+      </S.Wrapper>
+    </Container>
+  </Base>
 )
 
 export default Auth

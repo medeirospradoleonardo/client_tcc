@@ -23,8 +23,12 @@ import {
   AiOutlineApartment,
   AiOutlineHome,
   AiOutlineLeft,
-  AiOutlineSearch,
-  AiOutlineSetting
+  AiOutlineSetting,
+  AiOutlineUser,
+  AiOutlineCalendar,
+  AiOutlineDatabase,
+  AiOutlineGroup,
+  AiOutlineBulb
 } from 'react-icons/ai'
 import { MdLogout, MdOutlineAnalytics } from 'react-icons/md'
 import { BsPeople } from 'react-icons/bs'
@@ -43,8 +47,9 @@ const Sidebar = () => {
           <AiOutlineLeft />
         </SSidebarButton>
       </>
+      {/* <SDivider /> */}
       <SLogo>
-        <Logo color="black" />
+        {/* <Logo color="black" /> */}
         {/* <img src={logoSVG} alt="logo" /> */}
       </SLogo>
       {linksArray.map(({ icon, label, notification, to }) => (
@@ -70,10 +75,10 @@ const Sidebar = () => {
         </SLinkContainer>
       ))}
       <SDivider />
-      {secondaryLinksArray.map(({ icon, label }) => (
+      {secondaryLinksArray.map(({ icon, label, to }) => (
         <SLinkContainer key={label}>
           <Link
-            href="/sign-in"
+            href={to}
             passHref
             style={!sidebarOpen ? { width: `fit-content` } : {}}
           >
@@ -87,6 +92,22 @@ const Sidebar = () => {
         </SLinkContainer>
       ))}
       <SDivider />
+      {terciaryLinksArray.map(({ icon, label, to }) => (
+        <SLinkContainer key={label}>
+          <Link
+            href={to}
+            passHref
+            style={!sidebarOpen ? { width: `fit-content` } : {}}
+          >
+            <SLink>
+              <>
+                <SLinkIcon>{icon}</SLinkIcon>
+                {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}
+              </>
+            </SLink>
+          </Link>
+        </SLinkContainer>
+      ))}
       {/* <STheme>
         {sidebarOpen && <SThemeLabel>Dark Mode</SThemeLabel>}
         <SThemeToggler
@@ -109,44 +130,54 @@ const linksArray = [
   },
   {
     label: 'Linha do tempo',
-    icon: <MdOutlineAnalytics />,
+    icon: <AiOutlineCalendar />,
     to: '/profile/me',
-    notification: 3
+    notification: 0
   },
   {
     label: 'Backlog do produto',
-    icon: <BsPeople />,
+    icon: <AiOutlineDatabase />,
     to: '/customers',
     notification: 0
   },
   {
     label: 'Painel',
-    icon: <AiOutlineApartment />,
+    icon: <AiOutlineGroup />,
     to: '/diagrams',
-    notification: 1
+    notification: 0
   },
   {
     label: 'Grafico Burndown',
     icon: <MdOutlineAnalytics />,
     to: '/diagrams',
-    notification: 1
+    notification: 0
   },
   {
     label: 'Base de conhecimento',
-    icon: <BsPeople />,
+    icon: <AiOutlineBulb />,
     to: '/diagrams',
-    notification: 1
+    notification: 0
   }
 ]
 
 const secondaryLinksArray = [
   {
     label: 'Meus Projetos',
-    icon: <AiOutlineSetting />
+    icon: <AiOutlineSetting />,
+    to: '/sign-up'
   },
   {
     label: 'Minha compania',
-    icon: <AiOutlineSetting />
+    icon: <AiOutlineSetting />,
+    to: '/sign-in'
+  }
+]
+
+const terciaryLinksArray = [
+  {
+    label: 'Meu Perfil',
+    icon: <AiOutlineUser />,
+    to: '/profile/me'
   }
 ]
 

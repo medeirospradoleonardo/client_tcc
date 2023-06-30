@@ -1,14 +1,12 @@
-import Link from 'next/link'
 import styled from 'styled-components'
 
 import { btnReset, v } from './variables'
-
 export const SSidebar = styled.div`
   width: ${({ isOpen }) => (!isOpen ? `auto` : v.sidebarWidth)};
-  background: ${({ theme }) => theme.colors.bg};
+  background: ${({ theme }) => theme.colors.white};
   height: 100vh;
   padding: ${v.lgSpacing};
-
+  box-shadow: 8px 0px 12px 0px rgba(0, 0, 0, 0.1);
   position: relative;
 `
 

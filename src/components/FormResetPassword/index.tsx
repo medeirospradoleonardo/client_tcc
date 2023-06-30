@@ -73,7 +73,7 @@ const FormResetPassword = () => {
       <form onSubmit={handleSubmit}>
         <TextField
           name="password"
-          placeholder="Password"
+          placeholder="Senha"
           type="password"
           error={fieldError?.password}
           onInputChange={(v) => handleInput('password', v)}
@@ -81,14 +81,14 @@ const FormResetPassword = () => {
         />
         <TextField
           name="confirm_password"
-          placeholder="Confirm password"
+          placeholder="Confirmar senha"
           type="password"
           error={fieldError?.confirm_password}
           onInputChange={(v) => handleInput('confirm_password', v)}
           icon={<Lock />}
         />
         <Button type="submit" size="large" fullWidth disabled={loading}>
-          {loading ? <FormLoading /> : <span>Reset password</span>}
+          {loading ? <FormLoading /> : <span>Resetar senha</span>}
         </Button>
       </form>
     </FormWrapper>

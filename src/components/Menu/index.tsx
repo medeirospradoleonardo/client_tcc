@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Menu2 as MenuIcon } from '@styled-icons/remix-fill/Menu2'
-import { Search as SearchIcon } from '@styled-icons/material-outlined/Search'
 import { Close as CloseIcon } from '@styled-icons/material-outlined/Close'
 
 import Logo from 'components/Logo'
@@ -38,7 +37,7 @@ const Menu = ({ username, loading }: MenuProps) => {
             <MediaMatch greaterThan="medium">
               {!username ? (
                 <Link href="/sign-in" passHref>
-                  <Button as="a">Sign in</Button>
+                  <Button as="a">Entrar</Button>
                 </Link>
               ) : (
                 <UserDropdown username={username} />
@@ -58,7 +57,7 @@ const Menu = ({ username, loading }: MenuProps) => {
               {!!username && (
                 <>
                   <Link href="/profile/me" passHref>
-                    <S.MenuLink href="#">My profile</S.MenuLink>
+                    <S.MenuLink href="#">Meu Perfil</S.MenuLink>
                   </Link>
                 </>
               )}
@@ -67,12 +66,12 @@ const Menu = ({ username, loading }: MenuProps) => {
               <S.RegisterBox>
                 <Link href="/sign-in" passHref>
                   <Button fullWidth size="large" as="a">
-                    Sign in
+                    Entrar
                   </Button>
                 </Link>
                 <span>or</span>
                 <Link href="/sign-up" passHref>
-                  <S.CreateAccount title="Sign Up">Sign Up</S.CreateAccount>
+                  <S.CreateAccount title="Sign Up">Criar conta</S.CreateAccount>
                 </Link>
               </S.RegisterBox>
             )}

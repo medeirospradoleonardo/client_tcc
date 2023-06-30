@@ -71,7 +71,7 @@ const FormForgotPassword = () => {
       {success ? (
         <FormSuccess>
           <CheckCircleOutline />
-          You just received an email!
+          Voce já recebeu seu email!
         </FormSuccess>
       ) : (
         <>
@@ -92,7 +92,7 @@ const FormForgotPassword = () => {
             />
 
             <Button type="submit" size="large" fullWidth disabled={loading}>
-              {loading ? <FormLoading /> : <span>Send email</span>}
+              {loading ? <FormLoading /> : <span>Enviar email</span>}
             </Button>
           </form>
         </>

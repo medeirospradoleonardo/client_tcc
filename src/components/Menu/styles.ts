@@ -3,9 +3,11 @@ import media from 'styled-media-query'
 
 export const Wrapper = styled.menu<MenuFullProps>`
   ${({ theme, isOpen }) => css`
+    background-color: ${theme.colors.lightBg};
+    box-shadow: 8px 0px 24px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
-    padding: ${theme.spacings.small} 0;
+    padding: ${theme.spacings.xsmall};
     position: relative;
     z-index: ${isOpen ? theme.layers.menu : `calc(${theme.layers.menu} - 1)`};
   `}
@@ -16,6 +18,9 @@ export const LogoWrapper = styled.div`
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+  `}
+  ${({ theme }) => css`
+    margin-left: ${theme.spacings.xsmall};
   `}
 `
 

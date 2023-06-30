@@ -9,10 +9,10 @@ export const Wrapper = styled.div`
 `
 
 export const Content = styled.div`
-  ${({ theme }) => css`
+  /* ${({ theme }) => css`
     margin-top: ${theme.spacings.large};
     flex: 1 0 auto;
-  `}
+  `} */
 `
 
 export const SectionFooter = styled.section`
@@ -27,4 +27,19 @@ export const SectionFooter = styled.section`
       clip-path: polygon(0 15%, 100% 0%, 100% 100%, 0 100%);
     `}
   `}
+`
+export const SLayout = styled.div`
+  display: flex;
+`
+
+export const SMain = styled.main`
+  padding: calc(8 * 2);
+  flex: min-content;
+  ${({ theme }) => css`
+    margin-top: ${theme.spacings.large};
+  `}
+
+  h1 {
+    font-size: 14px;
+  }
 `

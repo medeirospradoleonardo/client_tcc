@@ -2,6 +2,9 @@ import Menu from 'components/Menu'
 import { useSession } from 'next-auth/client'
 import * as S from './styles'
 
+import Sidebar from 'components/Sidebar'
+import { SLayout, SMain } from './styles'
+
 export type BaseTemplateProps = {
   children: React.ReactNode
 }
@@ -12,7 +15,12 @@ const Base = ({ children }: BaseTemplateProps) => {
   return (
     <S.Wrapper>
       <Menu username={session?.user?.name} loading={loading} />
-      <S.Content>{children}</S.Content>
+      <S.Content>
+        <SLayout>
+          <Sidebar />
+          <SMain>{children}</SMain>
+        </SLayout>
+      </S.Content>
     </S.Wrapper>
   )
 }

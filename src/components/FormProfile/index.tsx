@@ -13,7 +13,7 @@ export type FormProfileProps = {
 const FormProfile = ({ email, username }: FormProfileProps) => (
   <>
     <Heading lineBottom color="black" size="small">
-      My profile
+      Meu Perfil
     </Heading>
 
     <S.Form>

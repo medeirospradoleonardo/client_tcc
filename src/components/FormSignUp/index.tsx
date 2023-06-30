@@ -123,7 +123,7 @@ const FormSignUp = () => {
         />
         <TextField
           name="password"
-          placeholder="Password"
+          placeholder="Senha"
           type="password"
           error={fieldError?.password}
           onInputChange={(v) => handleInput('password', v)}
@@ -131,7 +131,7 @@ const FormSignUp = () => {
         />
         <TextField
           name="confirm_password"
-          placeholder="Confirm password"
+          placeholder="Confirmar senha"
           type="password"
           error={fieldError?.confirm_password}
           onInputChange={(v) => handleInput('confirm_password', v)}
@@ -139,13 +139,13 @@ const FormSignUp = () => {
         />
 
         <Button type="submit" size="large" fullWidth disabled={loading}>
-          {loading ? <FormLoading /> : <span>Sign up now</span>}
+          {loading ? <FormLoading /> : <span>Criar conta</span>}
         </Button>
 
         <FormLink>
-          Already have an account?{' '}
+          Já possui conta?{' '}
           <Link href="/sign-in">
-            <a>Sign in</a>
+            <a>Entrar</a>
           </Link>
         </FormLink>
       </form>

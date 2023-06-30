@@ -73,23 +73,23 @@ const FormSignIn = () => {
         />
         <TextField
           name="password"
-          placeholder="Password"
+          placeholder="Senha"
           type="password"
           error={fieldError?.password}
           onInputChange={(v) => handleInput('password', v)}
           icon={<Lock />}
         />
         <Link href="/forgot-password" passHref>
-          <S.ForgotPassword>Forgot your password?</S.ForgotPassword>
+          <S.ForgotPassword>Esqueceu sua senha?</S.ForgotPassword>
         </Link>
         <Button type="submit" size="large" fullWidth disabled={loading}>
-          {loading ? <FormLoading /> : <span>Sign in now</span>}
+          {loading ? <FormLoading /> : <span>Entrar</span>}
         </Button>
 
         <FormLink>
-          Don’t have an account?{' '}
+          Não possui conta?{' '}
           <Link href="/sign-up">
-            <a>Sign up</a>
+            <a>Criar conta</a>
           </Link>
         </FormLink>
       </form>

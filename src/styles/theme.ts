@@ -28,9 +28,9 @@ export default {
     }
   },
   colors: {
-    // primary: '#F26122',
+    primary: '#F26122',
     secondary: '#f67f45',
-    mainBg: '#030517',
+    mainBg: '#F2F2F2',
     lightBg: '#F2F2F2',
     white: '#FAFAFA',
     black: '#030517',
@@ -42,8 +42,8 @@ export default {
     bgAlpha: 'rgba(250,250,250,.3)',
     bg2: 'rgb(245,245,245)',
     bg3: 'rgb(230,230,230)',
-    text: 'rgb(45,45,45)',
-    primary: 'rgb(52, 131, 235)'
+    text: 'rgb(45,45,45)'
+    // primary: 'rgb(52, 131, 235)'
   },
   spacings: {
     xxsmall: '0.8rem',

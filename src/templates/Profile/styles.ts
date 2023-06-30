@@ -6,10 +6,11 @@ export const Main = styled.main`
     margin-top: ${theme.spacings.medium};
 
     ${media.greaterThan('medium')`
-        display: grid;
-        grid-template-columns: 32rem 1fr;
-        gap: calc(${theme.grid.gutter} * 2);
+        /* display: grid; */
+        /* grid-template-columns: 32rem 1fr; */
+        /* gap: calc(${theme.grid.gutter} * 2); */
     `}
+    box-shadow: 8px 12px 24px 12px rgba(0, 0, 0, 0.1);
   `}
 `
 

@@ -1,14 +1,13 @@
-import { Container } from 'components/Container'
 import Heading from 'components/Heading'
-import Layout from 'components/Layout'
+import Base from 'templates/Base'
 
 const Home = () => {
   return (
-    <Layout>
+    <Base>
       <Heading lineLeft lineColor="secondary">
         Oi
       </Heading>
-    </Layout>
+    </Base>
   )
 }
 
