@@ -27,7 +27,7 @@ const Menu = ({ username, loading }: MenuProps) => {
       <S.LogoWrapper>
         <Link href="/" passHref>
           <a>
-            <Logo hideOnMobile color="black" />
+            <Logo color="black" />
           </a>
         </Link>
       </S.LogoWrapper>
@@ -56,7 +56,7 @@ const Menu = ({ username, loading }: MenuProps) => {
               </Link>
               {!!username && (
                 <>
-                  <Link href="/profile/me" passHref>
+                  <Link href="/profile" passHref>
                     <S.MenuLink href="#">Meu Perfil</S.MenuLink>
                   </Link>
                 </>

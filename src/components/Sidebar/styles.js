@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { btnReset, v } from './variables'
 export const SSidebar = styled.div`
@@ -100,6 +100,9 @@ export const SLink = styled.a`
 export const SLinkIcon = styled.div`
   padding: ${v.smSpacing} ${v.mdSpacing};
   display: flex;
+  ${({ theme }) => css`
+    color: ${theme.colors.primary};
+  `}
 
   svg {
     font-size: 20px;

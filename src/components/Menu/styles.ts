@@ -6,6 +6,7 @@ export const Wrapper = styled.menu<MenuFullProps>`
     background-color: ${theme.colors.lightBg};
     box-shadow: 8px 0px 24px 12px rgba(0, 0, 0, 0.1);
     display: flex;
+    height: 50px;
     align-items: center;
     padding: ${theme.spacings.xsmall};
     position: relative;
@@ -19,6 +20,7 @@ export const LogoWrapper = styled.div`
     left: 50%;
     transform: translateX(-50%);
   `}
+  height: 38px;
   ${({ theme }) => css`
     margin-left: ${theme.spacings.xsmall};
   `}

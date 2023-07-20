@@ -86,25 +86,6 @@ const FormSignUp = () => {
         </FormError>
       )}
       <form onSubmit={handleSubmit}>
-        <FormRadio>
-          <Radio
-            label="Padrao"
-            labelFor="padrao"
-            id="padrao"
-            name="tipo"
-            value="padrao"
-            labelColor="black"
-            defaultChecked
-          />
-          <Radio
-            label="Companhia"
-            labelFor="companhia"
-            id="companhia"
-            name="tipo"
-            value="companhia"
-            labelColor="black"
-          />
-        </FormRadio>
         <TextField
           name="username"
           placeholder="Username"

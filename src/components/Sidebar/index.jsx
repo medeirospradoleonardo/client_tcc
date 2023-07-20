@@ -33,9 +33,11 @@ import {
 import { MdLogout, MdOutlineAnalytics } from 'react-icons/md'
 import { BsPeople } from 'react-icons/bs'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const Sidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const pathname = useRouter().pathname
 
   return (
     <SSidebar isOpen={sidebarOpen}>
@@ -53,7 +55,7 @@ const Sidebar = () => {
         {/* <img src={logoSVG} alt="logo" /> */}
       </SLogo>
       {linksArray.map(({ icon, label, notification, to }) => (
-        <SLinkContainer key={label} isActive={false}>
+        <SLinkContainer key={label} isActive={pathname === to}>
           <Link
             href={to}
             passHref
@@ -76,7 +78,7 @@ const Sidebar = () => {
       ))}
       <SDivider />
       {secondaryLinksArray.map(({ icon, label, to }) => (
-        <SLinkContainer key={label}>
+        <SLinkContainer key={label} isActive={pathname === to}>
           <Link
             href={to}
             passHref
@@ -93,7 +95,7 @@ const Sidebar = () => {
       ))}
       <SDivider />
       {terciaryLinksArray.map(({ icon, label, to }) => (
-        <SLinkContainer key={label}>
+        <SLinkContainer key={label} isActive={pathname === to}>
           <Link
             href={to}
             passHref
@@ -128,12 +130,12 @@ const linksArray = [
     to: '/',
     notification: 0
   },
-  {
-    label: 'Linha do tempo',
-    icon: <AiOutlineCalendar />,
-    to: '/profile/me',
-    notification: 0
-  },
+  // {
+  //   label: 'Linha do tempo',
+  //   icon: <AiOutlineCalendar />,
+  //   to: '/timeline',
+  //   notification: 0
+  // },
   {
     label: 'Backlog do produto',
     icon: <AiOutlineDatabase />,
@@ -164,11 +166,6 @@ const secondaryLinksArray = [
   {
     label: 'Meus Projetos',
     icon: <AiOutlineSetting />,
-    to: '/sign-up'
-  },
-  {
-    label: 'Minha compania',
-    icon: <AiOutlineSetting />,
     to: '/sign-in'
   }
 ]
@@ -177,7 +174,7 @@ const terciaryLinksArray = [
   {
     label: 'Meu Perfil',
     icon: <AiOutlineUser />,
-    to: '/profile/me'
+    to: '/profile'
   }
 ]
 
