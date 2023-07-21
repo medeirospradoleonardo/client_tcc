@@ -139,25 +139,25 @@ const linksArray = [
   {
     label: 'Backlog do produto',
     icon: <AiOutlineDatabase />,
-    to: '/customers',
+    to: '/productBacklog',
     notification: 0
   },
   {
     label: 'Painel',
     icon: <AiOutlineGroup />,
-    to: '/diagrams',
+    to: '/panel',
     notification: 0
   },
   {
-    label: 'Grafico Burndown',
+    label: 'Gráfico Burndown',
     icon: <MdOutlineAnalytics />,
-    to: '/diagrams',
+    to: '/burndownChart',
     notification: 0
   },
   {
     label: 'Base de conhecimento',
     icon: <AiOutlineBulb />,
-    to: '/diagrams',
+    to: '/knowledgeBase',
     notification: 0
   }
 ]
@@ -166,7 +166,7 @@ const secondaryLinksArray = [
   {
     label: 'Meus Projetos',
     icon: <AiOutlineSetting />,
-    to: '/sign-in'
+    to: '/projects'
   }
 ]
 
