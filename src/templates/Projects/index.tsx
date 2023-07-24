@@ -3,11 +3,16 @@ import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
 
-export type ProjectsTemplateProps = {
-  children: React.ReactNode
+export type ProjectUserRoleType = {
+  role: string
+  name: string
 }
 
-const Projects = ({ children }: ProjectsTemplateProps) => {
+export type ProjectsTemplateProps = {
+  projectUserRoles: ProjectUserRoleType[]
+}
+
+const Projects = ({ projectUserRoles }: ProjectsTemplateProps) => {
   return (
     <Base>
       <Container>
@@ -16,7 +21,8 @@ const Projects = ({ children }: ProjectsTemplateProps) => {
         </Heading>
 
         <S.Main>
-          <S.Content>{children}</S.Content>
+          <S.Content>{projectUserRoles[0].name}</S.Content>
+          <S.Content>{projectUserRoles[1].name}</S.Content>
         </S.Main>
       </Container>
     </Base>

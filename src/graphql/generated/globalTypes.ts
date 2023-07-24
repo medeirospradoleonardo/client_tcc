@@ -7,6 +7,11 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum ENUM_PROJECTUSERROLE_ROLE {
+  leader = "leader",
+  member = "member",
+}
+
 export interface UsersPermissionsRegisterInput {
   username: string;
   email: string;

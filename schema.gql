@@ -488,8 +488,8 @@ type UsersPermissionsRoleEntityResponseCollection {
 }
 
 enum ENUM_USERSPERMISSIONSUSER_TYPE {
-  company
-  employee
+  admin
+  default
 }
 
 input UsersPermissionsUserFiltersInput {
@@ -504,14 +504,11 @@ input UsersPermissionsUserFiltersInput {
   blocked: BooleanFilterInput
   role: UsersPermissionsRoleFiltersInput
   type: StringFilterInput
-  company: CompanyFiltersInput
-  ownerCompany: CompanyFiltersInput
   ownerBoards: BoardFiltersInput
   comentaries: ComentaryFiltersInput
-  ownerProjects: ProjectFiltersInput
-  projects: ProjectFiltersInput
   responsibleboards: BoardFiltersInput
   knowledges: KnowledgeFiltersInput
+  projectUserRoles: ProjectUserRoleFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [UsersPermissionsUserFiltersInput]
@@ -531,14 +528,11 @@ input UsersPermissionsUserInput {
   role: ID
   profilePhoto: ID
   type: ENUM_USERSPERMISSIONSUSER_TYPE
-  company: ID
-  ownerCompany: ID
   ownerBoards: [ID]
   comentaries: [ID]
-  ownerProjects: [ID]
-  projects: [ID]
   responsibleboards: [ID]
   knowledges: [ID]
+  projectUserRoles: [ID]
 }
 
 type UsersPermissionsUser {
@@ -550,14 +544,11 @@ type UsersPermissionsUser {
   role: UsersPermissionsRoleEntityResponse
   profilePhoto: UploadFileEntityResponse
   type: ENUM_USERSPERMISSIONSUSER_TYPE
-  company: CompanyEntityResponse
-  ownerCompany: CompanyEntityResponse
   ownerBoards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryRelationResponseCollection
-  ownerProjects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectRelationResponseCollection
-  projects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectRelationResponseCollection
   responsibleboards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
   knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeRelationResponseCollection
+  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectUserRoleRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -586,11 +577,16 @@ enum ENUM_BOARD_TYPE {
   bug
 }
 
+enum ENUM_BOARD_STATUS {
+  Nao_iniciado
+  Em_progresso
+  Concluido
+}
+
 input BoardFiltersInput {
   id: IDFilterInput
   Title: StringFilterInput
   timeEstimated: IntFilterInput
-  status: StringFilterInput
   type: StringFilterInput
   description: StringFilterInput
   comentaries: ComentaryFiltersInput
@@ -598,6 +594,7 @@ input BoardFiltersInput {
   sprint: SprintFiltersInput
   responsible: UsersPermissionsUserFiltersInput
   author: UsersPermissionsUserFiltersInput
+  status: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -609,7 +606,6 @@ input BoardFiltersInput {
 input BoardInput {
   Title: String
   timeEstimated: Int
-  status: String
   type: ENUM_BOARD_TYPE
   description: String
   comentaries: [ID]
@@ -617,13 +613,13 @@ input BoardInput {
   sprint: ID
   responsible: ID
   author: ID
+  status: ENUM_BOARD_STATUS
   publishedAt: DateTime
 }
 
 type Board {
   Title: String!
   timeEstimated: Int!
-  status: String!
   type: ENUM_BOARD_TYPE!
   description: String
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryRelationResponseCollection
@@ -631,6 +627,7 @@ type Board {
   sprint: SprintEntityResponse
   responsible: UsersPermissionsUserEntityResponse
   author: UsersPermissionsUserEntityResponse
+  status: ENUM_BOARD_STATUS
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -748,52 +745,6 @@ type ComentaryRelationResponseCollection {
   data: [ComentaryEntity!]!
 }
 
-input CompanyFiltersInput {
-  id: IDFilterInput
-  name: StringFilterInput
-  users: UsersPermissionsUserFiltersInput
-  ownerUser: UsersPermissionsUserFiltersInput
-  projects: ProjectFiltersInput
-  createdAt: DateTimeFilterInput
-  updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
-  and: [CompanyFiltersInput]
-  or: [CompanyFiltersInput]
-  not: CompanyFiltersInput
-}
-
-input CompanyInput {
-  name: String
-  users: [ID]
-  ownerUser: ID
-  projects: [ID]
-  publishedAt: DateTime
-}
-
-type Company {
-  name: String!
-  users(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserRelationResponseCollection
-  ownerUser: UsersPermissionsUserEntityResponse
-  projects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectRelationResponseCollection
-  createdAt: DateTime
-  updatedAt: DateTime
-  publishedAt: DateTime
-}
-
-type CompanyEntity {
-  id: ID
-  attributes: Company
-}
-
-type CompanyEntityResponse {
-  data: CompanyEntity
-}
-
-type CompanyEntityResponseCollection {
-  data: [CompanyEntity!]!
-  meta: ResponseCollectionMeta!
-}
-
 input KnowledgeFiltersInput {
   id: IDFilterInput
   title: StringFilterInput
@@ -847,13 +798,10 @@ type KnowledgeRelationResponseCollection {
 input ProjectFiltersInput {
   id: IDFilterInput
   name: StringFilterInput
-  ownerUser: UsersPermissionsUserFiltersInput
-  users: UsersPermissionsUserFiltersInput
-  company: CompanyFiltersInput
   sprints: SprintFiltersInput
+  projectUserRoles: ProjectUserRoleFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
   and: [ProjectFiltersInput]
   or: [ProjectFiltersInput]
   not: ProjectFiltersInput
@@ -861,22 +809,16 @@ input ProjectFiltersInput {
 
 input ProjectInput {
   name: String
-  ownerUser: ID
-  users: [ID]
-  company: ID
   sprints: [ID]
-  publishedAt: DateTime
+  projectUserRoles: [ID]
 }
 
 type Project {
   name: String!
-  ownerUser: UsersPermissionsUserEntityResponse
-  users(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserRelationResponseCollection
-  company: CompanyEntityResponse
   sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): SprintRelationResponseCollection
+  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectUserRoleRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 type ProjectEntity {
@@ -893,8 +835,56 @@ type ProjectEntityResponseCollection {
   meta: ResponseCollectionMeta!
 }
 
-type ProjectRelationResponseCollection {
-  data: [ProjectEntity!]!
+enum ENUM_PROJECTUSERROLE_ROLE {
+  leader
+  member
+}
+
+input ProjectUserRoleFiltersInput {
+  id: IDFilterInput
+  role: StringFilterInput
+  user: UsersPermissionsUserFiltersInput
+  project: ProjectFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [ProjectUserRoleFiltersInput]
+  or: [ProjectUserRoleFiltersInput]
+  not: ProjectUserRoleFiltersInput
+}
+
+input ProjectUserRoleInput {
+  role: ENUM_PROJECTUSERROLE_ROLE
+  user: ID
+  project: ID
+  publishedAt: DateTime
+}
+
+type ProjectUserRole {
+  role: ENUM_PROJECTUSERROLE_ROLE
+  user: UsersPermissionsUserEntityResponse
+  project: ProjectEntityResponse
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type ProjectUserRoleEntity {
+  id: ID
+  attributes: ProjectUserRole
+}
+
+type ProjectUserRoleEntityResponse {
+  data: ProjectUserRoleEntity
+}
+
+type ProjectUserRoleEntityResponseCollection {
+  data: [ProjectUserRoleEntity!]!
+  meta: ResponseCollectionMeta!
+}
+
+type ProjectUserRoleRelationResponseCollection {
+  data: [ProjectUserRoleEntity!]!
 }
 
 input SprintFiltersInput {
@@ -950,7 +940,7 @@ type SprintRelationResponseCollection {
   data: [SprintEntity!]!
 }
 
-union GenericMorph = UploadFile | UploadFolder | I18NLocale | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Board | Category | Comentary | Company | Knowledge | Project | Sprint
+union GenericMorph = UploadFile | UploadFolder | I18NLocale | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Board | Category | Comentary | Knowledge | Project | ProjectUserRole | Sprint
 
 input FileInfoInput {
   name: String
@@ -1031,12 +1021,12 @@ type Query {
   categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): CategoryEntityResponseCollection
   comentary(id: ID): ComentaryEntityResponse
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryEntityResponseCollection
-  company(id: ID): CompanyEntityResponse
-  companies(filters: CompanyFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): CompanyEntityResponseCollection
   knowledge(id: ID): KnowledgeEntityResponse
   knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeEntityResponseCollection
   project(id: ID): ProjectEntityResponse
-  projects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectEntityResponseCollection
+  projects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectEntityResponseCollection
+  projectUserRole(id: ID): ProjectUserRoleEntityResponse
+  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectUserRoleEntityResponseCollection
   sprint(id: ID): SprintEntityResponse
   sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): SprintEntityResponseCollection
   me: UsersPermissionsMe
@@ -1058,15 +1048,15 @@ type Mutation {
   createComentary(data: ComentaryInput!): ComentaryEntityResponse
   updateComentary(id: ID!, data: ComentaryInput!): ComentaryEntityResponse
   deleteComentary(id: ID!): ComentaryEntityResponse
-  createCompany(data: CompanyInput!): CompanyEntityResponse
-  updateCompany(id: ID!, data: CompanyInput!): CompanyEntityResponse
-  deleteCompany(id: ID!): CompanyEntityResponse
   createKnowledge(data: KnowledgeInput!): KnowledgeEntityResponse
   updateKnowledge(id: ID!, data: KnowledgeInput!): KnowledgeEntityResponse
   deleteKnowledge(id: ID!): KnowledgeEntityResponse
   createProject(data: ProjectInput!): ProjectEntityResponse
   updateProject(id: ID!, data: ProjectInput!): ProjectEntityResponse
   deleteProject(id: ID!): ProjectEntityResponse
+  createProjectUserRole(data: ProjectUserRoleInput!): ProjectUserRoleEntityResponse
+  updateProjectUserRole(id: ID!, data: ProjectUserRoleInput!): ProjectUserRoleEntityResponse
+  deleteProjectUserRole(id: ID!): ProjectUserRoleEntityResponse
   createSprint(data: SprintInput!): SprintEntityResponse
   updateSprint(id: ID!, data: SprintInput!): SprintEntityResponse
   deleteSprint(id: ID!): SprintEntityResponse

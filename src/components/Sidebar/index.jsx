@@ -35,7 +35,7 @@ import { BsPeople } from 'react-icons/bs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-const Sidebar = () => {
+const Sidebar = ({ session }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = useRouter().pathname
 
@@ -55,13 +55,18 @@ const Sidebar = () => {
         {/* <img src={logoSVG} alt="logo" /> */}
       </SLogo>
       {linksArray.map(({ icon, label, notification, to }) => (
-        <SLinkContainer key={label} isActive={pathname === to}>
+        <SLinkContainer
+          key={label}
+          isActive={pathname === to}
+          session={session}
+          title={!session ? 'Você precisa estar logado' : ''}
+        >
           <Link
             href={to}
             passHref
             style={!sidebarOpen ? { width: `fit-content` } : {}}
           >
-            <SLink>
+            <SLink session={session}>
               <SLinkIcon>{icon}</SLinkIcon>
               {sidebarOpen && (
                 <>
@@ -78,13 +83,18 @@ const Sidebar = () => {
       ))}
       <SDivider />
       {secondaryLinksArray.map(({ icon, label, to }) => (
-        <SLinkContainer key={label} isActive={pathname === to}>
+        <SLinkContainer
+          key={label}
+          isActive={pathname === to}
+          session={session}
+          title={!session ? 'Você precisa estar logado' : ''}
+        >
           <Link
             href={to}
             passHref
             style={!sidebarOpen ? { width: `fit-content` } : {}}
           >
-            <SLink>
+            <SLink session={session}>
               <>
                 <SLinkIcon>{icon}</SLinkIcon>
                 {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}
@@ -95,13 +105,18 @@ const Sidebar = () => {
       ))}
       <SDivider />
       {terciaryLinksArray.map(({ icon, label, to }) => (
-        <SLinkContainer key={label} isActive={pathname === to}>
+        <SLinkContainer
+          key={label}
+          isActive={pathname === to}
+          session={session}
+          title={!session ? 'Você precisa estar logado' : ''}
+        >
           <Link
             href={to}
             passHref
             style={!sidebarOpen ? { width: `fit-content` } : {}}
           >
-            <SLink>
+            <SLink session={session}>
               <>
                 <SLinkIcon>{icon}</SLinkIcon>
                 {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}

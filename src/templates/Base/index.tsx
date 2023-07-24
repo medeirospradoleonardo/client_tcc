@@ -17,7 +17,7 @@ const Base = ({ children }: BaseTemplateProps) => {
       <Menu username={session?.user?.name} loading={loading} />
       <S.Content>
         <SLayout>
-          <Sidebar />
+          <Sidebar session={session} />
           <SMain>{children}</SMain>
         </SLayout>
       </S.Content>

@@ -86,7 +86,24 @@ export const SLinkContainer = styled.div`
   :hover {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.bg3};
   }
+
+  ${({ session, theme }) => css`
+    ${!session && wrapperModifiers.noSessionSLinkContainer(theme)}
+  `}
 `
+
+const wrapperModifiers = {
+  noSessionSLinkContainer: () => css`
+    cursor: not-allowed;
+  `,
+  noSessionSLink: (theme) => css`
+    color: ${theme.colors.gray};
+    pointer-events: none;
+    &::placeholder {
+      color: currentColor;
+    }
+  `
+}
 
 export const SLink = styled.a`
   display: flex;
@@ -95,6 +112,9 @@ export const SLink = styled.a`
   color: inherit;
   font-size: 16px;
   padding: calc(${v.smSpacing} - 2px) 0;
+  ${({ session, theme }) => css`
+    ${!session && wrapperModifiers.noSessionSLink(theme)}
+  `}
 `
 
 export const SLinkIcon = styled.div`
