@@ -1,12 +1,17 @@
+import {
+  QueryProjectUserRoles,
+  QueryProjectUserRolesVariables
+} from 'graphql/generated/QueryProjectUserRoles'
+import { QUERY_PROJECT_USER_ROLES } from 'graphql/queries/projectUserRole'
 import { GetServerSidePropsContext } from 'next'
 import React from 'react'
-import Panel from 'templates/Panel'
+import Panel, { PanelTemplateProps } from 'templates/Panel'
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
 
-export default function PanelPage() {
+export default function PanelPage(props: PanelTemplateProps) {
   return (
-    <Panel>
+    <Panel projectUserRoles={props?.projectUserRoles}>
       <h1>Painel</h1>
     </Panel>
   )
@@ -20,7 +25,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return { props: {} }
   }
 
+  const {
+    data: { projectUserRoles }
+  } = await apolloClient.query<
+    QueryProjectUserRoles,
+    QueryProjectUserRolesVariables
+  >({
+    query: QUERY_PROJECT_USER_ROLES,
+    variables: {
+      email: session?.user?.email as string
+    }
+  })
+
   return {
-    props: {}
+    props: { projectUserRoles: projectUserRoles.data }
   }
 }

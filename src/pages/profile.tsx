@@ -10,10 +10,15 @@ import {
   QueryProfileMeVariables
 } from 'graphql/generated/QueryProfileMe'
 import { QUERY_PROFILE_ME } from 'graphql/queries/profile'
+import {
+  QueryProjectUserRoles,
+  QueryProjectUserRolesVariables
+} from 'graphql/generated/QueryProjectUserRoles'
+import { QUERY_PROJECT_USER_ROLES } from 'graphql/queries/projectUserRole'
 
 export default function Me(props: FormProfileProps) {
   return (
-    <Profile>
+    <Profile projectUserRoles={props?.projectUserRoles}>
       <FormProfile {...props} />
     </Profile>
   )
@@ -37,11 +42,24 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
   })
 
+  const {
+    data: { projectUserRoles }
+  } = await apolloClient.query<
+    QueryProjectUserRoles,
+    QueryProjectUserRolesVariables
+  >({
+    query: QUERY_PROJECT_USER_ROLES,
+    variables: {
+      email: session?.user?.email as string
+    }
+  })
+
   return {
     props: {
       session,
       username: data.usersPermissionsUser?.data?.attributes?.username,
-      email: data.usersPermissionsUser?.data?.attributes?.email
+      email: data.usersPermissionsUser?.data?.attributes?.email,
+      projectUserRoles: projectUserRoles.data
     }
   }
 }

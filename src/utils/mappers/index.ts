@@ -5,6 +5,6 @@ export const projectsMapper = (
 ) => {
   return projectUserRoles.map((projectUserRole) => ({
     role: projectUserRole.attributes?.role,
-    name: projectUserRole.attributes?.project?.data?.attributes?.name
+    nameProject: projectUserRole.attributes?.project?.data?.attributes?.name
   }))
 }

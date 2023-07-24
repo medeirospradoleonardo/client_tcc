@@ -35,7 +35,7 @@ import { BsPeople } from 'react-icons/bs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-const Sidebar = ({ session }) => {
+const Sidebar = ({ session, projects }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = useRouter().pathname
 
@@ -54,7 +54,7 @@ const Sidebar = ({ session }) => {
         {/* <Logo color="black" /> */}
         {/* <img src={logoSVG} alt="logo" /> */}
       </SLogo>
-      {linksArray.map(({ icon, label, notification, to }) => (
+      {linksArray.map(({ icon, label, to }) => (
         <SLinkContainer
           key={label}
           isActive={pathname === to}
@@ -71,10 +71,6 @@ const Sidebar = ({ session }) => {
               {sidebarOpen && (
                 <>
                   <SLinkLabel>{label}</SLinkLabel>
-                  {/* if notifications are at 0 or null, do not display */}
-                  {!!notification && (
-                    <SLinkNotification>{notification}</SLinkNotification>
-                  )}
                 </>
               )}
             </SLink>
@@ -98,6 +94,9 @@ const Sidebar = ({ session }) => {
               <>
                 <SLinkIcon>{icon}</SLinkIcon>
                 {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}
+                {sidebarOpen && !!session && !!projects && (
+                  <SLinkNotification>{projects}</SLinkNotification>
+                )}
               </>
             </SLink>
           </Link>

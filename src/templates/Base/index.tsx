@@ -7,9 +7,13 @@ import { SLayout, SMain } from './styles'
 
 export type BaseTemplateProps = {
   children: React.ReactNode
+  projectsQuantity?: number
 }
 
-const Base = ({ children }: BaseTemplateProps) => {
+export default function Base({
+  children,
+  projectsQuantity
+}: BaseTemplateProps) {
   const [session, loading] = useSession()
 
   return (
@@ -17,12 +21,10 @@ const Base = ({ children }: BaseTemplateProps) => {
       <Menu username={session?.user?.name} loading={loading} />
       <S.Content>
         <SLayout>
-          <Sidebar session={session} />
+          <Sidebar session={session} projects={projectsQuantity} />
           <SMain>{children}</SMain>
         </SLayout>
       </S.Content>
     </S.Wrapper>
   )
 }
-
-export default Base

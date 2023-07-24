@@ -1,12 +1,19 @@
+import {
+  QueryProjectUserRoles,
+  QueryProjectUserRolesVariables
+} from 'graphql/generated/QueryProjectUserRoles'
+import { QUERY_PROJECT_USER_ROLES } from 'graphql/queries/projectUserRole'
 import { GetServerSidePropsContext } from 'next'
 import React from 'react'
-import ProductBacklog from 'templates/ProductBacklog'
+import ProductBacklog, {
+  ProductBacklogTemplateProps
+} from 'templates/ProductBacklog'
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
 
-export default function ProductBacklogPage() {
+export default function ProductBacklogPage(props: ProductBacklogTemplateProps) {
   return (
-    <ProductBacklog>
+    <ProductBacklog projectUserRoles={props?.projectUserRoles}>
       <h1>Backlog do produto</h1>
     </ProductBacklog>
   )
@@ -20,7 +27,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return { props: {} }
   }
 
+  const {
+    data: { projectUserRoles }
+  } = await apolloClient.query<
+    QueryProjectUserRoles,
+    QueryProjectUserRolesVariables
+  >({
+    query: QUERY_PROJECT_USER_ROLES,
+    variables: {
+      email: session?.user?.email as string
+    }
+  })
+
   return {
-    props: {}
+    props: { projectUserRoles: projectUserRoles.data }
   }
 }

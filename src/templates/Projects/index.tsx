@@ -5,7 +5,7 @@ import Base from 'templates/Base'
 
 export type ProjectUserRoleType = {
   role: string
-  name: string
+  nameProject: string
 }
 
 export type ProjectsTemplateProps = {
@@ -14,16 +14,18 @@ export type ProjectsTemplateProps = {
 
 const Projects = ({ projectUserRoles }: ProjectsTemplateProps) => {
   return (
-    <Base>
+    <Base projectsQuantity={projectUserRoles?.length}>
       <Container>
         <Heading lineLeft lineColor="secondary" color="black">
           Meus projetos
         </Heading>
 
-        <S.Main>
-          <S.Content>{projectUserRoles[0].name}</S.Content>
-          <S.Content>{projectUserRoles[1].name}</S.Content>
-        </S.Main>
+        {!!projectUserRoles && (
+          <S.Main>
+            <S.Content>{projectUserRoles[0].nameProject}</S.Content>
+            <S.Content>{projectUserRoles[1].nameProject}</S.Content>
+          </S.Main>
+        )}
       </Container>
     </Base>
   )

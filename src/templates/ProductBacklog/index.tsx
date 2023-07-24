@@ -2,14 +2,19 @@ import Heading from 'components/Heading'
 import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
+import { ProjectsTemplateProps } from 'templates/Projects'
 
 export type ProductBacklogTemplateProps = {
   children: React.ReactNode
+  projectUserRoles: ProjectsTemplateProps[]
 }
 
-const ProductBacklog = ({ children }: ProductBacklogTemplateProps) => {
+const ProductBacklog = ({
+  children,
+  projectUserRoles
+}: ProductBacklogTemplateProps) => {
   return (
-    <Base>
+    <Base projectsQuantity={projectUserRoles?.length}>
       <Container>
         <Heading lineLeft lineColor="secondary" color="black">
           Backlog do produto

@@ -1,27 +1,23 @@
-import { useRouter } from 'next/router'
-
 import Heading from 'components/Heading'
-import ProfileMenu from 'components/ProfileMenu'
 import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
+import { ProjectsTemplateProps } from 'templates/Projects'
 
 export type ProfileTemplateProps = {
   children: React.ReactNode
+  projectUserRoles: ProjectsTemplateProps[]
 }
 
-const Profile = ({ children }: ProfileTemplateProps) => {
-  const { asPath } = useRouter()
-
+const Profile = ({ children, projectUserRoles }: ProfileTemplateProps) => {
   return (
-    <Base>
+    <Base projectsQuantity={projectUserRoles?.length}>
       <Container>
         <Heading lineLeft lineColor="secondary" color="black">
           Meu Perfil
         </Heading>
 
         <S.Main>
-          {/* <ProfileMenu activeLink={asPath} /> */}
           <S.Content>{children}</S.Content>
         </S.Main>
       </Container>

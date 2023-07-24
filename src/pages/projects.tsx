@@ -12,7 +12,7 @@ import protectedRoutes from 'utils/protected-routes'
 import { projectsMapper } from 'utils/mappers'
 
 export default function MyProjects(props: ProjectsTemplateProps) {
-  return <Projects projectUserRoles={props.projectUserRoles} />
+  return <Projects projectUserRoles={props?.projectUserRoles} />
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
