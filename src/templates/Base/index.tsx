@@ -4,15 +4,18 @@ import * as S from './styles'
 
 import Sidebar from 'components/Sidebar'
 import { SLayout, SMain } from './styles'
+import { Project } from 'templates/Projects'
 
 export type BaseTemplateProps = {
   children: React.ReactNode
   projectsQuantity?: number
+  activeProject: Project
 }
 
 export default function Base({
   children,
-  projectsQuantity
+  projectsQuantity,
+  activeProject
 }: BaseTemplateProps) {
   const [session, loading] = useSession()
 
@@ -21,7 +24,11 @@ export default function Base({
       <Menu username={session?.user?.name} loading={loading} />
       <S.Content>
         <SLayout>
-          <Sidebar session={session} projects={projectsQuantity} />
+          <Sidebar
+            session={session}
+            projectsQuantity={projectsQuantity}
+            activeProject={activeProject}
+          />
           <SMain>{children}</SMain>
         </SLayout>
       </S.Content>

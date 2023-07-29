@@ -1,18 +1,31 @@
 import { GetServerSidePropsContext } from 'next'
 
-import {
-  QueryProjectUserRoles,
-  QueryProjectUserRolesVariables
-} from 'graphql/generated/QueryProjectUserRoles'
-import { QUERY_PROJECT_USER_ROLES } from 'graphql/queries/projectUserRole'
+import { QUERY_PROJECT_USER_ROLES_FULL } from 'graphql/queries/projectUserRole'
 import React from 'react'
 import Projects, { ProjectsTemplateProps } from 'templates/Projects'
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
+
+import {
+  QueryProjectUserRolesFull,
+  QueryProjectUserRolesFullVariables
+} from 'graphql/generated/QueryProjectUserRolesFull'
 import { projectsMapper } from 'utils/mappers'
+import {
+  QueryProfileMe,
+  QueryProfileMeVariables
+} from 'graphql/generated/QueryProfileMe'
+import { QUERY_PROFILE_ME } from 'graphql/queries/profile'
 
 export default function MyProjects(props: ProjectsTemplateProps) {
-  return <Projects projectUserRoles={props?.projectUserRoles} />
+  return (
+    <Projects
+      projectUserRoles={props?.projectUserRoles}
+      user={props.user}
+      session={props.session}
+      activeProject={props.activeProject}
+    />
+  )
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -23,19 +36,41 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return { props: {} }
   }
 
+  const {
+    data: { usersPermissionsUser }
+  } = await apolloClient.query<QueryProfileMe, QueryProfileMeVariables>({
+    query: QUERY_PROFILE_ME,
+    variables: {
+      identifier: session?.id as string
+    },
+    fetchPolicy: 'no-cache'
+  })
+
   const { data } = await apolloClient.query<
-    QueryProjectUserRoles,
-    QueryProjectUserRolesVariables
+    QueryProjectUserRolesFull,
+    QueryProjectUserRolesFullVariables
   >({
-    query: QUERY_PROJECT_USER_ROLES,
+    query: QUERY_PROJECT_USER_ROLES_FULL,
     variables: {
       email: session?.user?.email as string
-    }
+    },
+    fetchPolicy: 'no-cache'
   })
 
   return {
     props: {
-      projectUserRoles: projectsMapper(data.projectUserRoles.data)
+      session,
+      projectUserRoles: projectsMapper(data.projectUserRoles.data),
+      user: {
+        id: usersPermissionsUser?.data?.id,
+        activeProjectId:
+          usersPermissionsUser?.data?.attributes?.activeProject?.data?.id
+      },
+      activeProject: {
+        id: usersPermissionsUser.data?.attributes?.activeProject?.data?.id,
+        name: usersPermissionsUser.data?.attributes?.activeProject?.data
+          ?.attributes?.name
+      }
     }
   }
 }

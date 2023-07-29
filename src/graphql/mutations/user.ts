@@ -1,13 +1,13 @@
 import { gql } from '@apollo/client'
 
-export const QUERY_PROFILE_ME = gql`
-  query QueryProfileMe($identifier: ID!) {
-    usersPermissionsUser(id: $identifier) {
+export const MUTATION_ACTIVE_PROJECT = gql`
+  mutation MutationActiveProject($idProject: ID!, $idUser: ID!) {
+    updateUsersPermissionsUser(
+      id: $idUser
+      data: { activeProject: $idProject }
+    ) {
       data {
-        id
         attributes {
-          email
-          username
           activeProject {
             data {
               id

@@ -1,15 +1,41 @@
 import { gql } from '@apollo/client'
 
-export const QUERY_PROJECT_USER_ROLES = gql`
-  query QueryProjectUserRoles($email: String!) {
+export const QUERY_PROJECT_USER_ROLES_LIGHT = gql`
+  query QueryProjectUserRolesLight($email: String!) {
     projectUserRoles(filters: { user: { email: { eq: $email } } }) {
       data {
+        id
+      }
+    }
+  }
+`
+
+export const QUERY_PROJECT_USER_ROLES_FULL = gql`
+  query QueryProjectUserRolesFull($email: String!) {
+    projectUserRoles(filters: { user: { email: { eq: $email } } }) {
+      data {
+        id
         attributes {
           role
           project {
             data {
+              id
               attributes {
                 name
+                projectUserRoles {
+                  data {
+                    attributes {
+                      user {
+                        data {
+                          id
+                          attributes {
+                            username
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }

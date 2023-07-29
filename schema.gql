@@ -509,6 +509,7 @@ input UsersPermissionsUserFiltersInput {
   responsibleboards: BoardFiltersInput
   knowledges: KnowledgeFiltersInput
   projectUserRoles: ProjectUserRoleFiltersInput
+  activeProject: ProjectFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [UsersPermissionsUserFiltersInput]
@@ -533,6 +534,7 @@ input UsersPermissionsUserInput {
   responsibleboards: [ID]
   knowledges: [ID]
   projectUserRoles: [ID]
+  activeProject: ID
 }
 
 type UsersPermissionsUser {
@@ -543,12 +545,13 @@ type UsersPermissionsUser {
   blocked: Boolean
   role: UsersPermissionsRoleEntityResponse
   profilePhoto: UploadFileEntityResponse
-  type: ENUM_USERSPERMISSIONSUSER_TYPE
+  type: ENUM_USERSPERMISSIONSUSER_TYPE!
   ownerBoards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryRelationResponseCollection
   responsibleboards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
   knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeRelationResponseCollection
-  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectUserRoleRelationResponseCollection
+  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleRelationResponseCollection
+  activeProject: ProjectEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -816,7 +819,7 @@ input ProjectInput {
 type Project {
   name: String!
   sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): SprintRelationResponseCollection
-  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectUserRoleRelationResponseCollection
+  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -836,7 +839,8 @@ type ProjectEntityResponseCollection {
 }
 
 enum ENUM_PROJECTUSERROLE_ROLE {
-  leader
+  scrumMaster
+  productOwner
   member
 }
 
@@ -847,7 +851,6 @@ input ProjectUserRoleFiltersInput {
   project: ProjectFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
   and: [ProjectUserRoleFiltersInput]
   or: [ProjectUserRoleFiltersInput]
   not: ProjectUserRoleFiltersInput
@@ -857,7 +860,6 @@ input ProjectUserRoleInput {
   role: ENUM_PROJECTUSERROLE_ROLE
   user: ID
   project: ID
-  publishedAt: DateTime
 }
 
 type ProjectUserRole {
@@ -866,7 +868,6 @@ type ProjectUserRole {
   project: ProjectEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 type ProjectUserRoleEntity {
@@ -1026,7 +1027,7 @@ type Query {
   project(id: ID): ProjectEntityResponse
   projects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectEntityResponseCollection
   projectUserRole(id: ID): ProjectUserRoleEntityResponse
-  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ProjectUserRoleEntityResponseCollection
+  projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleEntityResponseCollection
   sprint(id: ID): SprintEntityResponse
   sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): SprintEntityResponseCollection
   me: UsersPermissionsMe

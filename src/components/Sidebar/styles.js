@@ -29,16 +29,28 @@ export const SSidebarButton = styled.button`
   transform: ${({ isOpen }) => (!isOpen ? `rotate(180deg)` : `initial`)};
 `
 
-export const SLogo = styled.div`
-  width: 52px;
+export const SProjectTitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  font-size: 16px;
+  padding: calc(${v.smSpacing} - 2px) 0;
+`
 
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-  cursor: pointer;
+export const SProjectTitle = styled.h1`
+  /* width: 52px; */
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+`
 
-  margin-bottom: ${v.lgSpacing};
+export const SProjectHelp = styled.h1`
+  /* width: 52px; */
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  color: #2e2f42;
 `
 
 export const SSearch = styled.div`

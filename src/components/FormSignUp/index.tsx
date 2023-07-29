@@ -88,7 +88,7 @@ const FormSignUp = () => {
       <form onSubmit={handleSubmit}>
         <TextField
           name="username"
-          placeholder="Username"
+          placeholder="Nome"
           type="text"
           error={fieldError?.username}
           onInputChange={(v) => handleInput('username', v)}

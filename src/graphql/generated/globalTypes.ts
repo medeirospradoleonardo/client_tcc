@@ -8,8 +8,9 @@
 //==============================================================
 
 export enum ENUM_PROJECTUSERROLE_ROLE {
-  leader = "leader",
   member = "member",
+  productOwner = "productOwner",
+  scrumMaster = "scrumMaster",
 }
 
 export interface UsersPermissionsRegisterInput {

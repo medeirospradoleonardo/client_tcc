@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next'
 
-import Profile from 'templates/Profile'
+import Profile, { ProfileTemplateProps } from 'templates/Profile'
 import FormProfile, { FormProfileProps } from 'components/FormProfile'
 
 import protectedRoutes from 'utils/protected-routes'
@@ -10,16 +10,24 @@ import {
   QueryProfileMeVariables
 } from 'graphql/generated/QueryProfileMe'
 import { QUERY_PROFILE_ME } from 'graphql/queries/profile'
-import {
-  QueryProjectUserRoles,
-  QueryProjectUserRolesVariables
-} from 'graphql/generated/QueryProjectUserRoles'
-import { QUERY_PROJECT_USER_ROLES } from 'graphql/queries/projectUserRole'
 
-export default function Me(props: FormProfileProps) {
+import { QUERY_PROJECT_USER_ROLES_LIGHT } from 'graphql/queries/projectUserRole'
+import {
+  QueryProjectUserRolesLight,
+  QueryProjectUserRolesLightVariables
+} from 'graphql/generated/QueryProjectUserRolesLight'
+
+export default function Me(
+  props: FormProfileProps &
+    Pick<ProfileTemplateProps, 'projectUserRoles'> &
+    Pick<ProfileTemplateProps, 'activeProject'>
+) {
   return (
-    <Profile projectUserRoles={props?.projectUserRoles}>
-      <FormProfile {...props} />
+    <Profile
+      projectUserRoles={props?.projectUserRoles}
+      activeProject={props.activeProject}
+    >
+      <FormProfile email={props.email} username={props.username} />
     </Profile>
   )
 }
@@ -45,13 +53,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const {
     data: { projectUserRoles }
   } = await apolloClient.query<
-    QueryProjectUserRoles,
-    QueryProjectUserRolesVariables
+    QueryProjectUserRolesLight,
+    QueryProjectUserRolesLightVariables
   >({
-    query: QUERY_PROJECT_USER_ROLES,
+    query: QUERY_PROJECT_USER_ROLES_LIGHT,
     variables: {
       email: session?.user?.email as string
-    }
+    },
+    fetchPolicy: 'no-cache'
   })
 
   return {
@@ -59,7 +68,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       session,
       username: data.usersPermissionsUser?.data?.attributes?.username,
       email: data.usersPermissionsUser?.data?.attributes?.email,
-      projectUserRoles: projectUserRoles.data
+      projectUserRoles: projectUserRoles.data,
+      activeProject: {
+        id: data.usersPermissionsUser.data?.attributes?.activeProject?.data?.id,
+        name: data.usersPermissionsUser.data?.attributes?.activeProject?.data
+          ?.attributes?.name
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import {
   SDivider,
   SLink,
@@ -6,7 +6,9 @@ import {
   SLinkIcon,
   SLinkLabel,
   SLinkNotification,
-  SLogo,
+  SProjectTitle,
+  SProjectHelp,
+  SProjectTitleContainer,
   SSidebar,
   SSidebarButton,
   STheme,
@@ -20,22 +22,20 @@ import Logo from 'components/Logo'
 import Button from 'components/Button'
 
 import {
-  AiOutlineApartment,
+  AiOutlineCodepen,
   AiOutlineHome,
   AiOutlineLeft,
   AiOutlineSetting,
   AiOutlineUser,
-  AiOutlineCalendar,
   AiOutlineDatabase,
   AiOutlineGroup,
   AiOutlineBulb
 } from 'react-icons/ai'
-import { MdLogout, MdOutlineAnalytics } from 'react-icons/md'
-import { BsPeople } from 'react-icons/bs'
+import { MdOutlineAnalytics } from 'react-icons/md'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-const Sidebar = ({ session, projects }) => {
+const Sidebar = ({ session, projectsQuantity, activeProject }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = useRouter().pathname
 
@@ -49,11 +49,27 @@ const Sidebar = ({ session, projects }) => {
           <AiOutlineLeft />
         </SSidebarButton>
       </>
-      {/* <SDivider /> */}
-      <SLogo>
-        {/* <Logo color="black" /> */}
-        {/* <img src={logoSVG} alt="logo" /> */}
-      </SLogo>
+
+      <>
+        <SProjectTitleContainer>
+          <SLinkIcon>
+            <AiOutlineCodepen />
+          </SLinkIcon>
+          {sidebarOpen && (
+            <div>
+              {activeProject != null ? (
+                <SProjectTitle>{activeProject.name}</SProjectTitle>
+              ) : (
+                <>
+                  <SProjectTitle>Selecione um projeto</SProjectTitle>
+                  <SProjectHelp>Vá em &quot;Meus Projetos&quot;</SProjectHelp>
+                </>
+              )}
+            </div>
+          )}
+        </SProjectTitleContainer>
+        <SDivider />
+      </>
       {linksArray.map(({ icon, label, to }) => (
         <SLinkContainer
           key={label}
@@ -94,8 +110,8 @@ const Sidebar = ({ session, projects }) => {
               <>
                 <SLinkIcon>{icon}</SLinkIcon>
                 {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}
-                {sidebarOpen && !!session && !!projects && (
-                  <SLinkNotification>{projects}</SLinkNotification>
+                {sidebarOpen && !!session && !!projectsQuantity && (
+                  <SLinkNotification>{projectsQuantity}</SLinkNotification>
                 )}
               </>
             </SLink>

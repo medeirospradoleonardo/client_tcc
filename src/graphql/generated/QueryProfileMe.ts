@@ -7,10 +7,27 @@
 // GraphQL query operation: QueryProfileMe
 // ====================================================
 
+export interface QueryProfileMe_usersPermissionsUser_data_attributes_activeProject_data_attributes {
+  __typename: "Project";
+  name: string;
+}
+
+export interface QueryProfileMe_usersPermissionsUser_data_attributes_activeProject_data {
+  __typename: "ProjectEntity";
+  id: string | null;
+  attributes: QueryProfileMe_usersPermissionsUser_data_attributes_activeProject_data_attributes | null;
+}
+
+export interface QueryProfileMe_usersPermissionsUser_data_attributes_activeProject {
+  __typename: "ProjectEntityResponse";
+  data: QueryProfileMe_usersPermissionsUser_data_attributes_activeProject_data | null;
+}
+
 export interface QueryProfileMe_usersPermissionsUser_data_attributes {
   __typename: "UsersPermissionsUser";
   email: string;
   username: string;
+  activeProject: QueryProfileMe_usersPermissionsUser_data_attributes_activeProject | null;
 }
 
 export interface QueryProfileMe_usersPermissionsUser_data {
@@ -25,7 +42,7 @@ export interface QueryProfileMe_usersPermissionsUser {
 }
 
 export interface QueryProfileMe {
-  usersPermissionsUser: QueryProfileMe_usersPermissionsUser | null;
+  usersPermissionsUser: QueryProfileMe_usersPermissionsUser;
 }
 
 export interface QueryProfileMeVariables {

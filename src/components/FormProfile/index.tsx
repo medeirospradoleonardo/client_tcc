@@ -4,12 +4,10 @@ import TextField from 'components/TextField'
 import Link from 'next/link'
 
 import * as S from './styles'
-import { ProjectsTemplateProps } from 'templates/Projects'
 
 export type FormProfileProps = {
   username?: string
   email?: string
-  projectUserRoles: ProjectsTemplateProps[]
 }
 
 const FormProfile = ({ email, username }: FormProfileProps) => (
@@ -21,8 +19,8 @@ const FormProfile = ({ email, username }: FormProfileProps) => (
     <S.Form>
       <TextField
         name="username"
-        placeholder="Username"
-        label="Username"
+        placeholder="Nome"
+        label="Nome"
         initialValue={username}
       />
 

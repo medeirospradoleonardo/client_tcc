@@ -2,16 +2,24 @@ import Heading from 'components/Heading'
 import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
-import { ProjectsTemplateProps } from 'templates/Projects'
+import { Project, ProjectsTemplateProps } from 'templates/Projects'
 
 export type ProfileTemplateProps = {
   children: React.ReactNode
-  projectUserRoles: ProjectsTemplateProps[]
+  projectUserRoles?: ProjectsTemplateProps[] | undefined
+  activeProject: Project
 }
 
-const Profile = ({ children, projectUserRoles }: ProfileTemplateProps) => {
+const Profile = ({
+  children,
+  projectUserRoles,
+  activeProject
+}: ProfileTemplateProps) => {
   return (
-    <Base projectsQuantity={projectUserRoles?.length}>
+    <Base
+      projectsQuantity={projectUserRoles?.length}
+      activeProject={activeProject}
+    >
       <Container>
         <Heading lineLeft lineColor="secondary" color="black">
           Meu Perfil
