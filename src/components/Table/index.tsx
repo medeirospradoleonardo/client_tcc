@@ -8,14 +8,16 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import { StyledTableCell } from './styles'
-import { Icon, TableFooter, TablePagination } from '@mui/material'
+import { Dialog, Icon, TableFooter, TablePagination } from '@mui/material'
 import TablePaginationActions from './TablePagination'
 import Button from 'components/Button'
+import SelectChips from 'components/SelectChips'
+
 import AddIcon from '@mui/icons-material/Add'
 
 import { AiOutlineCheck } from 'react-icons/ai'
 import { ProjectUserRoleType } from 'templates/Projects'
-import { projectsToTableMapper } from 'utils/mappers'
+import { projectsToTableMapper, usersToSelectMapper } from 'utils/mappers'
 import { Session } from 'next-auth'
 import { initializeApollo } from 'utils/apollo'
 import {
@@ -28,6 +30,10 @@ import {
   MutationActiveProjectVariables
 } from 'graphql/generated/MutationActiveProject'
 import { MUTATION_ACTIVE_PROJECT } from 'graphql/mutations/user'
+import FormProject, { FormProjectProps } from 'components/FormProject'
+
+import { QueryAllUsers } from 'graphql/generated/QueryAllUsers'
+import { QUERY_ALL_USERS } from 'graphql/queries/user'
 
 type User = {
   id: string
@@ -35,7 +41,7 @@ type User = {
 }
 
 type Project = {
-  id: string | null | undefined
+  id: string
   name: string | undefined
 }
 
@@ -60,10 +66,27 @@ export default function CustomizedTables({
   const [activeProjectId, setActiveProjectId] = React.useState(
     user.activeProjectId
   )
+  const [openModal, setOpenModal] = React.useState(false)
+
+  const modalProjectPropsDefault = {
+    nameProject: '',
+    closeModal: () => setOpenModal(false),
+    usersOptions: [{ label: '', value: '' }]
+  }
+
+  const [propsModalProject, setPropsModalProject] =
+    React.useState<FormProjectProps>(modalProjectPropsDefault)
+
   const apolloClient = initializeApollo(null, session)
+
+  const [usersOptions, setUsersOptions] = React.useState([])
 
   const editProject = (id: string) => {
     // router.push('/projects')
+    const propsModalProjectNew = propsModalProject
+    propsModalProjectNew.nameProject = 'Vale Ouro'
+    setPropsModalProject(propsModalProjectNew)
+    setOpenModal(true)
     setPage(0)
   }
 
@@ -106,7 +129,10 @@ export default function CustomizedTables({
       setActiveProjectId(id)
       setActiveProjectSideBar({
         id: data?.updateUsersPermissionsUser.data?.attributes?.activeProject
-          ?.data?.id,
+          ?.data?.id
+          ? data?.updateUsersPermissionsUser.data?.attributes?.activeProject
+              ?.data?.id
+          : '',
         name: data?.updateUsersPermissionsUser.data?.attributes?.activeProject
           ?.data?.attributes?.name
       })
@@ -114,9 +140,23 @@ export default function CustomizedTables({
     }
   }
 
-  const createProject = () => {
+  const createProject = async () => {
     // router.push('/projects')
-    setPage(0)
+    const { data, errors } = await apolloClient.query<QueryAllUsers>({
+      query: QUERY_ALL_USERS,
+      fetchPolicy: 'no-cache'
+    })
+
+    if (!errors) {
+      const propsModalProjectNew = modalProjectPropsDefault
+      propsModalProjectNew.usersOptions = usersToSelectMapper(
+        data.usersPermissionsUsers?.data
+      )
+
+      setPropsModalProject(propsModalProjectNew)
+      setOpenModal(true)
+      setPage(0)
+    }
   }
 
   const tableData = projectsToTableMapper(
@@ -144,8 +184,44 @@ export default function CustomizedTables({
     setPage(0)
   }
 
+  const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)'
+    },
+    overlay: {
+      // background: '#F2F2F2'
+    }
+  }
+
+  const handleClose = (event: React.MouseEventHandler, reason: string) => {
+    if (reason && reason == 'backdropClick') return
+    setOpenModal(false)
+  }
+
   return (
     <>
+      {/* <Modal
+        isOpen={openModal}
+        // onAfterOpen={afterOpenModal}
+        // onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <FormProject />
+      </Modal> */}
+      <Dialog
+        open={openModal}
+        fullWidth={true}
+        maxWidth="xs"
+        onClose={handleClose}
+      >
+        <FormProject {...propsModalProject} />
+      </Dialog>
       <Button
         size="small"
         icon={<AddIcon />}

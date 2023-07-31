@@ -12,7 +12,7 @@ type User = {
 }
 
 export type Project = {
-  id: string | null | undefined
+  id: string
   name: string | undefined
 }
 

@@ -9,7 +9,7 @@ import {
   QueryProfileMe,
   QueryProfileMeVariables
 } from 'graphql/generated/QueryProfileMe'
-import { QUERY_PROFILE_ME } from 'graphql/queries/profile'
+import { QUERY_PROFILE_ME } from 'graphql/queries/user'
 
 import { QUERY_PROJECT_USER_ROLES_LIGHT } from 'graphql/queries/projectUserRole'
 import {

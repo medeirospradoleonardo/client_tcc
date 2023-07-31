@@ -4,6 +4,7 @@ import { IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import CheckIcon from '@mui/icons-material/Check'
+import { QueryAllUsers_usersPermissionsUsers_data } from 'graphql/generated/QueryAllUsers'
 
 export const projectsMapper = (
   projectUserRoles: QueryProjectUserRolesFull_projectUserRoles_data[]
@@ -99,5 +100,14 @@ export const projectsToTableMapper = (
         />
       </IconButton>
     ]
+  }))
+}
+
+export const usersToSelectMapper = (
+  users: QueryAllUsers_usersPermissionsUsers_data[]
+) => {
+  return users.map((user) => ({
+    label: `${user.attributes?.username}`,
+    value: `${user.id}`
   }))
 }

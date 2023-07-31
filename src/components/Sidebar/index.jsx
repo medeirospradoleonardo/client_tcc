@@ -58,7 +58,9 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           {sidebarOpen && (
             <div>
               {activeProject != null ? (
-                <SProjectTitle>{activeProject.name}</SProjectTitle>
+                <>
+                  <SProjectTitle>{activeProject.name}</SProjectTitle>
+                </>
               ) : (
                 <>
                   <SProjectTitle>Selecione um projeto</SProjectTitle>

@@ -15,7 +15,7 @@ import {
   QueryProfileMe,
   QueryProfileMeVariables
 } from 'graphql/generated/QueryProfileMe'
-import { QUERY_PROFILE_ME } from 'graphql/queries/profile'
+import { QUERY_PROFILE_ME } from 'graphql/queries/user'
 
 export default function MyProjects(props: ProjectsTemplateProps) {
   return (

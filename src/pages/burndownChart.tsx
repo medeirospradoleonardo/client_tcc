@@ -6,7 +6,7 @@ import {
   QueryProjectUserRolesLight,
   QueryProjectUserRolesLightVariables
 } from 'graphql/generated/QueryProjectUserRolesLight'
-import { QUERY_PROFILE_ME } from 'graphql/queries/profile'
+import { QUERY_PROFILE_ME } from 'graphql/queries/user'
 import { QUERY_PROJECT_USER_ROLES_LIGHT } from 'graphql/queries/projectUserRole'
 import { GetServerSidePropsContext } from 'next'
 import React from 'react'

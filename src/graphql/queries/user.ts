@@ -21,3 +21,16 @@ export const QUERY_PROFILE_ME = gql`
     }
   }
 `
+
+export const QUERY_ALL_USERS = gql`
+  query QueryAllUsers {
+    usersPermissionsUsers(filters: { type: { eqi: "default" } }) {
+      data {
+        id
+        attributes {
+          username
+        }
+      }
+    }
+  }
+`
