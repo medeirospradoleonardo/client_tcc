@@ -24,5 +24,5 @@ export interface QueryAllUsers_usersPermissionsUsers {
 }
 
 export interface QueryAllUsers {
-  usersPermissionsUsers: QueryAllUsers_usersPermissionsUsers;
+  usersPermissionsUsers: QueryAllUsers_usersPermissionsUsers | null;
 }

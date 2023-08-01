@@ -1,4 +1,14 @@
-import { gql } from '@apollo/client'
+import {
+  MutationHookOptions,
+  QueryHookOptions,
+  gql,
+  useMutation
+} from '@apollo/client'
+import {
+  MutationActiveProject,
+  MutationActiveProjectVariables
+} from 'graphql/generated/MutationActiveProject'
+import { Project } from 'templates/Projects'
 
 export const MUTATION_ACTIVE_PROJECT = gql`
   mutation MutationActiveProject($idProject: ID!, $idUser: ID!) {

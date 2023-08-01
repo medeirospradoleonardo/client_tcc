@@ -1,7 +1,7 @@
 import { UsersPermissionsRegisterInput } from 'graphql/generated/globalTypes'
 import Joi from 'joi'
 
-const fieldsValidations = {
+const fieldsValidationsSignUp = {
   username: Joi.string().min(5).required(),
   email: Joi.string()
     .email({ tlds: { allow: false } })
@@ -30,7 +30,7 @@ function getFieldErrors(objError: Joi.ValidationResult) {
 }
 
 export function signUpValidate(values: UsersPermissionsRegisterInput) {
-  const schema = Joi.object(fieldsValidations)
+  const schema = Joi.object(fieldsValidationsSignUp)
 
   return getFieldErrors(schema.validate(values, { abortEarly: false }))
 }
@@ -38,7 +38,7 @@ export function signUpValidate(values: UsersPermissionsRegisterInput) {
 type SignInValues = Omit<UsersPermissionsRegisterInput, 'username'>
 
 export function signInValidate(values: SignInValues) {
-  const { email, password } = fieldsValidations
+  const { email, password } = fieldsValidationsSignUp
   const schema = Joi.object({ email, password })
 
   return getFieldErrors(schema.validate(values, { abortEarly: false }))
@@ -47,7 +47,7 @@ export function signInValidate(values: SignInValues) {
 type ForgotValidateParamas = Pick<UsersPermissionsRegisterInput, 'email'>
 
 export function forgotValidate(values: ForgotValidateParamas) {
-  const { email } = fieldsValidations
+  const { email } = fieldsValidationsSignUp
 
   const schema = Joi.object({ email })
 
@@ -60,9 +60,21 @@ type ResetValidateParams = {
 }
 
 export function resetValidate(values: ResetValidateParams) {
-  const { password, confirm_password } = fieldsValidations
+  const { password, confirm_password } = fieldsValidationsSignUp
 
   const schema = Joi.object({ password, confirm_password })
 
   return getFieldErrors(schema.validate(values, { abortEarly: false }))
+}
+
+const fieldsValidationsProject = {
+  name: Joi.string().required().messages({
+    'string.empty': `O campo nome do projeto não pode ficar vazio`
+  })
+}
+
+export function createProjectValidate(name: string) {
+  const schema = Joi.object(fieldsValidationsProject)
+
+  return getFieldErrors(schema.validate({ name }, { abortEarly: false }))
 }

@@ -9,3 +9,16 @@ export const MUTATION_DELETE_PROJECT_USER_ROLE = gql`
     }
   }
 `
+
+export const MUTATION_CREATE_PROJECT_USER_ROLE = gql`
+  mutation MutationCreateProjectUserRoles(
+    $role: ENUM_PROJECTUSERROLE_ROLE!
+    $userId: ID!
+  ) {
+    createProjectUserRole(data: { role: $role, user: $userId }) {
+      data {
+        id
+      }
+    }
+  }
+`

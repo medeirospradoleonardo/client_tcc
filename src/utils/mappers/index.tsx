@@ -53,7 +53,7 @@ export const projectsToTableMapper = (
         key={`edit${projectUserRole.id}`}
         size="small"
         disabled={projectUserRole.role == 'member' ? true : false}
-        onClick={() => editFunction(projectUserRole.id)}
+        onClick={() => editFunction(projectUserRole.project.id)}
       >
         <EditIcon
           style={

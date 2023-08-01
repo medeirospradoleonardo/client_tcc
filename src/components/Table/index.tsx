@@ -19,7 +19,7 @@ import { AiOutlineCheck } from 'react-icons/ai'
 import { ProjectUserRoleType } from 'templates/Projects'
 import { projectsToTableMapper, usersToSelectMapper } from 'utils/mappers'
 import { Session } from 'next-auth'
-import { initializeApollo } from 'utils/apollo'
+
 import {
   MutationDeleteProjectUserRole,
   MutationDeleteProjectUserRoleVariables
@@ -35,7 +35,14 @@ import FormProject, { FormProjectProps } from 'components/FormProject'
 import { QueryAllUsers } from 'graphql/generated/QueryAllUsers'
 import { QUERY_ALL_USERS } from 'graphql/queries/user'
 
-type User = {
+import { useLazyQuery, useMutation } from '@apollo/client'
+import {
+  QueryProject,
+  QueryProjectVariables
+} from 'graphql/generated/QueryProject'
+import { QUERY_PROJECT } from 'graphql/queries/project'
+
+export type User = {
   id: string
   activeProjectId: string
 }
@@ -71,39 +78,122 @@ export default function CustomizedTables({
   const modalProjectPropsDefault = {
     nameProject: '',
     closeModal: () => setOpenModal(false),
-    usersOptions: [{ label: '', value: '' }]
+    usersOptions: [{ label: '', value: '' }],
+    user: user,
+    session: session,
+    scrumMastersReceived: [],
+    productOwnersReceived: [],
+    membersReceived: []
   }
 
   const [propsModalProject, setPropsModalProject] =
     React.useState<FormProjectProps>(modalProjectPropsDefault)
 
-  const apolloClient = initializeApollo(null, session)
-
   const [usersOptions, setUsersOptions] = React.useState([])
 
-  const editProject = (id: string) => {
-    // router.push('/projects')
-    const propsModalProjectNew = propsModalProject
-    propsModalProjectNew.nameProject = 'Vale Ouro'
-    setPropsModalProject(propsModalProjectNew)
+  const [getAllUsers, { data: QueryAllUsers }] = useLazyQuery<QueryAllUsers>(
+    QUERY_ALL_USERS,
+    {
+      context: { session },
+      onCompleted: () => {
+        const propsModalProjectNew = modalProjectPropsDefault
+        propsModalProjectNew.usersOptions = usersToSelectMapper(
+          QueryAllUsers?.usersPermissionsUsers?.data || []
+        )
+        setPropsModalProject(propsModalProjectNew)
+      }
+    }
+  )
+
+  const createProject = async () => {
+    await getAllUsers({
+      variables: {},
+      fetchPolicy: 'no-cache'
+    })
     setOpenModal(true)
     setPage(0)
   }
 
-  const removeProject = async (id: string) => {
-    const { errors } = await apolloClient.mutate<
-      MutationDeleteProjectUserRole,
-      MutationDeleteProjectUserRoleVariables
-    >({
-      mutation: MUTATION_DELETE_PROJECT_USER_ROLE,
+  const [getProject, { data: QueryProject }] = useLazyQuery<
+    QueryProject,
+    QueryProjectVariables
+  >(
+    QUERY_PROJECT,
+
+    {
+      context: { session },
+      onCompleted: () => {
+        const propsModalProjectNew = propsModalProject
+        propsModalProjectNew.nameProject =
+          QueryProject?.project?.data?.attributes?.name
+        console.log(QueryProject?.project?.data?.attributes?.name)
+        propsModalProjectNew.option = 'edit'
+
+        QueryProject?.project?.data?.attributes?.projectUserRoles?.data.map(
+          (p) => {
+            switch (p.attributes?.role) {
+              case 'scrumMaster': {
+                propsModalProjectNew.scrumMastersReceived =
+                  propsModalProjectNew.scrumMastersReceived.concat([
+                    {
+                      label: `${p.attributes.user?.data?.attributes?.username}`,
+                      value: `${p.attributes.user?.data?.id}`
+                    }
+                  ])
+                return
+              }
+              case 'productOwner': {
+                propsModalProjectNew.scrumMastersReceived =
+                  propsModalProjectNew.scrumMastersReceived.concat([
+                    {
+                      label: `${p.attributes.user?.data?.attributes?.username}`,
+                      value: `${p.attributes.user?.data?.id}`
+                    }
+                  ])
+                return
+              }
+              case 'member': {
+                propsModalProjectNew.membersReceived =
+                  propsModalProjectNew.membersReceived.concat([
+                    {
+                      label: `${p.attributes.user?.data?.attributes?.username}`,
+                      value: `${p.attributes.user?.data?.id}`
+                    }
+                  ])
+                return
+              }
+            }
+          }
+        )
+
+        setPropsModalProject(propsModalProjectNew)
+      }
+    }
+  )
+
+  const editProject = async (id: string) => {
+    await getAllUsers({
+      variables: {},
+      fetchPolicy: 'no-cache'
+    })
+    await getProject({
       variables: {
         id: id
-      }
+      },
+      fetchPolicy: 'no-cache'
     })
+    setOpenModal(true)
+    setPage(0)
+  }
 
-    if (errors == null) {
+  const [removeProjectGraphql, { data }] = useMutation<
+    MutationDeleteProjectUserRole,
+    MutationDeleteProjectUserRoleVariables
+  >(MUTATION_DELETE_PROJECT_USER_ROLE, {
+    context: { session },
+    onCompleted: () => {
       projectUserRoleTables = projectUserRoleTables.filter((p) => {
-        if (p.id != id) {
+        if (p.id != data?.deleteProjectUserRole?.data?.id) {
           return p
         }
       })
@@ -111,52 +201,46 @@ export default function CustomizedTables({
       setProjects(projectUserRoleTables)
       setQuantityProjectsPage(projectUserRoleTables.length)
     }
+  })
+
+  const removeProject = (id: string) => {
+    removeProjectGraphql({
+      variables: {
+        id: id
+      }
+    })
   }
 
-  const activeProject = async (id: string) => {
-    const { data, errors } = await apolloClient.mutate<
-      MutationActiveProject,
-      MutationActiveProjectVariables
-    >({
-      mutation: MUTATION_ACTIVE_PROJECT,
+  const [activeProjectGraphql, { data: dataActive }] = useMutation<
+    MutationActiveProject,
+    MutationActiveProjectVariables
+  >(MUTATION_ACTIVE_PROJECT, {
+    context: { session },
+    onCompleted: () => {
+      setActiveProjectSideBar({
+        id: dataActive?.updateUsersPermissionsUser.data?.attributes
+          ?.activeProject?.data?.id
+          ? dataActive?.updateUsersPermissionsUser.data?.attributes
+              ?.activeProject?.data?.id
+          : '',
+        name: dataActive?.updateUsersPermissionsUser.data?.attributes
+          ?.activeProject?.data?.attributes?.name
+      })
+      setActiveProjectId(
+        dataActive?.updateUsersPermissionsUser.data?.attributes?.activeProject
+          ?.data?.id || ''
+      )
+      setPage(0)
+    }
+  })
+
+  const activeProject = (id: string) => {
+    activeProjectGraphql({
       variables: {
         idProject: id,
         idUser: user.id
       }
     })
-
-    if (errors == null) {
-      setActiveProjectId(id)
-      setActiveProjectSideBar({
-        id: data?.updateUsersPermissionsUser.data?.attributes?.activeProject
-          ?.data?.id
-          ? data?.updateUsersPermissionsUser.data?.attributes?.activeProject
-              ?.data?.id
-          : '',
-        name: data?.updateUsersPermissionsUser.data?.attributes?.activeProject
-          ?.data?.attributes?.name
-      })
-      setPage(0)
-    }
-  }
-
-  const createProject = async () => {
-    // router.push('/projects')
-    const { data, errors } = await apolloClient.query<QueryAllUsers>({
-      query: QUERY_ALL_USERS,
-      fetchPolicy: 'no-cache'
-    })
-
-    if (!errors) {
-      const propsModalProjectNew = modalProjectPropsDefault
-      propsModalProjectNew.usersOptions = usersToSelectMapper(
-        data.usersPermissionsUsers?.data
-      )
-
-      setPropsModalProject(propsModalProjectNew)
-      setOpenModal(true)
-      setPage(0)
-    }
   }
 
   const tableData = projectsToTableMapper(
