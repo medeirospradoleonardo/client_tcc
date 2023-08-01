@@ -124,6 +124,7 @@ const FormProject = ({
       setFieldError(errors)
       return
     }
+    setFieldError({})
 
     createProjectGraphQL({
       variables: {

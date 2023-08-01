@@ -18,7 +18,7 @@ export interface QueryProjectUserRolesLight_projectUserRoles {
 }
 
 export interface QueryProjectUserRolesLight {
-  projectUserRoles: QueryProjectUserRolesLight_projectUserRoles | null;
+  projectUserRoles: QueryProjectUserRolesLight_projectUserRoles;
 }
 
 export interface QueryProjectUserRolesLightVariables {
