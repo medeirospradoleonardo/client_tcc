@@ -11,12 +11,6 @@ import * as S from './styles'
 
 import { MultiValue } from 'react-select'
 
-const cities = [
-  { label: 'Leonardo Medeiros Prado', value: 'adelaide' },
-  { label: 'Camila Medeiros Prado', value: 'brisbane' },
-  { label: 'Vilma Richart Prado', value: 'canberra' }
-]
-
 const DropdownIndicator = (props: DropdownIndicatorProps<OptionType, true>) => {
   return (
     <components.DropdownIndicator {...props}>
@@ -27,25 +21,41 @@ const DropdownIndicator = (props: DropdownIndicatorProps<OptionType, true>) => {
 
 type SelectChipsProps = {
   label: string
-  setData: (
-    e: MultiValue<{
-      label: string
-      value: string
-    }>
-  ) => void
+  setData: (e: MultiValue<OptionType>) => void
   options: MultiValue<OptionType>
   defaultValues?: MultiValue<{
     label: string
     value: string
   }>
+  maxMenuHeight?: number
+  isMulti?: any
 }
 
-const customStyles: StylesConfig = {
-  container: (styles) => ({
-    ...styles
+const customStyles: any = {
+  container: (styles: any, state: any) => ({
+    ...styles,
+    '&:hover': {
+      border: state.isFocused ? 'none' : 'none',
+      boxShadow: state.isFocused ? 'none' : 'none'
+    }
   }),
-  control: (styles, state) => ({
+  control: (styles: any, state: any) => ({
+    ...styles,
+    // backgroundColor: '#EAEAEA',
+    border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
+    boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none',
+    ':focus': {
+      border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
+      boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none'
+    },
+    ':focus-within': {
+      border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
+      boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none'
+    }
+  }),
+  menuPortal: (styles: any) => ({
     ...styles
+    // zIndex: 1000
   })
 }
 
@@ -53,7 +63,9 @@ export default function SelectChips({
   label,
   setData,
   options,
-  defaultValues = []
+  defaultValues = [],
+  maxMenuHeight,
+  isMulti = true
 }: SelectChipsProps) {
   return (
     <>
@@ -63,10 +75,11 @@ export default function SelectChips({
         closeMenuOnSelect={false}
         components={{ DropdownIndicator }}
         defaultValue={defaultValues}
-        isMulti
+        isMulti={isMulti}
         options={options}
         placeholder={`Selecione um ${label} para o projeto`}
         styles={customStyles}
+        maxMenuHeight={maxMenuHeight || 100}
         noOptionsMessage={({ inputValue }) =>
           !inputValue ? 'Sem resultados' : 'Sem resultados'
         }

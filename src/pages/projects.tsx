@@ -64,12 +64,17 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       user: {
         id: usersPermissionsUser?.data?.id,
         activeProjectId:
-          usersPermissionsUser?.data?.attributes?.activeProject?.data?.id
+          usersPermissionsUser.data?.attributes?.activeProject?.data?.id ||
+          null,
+        name: usersPermissionsUser.data?.attributes?.username
       },
       activeProject: {
-        id: usersPermissionsUser.data?.attributes?.activeProject?.data?.id,
-        name: usersPermissionsUser.data?.attributes?.activeProject?.data
-          ?.attributes?.name
+        id:
+          usersPermissionsUser.data?.attributes?.activeProject?.data?.id ||
+          null,
+        name:
+          usersPermissionsUser.data?.attributes?.activeProject?.data?.attributes
+            ?.name || null
       }
     }
   }

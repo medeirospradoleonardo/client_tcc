@@ -9,6 +9,7 @@ import { useState } from 'react'
 type User = {
   id: string
   activeProjectId: string
+  name: string
 }
 
 export type Project = {

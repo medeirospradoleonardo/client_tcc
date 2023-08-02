@@ -1,28 +1,18 @@
 import Button from 'components/Button'
 import Heading from 'components/Heading'
 import TextField from 'components/TextField'
-import Link from 'next/link'
 
 import * as S from './styles'
 import { Container } from 'components/Container'
-import MultipleSelectChip from 'components/MultipleSelectChip'
 import SelectChips from 'components/SelectChips'
 import { useEffect, useState } from 'react'
 import { MultiValue } from 'react-select'
 import { OptionType } from '@atlaskit/select'
 import { FormError } from 'components/Form'
 import { ErrorOutline, NewLabel } from '@styled-icons/material-outlined'
-import {
-  FieldErrors,
-  createProjectValidate,
-  signUpValidate
-} from 'utils/validations'
+import { FieldErrors, createProjectValidate } from 'utils/validations'
 import { User } from 'components/Table'
-import {
-  ApolloClient,
-  NormalizedCacheObject,
-  useMutation
-} from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { MUTATION_CREATE_PROJECT_USER_ROLE } from 'graphql/mutations/projectUserRole'
 import { MUTATION_CREATE_PROJECT } from 'graphql/mutations/project'
 import { Session } from 'next-auth'
@@ -63,8 +53,10 @@ const FormProject = ({
   const [members, setMembers] = useState<selectValue>(membersReceived)
   const [users, setUsers] = useState<MultiValue<OptionType>>(usersOptions)
   const [name, setName] = useState<string>(nameProject ? nameProject : '')
+
   const [formError, setFormError] = useState('')
   const [fieldError, setFieldError] = useState<FieldErrors>({})
+  const [firstForm, setFirstForm] = useState(option == 'create' ? true : false)
 
   useEffect(() => {
     let usersNew = []
@@ -79,7 +71,7 @@ const FormProject = ({
     })
 
     setUsers(usersNew)
-  }, [scrumMasters, productOwners, members])
+  }, [scrumMasters, productOwners, members, usersOptions])
 
   const handleInput = (value: string) => {
     setName(value)
@@ -133,7 +125,6 @@ const FormProject = ({
     })
 
     if (error) {
-      console.log('fafd')
       console.log(error)
       return
     }
@@ -151,50 +142,77 @@ const FormProject = ({
     console.log('edit')
   }
 
+  const handleFirstForm = (value: any) => {
+    setFirstForm(false)
+    switch (value.value) {
+      case 'scrumMaster': {
+        setScrumMasters([{ label: user.name, value: user.id }])
+        return
+      }
+      case 'productOwner': {
+        setProductOwners([{ label: user.name, value: user.id }])
+        return
+      }
+    }
+  }
+
+  const setDataScrumMaster = (value: MultiValue<OptionType>) => {
+    setScrumMasters(
+      value.map((user) => {
+        return {
+          label: `${user.label}`,
+          value: `${user.value}`
+        }
+      })
+    )
+  }
+
+  const setDataProductOwner = (value: MultiValue<OptionType>) => {
+    setProductOwners(
+      value.map((user) => {
+        return {
+          label: `${user.label}`,
+          value: `${user.value}`
+        }
+      })
+    )
+  }
+
+  const setDataMembers = (value: MultiValue<OptionType>) => {
+    setMembers(
+      value.map((user) => {
+        return {
+          label: `${user.label}`,
+          value: `${user.value}`
+        }
+      })
+    )
+  }
+
   return (
     <>
-      <Container>
-        <Heading lineBottom color="black" size="small">
-          Detalhes do projeto
-        </Heading>
-
-        {!!formError && (
-          <FormError>
-            <ErrorOutline /> {formError}
-          </FormError>
-        )}
-        <S.Content>
-          <S.Left></S.Left>
-          <S.Right></S.Right>
-          <TextField
-            name="name"
-            icon={<NewLabel />}
-            placeholder="Nome do projeto"
-            label="Nome do projeto"
-            initialValue={name}
-            error={fieldError?.name}
-            onInputChange={(v) => handleInput(v)}
-            style={{ height: '30px' }}
-          />
-          <SelectChips
-            label="Scrum Master"
-            setData={setScrumMasters}
-            defaultValues={scrumMasters}
-            options={users}
-          />
-          <SelectChips
-            label="Product Owner"
-            setData={setProductOwners}
-            defaultValues={productOwners}
-            options={users}
-          />
-          <SelectChips
-            label="Membro"
-            setData={setMembers}
-            defaultValues={members}
-            options={users}
-          />
-          <S.ButtonContainer>
+      {firstForm && option == 'create' && (
+        <Container>
+          <S.Heading>
+            <Heading lineBottom color="black" size="small">
+              Selecione o seu papel no projeto
+            </Heading>
+          </S.Heading>
+          <S.ContentFirstForm>
+            <S.Select>
+              <SelectChips
+                isMulti={false}
+                label="Membro"
+                setData={handleFirstForm}
+                defaultValues={[]}
+                options={[
+                  { label: 'Scrum Master', value: 'scrumMaster' },
+                  { label: 'Product Owner', value: 'productOwner' }
+                ]}
+              />
+            </S.Select>
+          </S.ContentFirstForm>
+          <S.ButtonContainerFirstForm>
             <Button
               minimal
               size="small"
@@ -203,16 +221,77 @@ const FormProject = ({
             >
               Cancelar
             </Button>
-            <Button
-              size="small"
-              style={{ marginBottom: '10px' }}
-              onClick={option == 'create' ? createProject : editProject}
-            >
-              {option == 'create' ? 'Criar projeto' : 'Editar projeto'}
-            </Button>
-          </S.ButtonContainer>
-        </S.Content>
-      </Container>
+          </S.ButtonContainerFirstForm>
+        </Container>
+      )}
+      {!firstForm && (
+        <Container>
+          <S.Heading>
+            <Heading lineBottom color="black" size="small">
+              Detalhes do projeto
+            </Heading>
+          </S.Heading>
+
+          {!!formError && (
+            <FormError>
+              <ErrorOutline /> {formError}
+            </FormError>
+          )}
+          <S.Content>
+            <S.Left></S.Left>
+            <S.Right></S.Right>
+            <TextField
+              name="name"
+              icon={<NewLabel />}
+              placeholder="Nome do projeto"
+              label="Nome do projeto"
+              initialValue={name}
+              error={fieldError?.name}
+              onInputChange={(v) => handleInput(v)}
+              style={{ height: '30px' }}
+            />
+            <S.Select>
+              <SelectChips
+                label="Scrum Master"
+                setData={setDataScrumMaster}
+                defaultValues={scrumMasters}
+                options={users}
+                maxMenuHeight={250}
+              />
+              <SelectChips
+                label="Product Owner"
+                setData={setDataProductOwner}
+                defaultValues={productOwners}
+                options={users}
+                maxMenuHeight={160}
+              />
+              <SelectChips
+                label="Membro"
+                setData={setDataMembers}
+                defaultValues={members}
+                options={users}
+              />
+            </S.Select>
+            <S.ButtonContainer>
+              <Button
+                minimal
+                size="small"
+                style={{ marginBottom: '10px' }}
+                onClick={closeModal}
+              >
+                Cancelar
+              </Button>
+              <Button
+                size="small"
+                style={{ marginBottom: '10px' }}
+                onClick={option == 'create' ? createProject : editProject}
+              >
+                {option == 'create' ? 'Criar projeto' : 'Editar projeto'}
+              </Button>
+            </S.ButtonContainer>
+          </S.Content>
+        </Container>
+      )}
     </>
   )
 }

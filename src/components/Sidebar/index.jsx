@@ -11,6 +11,7 @@ import {
   SProjectTitleContainer,
   SSidebar,
   SSidebarButton,
+  SNaoLogado,
   STheme,
   SThemeLabel,
   SThemeToggler,
@@ -57,7 +58,7 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           </SLinkIcon>
           {sidebarOpen && (
             <div>
-              {activeProject != null ? (
+              {activeProject != null && activeProject.name != null ? (
                 <>
                   <SProjectTitle>{activeProject.name}</SProjectTitle>
                 </>
@@ -88,7 +89,8 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
               <SLinkIcon>{icon}</SLinkIcon>
               {sidebarOpen && (
                 <>
-                  <SLinkLabel>{label}</SLinkLabel>
+                  <SLinkLabel session={session}>{label}</SLinkLabel>
+                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
                 </>
               )}
             </SLink>
@@ -111,8 +113,14 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
             <SLink session={session}>
               <>
                 <SLinkIcon>{icon}</SLinkIcon>
-                {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}
-                {sidebarOpen && !!session && !!projectsQuantity && (
+                {sidebarOpen && (
+                  <>
+                    <SLinkLabel session={session}>{label}</SLinkLabel>
+                    {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                  </>
+                )}
+
+                {sidebarOpen && !!session && projectsQuantity >= 0 && (
                   <SLinkNotification>{projectsQuantity}</SLinkNotification>
                 )}
               </>
@@ -136,7 +144,12 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
             <SLink session={session}>
               <>
                 <SLinkIcon>{icon}</SLinkIcon>
-                {sidebarOpen && <SLinkLabel>{label}</SLinkLabel>}
+                {sidebarOpen && (
+                  <>
+                    <SLinkLabel session={session}>{label}</SLinkLabel>
+                    {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                  </>
+                )}
               </>
             </SLink>
           </Link>

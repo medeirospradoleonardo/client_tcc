@@ -45,6 +45,7 @@ import { QUERY_PROJECT } from 'graphql/queries/project'
 export type User = {
   id: string
   activeProjectId: string
+  name: string
 }
 
 type Project = {
@@ -73,7 +74,7 @@ export default function CustomizedTables({
   const [activeProjectId, setActiveProjectId] = React.useState(
     user.activeProjectId
   )
-  const [openModal, setOpenModal] = React.useState(false)
+  const [openModal, setOpenModal] = React.useState(true)
 
   const modalProjectPropsDefault = {
     nameProject: '',
@@ -126,7 +127,6 @@ export default function CustomizedTables({
         const propsModalProjectNew = propsModalProject
         propsModalProjectNew.nameProject =
           QueryProject?.project?.data?.attributes?.name
-        console.log(QueryProject?.project?.data?.attributes?.name)
         propsModalProjectNew.option = 'edit'
 
         QueryProject?.project?.data?.attributes?.projectUserRoles?.data.map(

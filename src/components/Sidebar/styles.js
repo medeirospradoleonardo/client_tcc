@@ -97,6 +97,9 @@ export const SLinkContainer = styled.div`
 
   :hover {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.bg3};
+    ${({ session, theme }) => css`
+      ${!session && wrapperModifiers.noSessionSLinkLabel(theme)}
+    `}
   }
 
   ${({ session, theme }) => css`
@@ -114,6 +117,11 @@ const wrapperModifiers = {
     &::placeholder {
       color: currentColor;
     }
+  `,
+  noSessionSLinkLabel: () => css`
+    ${SLinkLabel} {
+      opacity: 0;
+    }
   `
 }
 
@@ -129,6 +137,25 @@ export const SLink = styled.a`
   `}
 `
 
+export const SNaoLogado = styled.div`
+  display: inline-block;
+  position: absolute;
+  margin-left: 60px;
+  color: '#42526E';
+  background: '#dfe1e6';
+  opacity: 0;
+  font-size: 16px;
+  ${SLinkContainer}:hover & {
+    opacity: 1;
+  }
+`
+
+export const SLinkLabel = styled.span`
+  display: block;
+  flex: 1;
+  margin-left: ${v.smSpacing};
+`
+
 export const SLinkIcon = styled.div`
   padding: ${v.smSpacing} ${v.mdSpacing};
   display: flex;
@@ -139,12 +166,6 @@ export const SLinkIcon = styled.div`
   svg {
     font-size: 20px;
   }
-`
-
-export const SLinkLabel = styled.span`
-  display: block;
-  flex: 1;
-  margin-left: ${v.smSpacing};
 `
 
 export const SLinkNotification = styled.div`
