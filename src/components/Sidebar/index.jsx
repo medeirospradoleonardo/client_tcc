@@ -39,6 +39,7 @@ import { useRouter } from 'next/router'
 const Sidebar = ({ session, projectsQuantity, activeProject }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = useRouter().pathname
+  const router = useRouter()
 
   return (
     <SSidebar isOpen={sidebarOpen}>
@@ -79,22 +80,22 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           isActive={pathname === to}
           session={session}
           title={!session ? 'Você precisa estar logado' : ''}
+          onClick={() =>
+            router.push({
+              pathname: to,
+              query: { confirm: true }
+            })
+          }
         >
-          <Link
-            href={to}
-            passHref
-            style={!sidebarOpen ? { width: `fit-content` } : {}}
-          >
-            <SLink session={session}>
-              <SLinkIcon>{icon}</SLinkIcon>
-              {sidebarOpen && (
-                <>
-                  <SLinkLabel session={session}>{label}</SLinkLabel>
-                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
-                </>
-              )}
-            </SLink>
-          </Link>
+          <SLink session={session}>
+            <SLinkIcon>{icon}</SLinkIcon>
+            {sidebarOpen && (
+              <>
+                <SLinkLabel session={session}>{label}</SLinkLabel>
+                {!session && <SNaoLogado>Não logado</SNaoLogado>}
+              </>
+            )}
+          </SLink>
         </SLinkContainer>
       ))}
       <SDivider />
@@ -104,28 +105,28 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           isActive={pathname === to}
           session={session}
           title={!session ? 'Você precisa estar logado' : ''}
+          onClick={() =>
+            router.push({
+              pathname: to,
+              query: { confirm: true }
+            })
+          }
         >
-          <Link
-            href={to}
-            passHref
-            style={!sidebarOpen ? { width: `fit-content` } : {}}
-          >
-            <SLink session={session}>
-              <>
-                <SLinkIcon>{icon}</SLinkIcon>
-                {sidebarOpen && (
-                  <>
-                    <SLinkLabel session={session}>{label}</SLinkLabel>
-                    {!session && <SNaoLogado>Não logado</SNaoLogado>}
-                  </>
-                )}
+          <SLink session={session}>
+            <>
+              <SLinkIcon>{icon}</SLinkIcon>
+              {sidebarOpen && (
+                <>
+                  <SLinkLabel session={session}>{label}</SLinkLabel>
+                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                </>
+              )}
 
-                {sidebarOpen && !!session && projectsQuantity >= 0 && (
-                  <SLinkNotification>{projectsQuantity}</SLinkNotification>
-                )}
-              </>
-            </SLink>
-          </Link>
+              {sidebarOpen && !!session && projectsQuantity >= 0 && (
+                <SLinkNotification>{projectsQuantity}</SLinkNotification>
+              )}
+            </>
+          </SLink>
         </SLinkContainer>
       ))}
       <SDivider />
@@ -135,24 +136,24 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           isActive={pathname === to}
           session={session}
           title={!session ? 'Você precisa estar logado' : ''}
+          onClick={() =>
+            router.push({
+              pathname: to,
+              query: { confirm: true }
+            })
+          }
         >
-          <Link
-            href={to}
-            passHref
-            style={!sidebarOpen ? { width: `fit-content` } : {}}
-          >
-            <SLink session={session}>
-              <>
-                <SLinkIcon>{icon}</SLinkIcon>
-                {sidebarOpen && (
-                  <>
-                    <SLinkLabel session={session}>{label}</SLinkLabel>
-                    {!session && <SNaoLogado>Não logado</SNaoLogado>}
-                  </>
-                )}
-              </>
-            </SLink>
-          </Link>
+          <SLink session={session}>
+            <>
+              <SLinkIcon>{icon}</SLinkIcon>
+              {sidebarOpen && (
+                <>
+                  <SLinkLabel session={session}>{label}</SLinkLabel>
+                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                </>
+              )}
+            </>
+          </SLink>
         </SLinkContainer>
       ))}
       {/* <STheme>

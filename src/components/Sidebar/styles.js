@@ -94,6 +94,7 @@ export const SLinkContainer = styled.div`
     !isActive ? `transparent` : theme.colors.bg3};
   border-radius: ${v.borderRadius};
   margin: 8px 0;
+  cursor: pointer;
 
   :hover {
     box-shadow: inset 0 0 0 1px ${({ theme }) => theme.colors.bg3};

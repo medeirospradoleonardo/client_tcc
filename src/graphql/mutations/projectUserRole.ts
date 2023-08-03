@@ -14,8 +14,11 @@ export const MUTATION_CREATE_PROJECT_USER_ROLE = gql`
   mutation MutationCreateProjectUserRoles(
     $role: ENUM_PROJECTUSERROLE_ROLE!
     $userId: ID!
+    $projectId: ID!
   ) {
-    createProjectUserRole(data: { role: $role, user: $userId }) {
+    createProjectUserRole(
+      data: { role: $role, user: $userId, project: $projectId }
+    ) {
       data {
         id
       }

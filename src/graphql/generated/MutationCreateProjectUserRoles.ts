@@ -26,4 +26,5 @@ export interface MutationCreateProjectUserRoles {
 export interface MutationCreateProjectUserRolesVariables {
   role: ENUM_PROJECTUSERROLE_ROLE;
   userId: string;
+  projectId: string;
 }

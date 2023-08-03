@@ -29,6 +29,7 @@ type SelectChipsProps = {
   }>
   maxMenuHeight?: number
   isMulti?: any
+  placeholder: string
 }
 
 const customStyles: any = {
@@ -65,7 +66,8 @@ export default function SelectChips({
   options,
   defaultValues = [],
   maxMenuHeight,
-  isMulti = true
+  isMulti = true,
+  placeholder
 }: SelectChipsProps) {
   return (
     <>
@@ -77,7 +79,7 @@ export default function SelectChips({
         defaultValue={defaultValues}
         isMulti={isMulti}
         options={options}
-        placeholder={`Selecione um ${label} para o projeto`}
+        placeholder={placeholder}
         styles={customStyles}
         maxMenuHeight={maxMenuHeight || 100}
         noOptionsMessage={({ inputValue }) =>

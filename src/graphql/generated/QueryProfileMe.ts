@@ -42,7 +42,7 @@ export interface QueryProfileMe_usersPermissionsUser {
 }
 
 export interface QueryProfileMe {
-  usersPermissionsUser: QueryProfileMe_usersPermissionsUser;
+  usersPermissionsUser: QueryProfileMe_usersPermissionsUser | null;
 }
 
 export interface QueryProfileMeVariables {

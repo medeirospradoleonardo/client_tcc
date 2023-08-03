@@ -73,7 +73,7 @@ export const projectsToTableMapper = (
         key={`delete${projectUserRole.id}`}
         size="small"
         disabled={projectUserRole.role == 'member' ? true : false}
-        onClick={() => removeFunction(projectUserRole.id)}
+        onClick={() => removeFunction(projectUserRole.project.id)}
       >
         <DeleteIcon
           style={

@@ -12,6 +12,7 @@ import { Session } from 'next-auth'
 import { ErrorOutline } from '@styled-icons/material-outlined'
 import { FormError } from 'components/Form'
 import { signOut } from 'next-auth/client'
+import { useRouter } from 'next/router'
 
 export type FormProfileProps = {
   username?: string
@@ -23,6 +24,7 @@ const FormProfile = ({ email, username, session }: FormProfileProps) => {
   const [fieldError, setFieldError] = useState<FieldErrors>({})
   const [formError, setFormError] = useState('')
   const [name, setName] = useState<string>(username ? username : '')
+  const { push } = useRouter()
 
   const handleInput = (value: string) => {
     setName(value)
@@ -46,8 +48,8 @@ const FormProfile = ({ email, username, session }: FormProfileProps) => {
         username: name
       }
     })
-    await signOut({ redirect: false, callbackUrl: '/' })
-    console.log(name)
+    const data = await signOut({ redirect: false, callbackUrl: '/sign-in' })
+    push('/sign-in')
   }
 
   return (

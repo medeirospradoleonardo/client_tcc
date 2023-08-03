@@ -41,6 +41,12 @@ import {
   QueryProjectVariables
 } from 'graphql/generated/QueryProject'
 import { QUERY_PROJECT } from 'graphql/queries/project'
+import {
+  MutationDeleteProject,
+  MutationDeleteProjectVariables
+} from 'graphql/generated/MutationDeleteProject'
+import { MUTATION_DELETE_PROJECT } from 'graphql/mutations/project'
+import Confirm from 'components/Confirm'
 
 export type User = {
   id: string
@@ -58,7 +64,7 @@ export type ProjectUserRoleTableProps = {
   session: Session
   setQuantityProjectsPage: (quantity: number) => void
   user: User
-  setActiveProjectSideBar: (project: Project) => void
+  setActiveProjectSideBar: (project: Project | null) => void
 }
 
 export default function CustomizedTables({
@@ -71,10 +77,12 @@ export default function CustomizedTables({
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(10)
   const [projects, setProjects] = React.useState(projectUserRoleTables)
+  const [projectToRemoveId, setProjectToRemoveId] = React.useState<string>()
   const [activeProjectId, setActiveProjectId] = React.useState(
     user.activeProjectId
   )
-  const [openModal, setOpenModal] = React.useState(true)
+  const [openModal, setOpenModal] = React.useState(false)
+  const [openModalDelete, setOpenModalDelete] = React.useState(false)
 
   const modalProjectPropsDefault = {
     nameProject: '',
@@ -84,7 +92,10 @@ export default function CustomizedTables({
     session: session,
     scrumMastersReceived: [],
     productOwnersReceived: [],
-    membersReceived: []
+    membersReceived: [],
+    projectUserRoleTables: projects,
+    setProjects,
+    setQuantityProjectsPage
   }
 
   const [propsModalProject, setPropsModalProject] =
@@ -143,8 +154,8 @@ export default function CustomizedTables({
                 return
               }
               case 'productOwner': {
-                propsModalProjectNew.scrumMastersReceived =
-                  propsModalProjectNew.scrumMastersReceived.concat([
+                propsModalProjectNew.productOwnersReceived =
+                  propsModalProjectNew.productOwnersReceived.concat([
                     {
                       label: `${p.attributes.user?.data?.attributes?.username}`,
                       value: `${p.attributes.user?.data?.id}`
@@ -187,19 +198,23 @@ export default function CustomizedTables({
   }
 
   const [removeProjectGraphql, { data }] = useMutation<
-    MutationDeleteProjectUserRole,
-    MutationDeleteProjectUserRoleVariables
-  >(MUTATION_DELETE_PROJECT_USER_ROLE, {
+    MutationDeleteProject,
+    MutationDeleteProjectVariables
+  >(MUTATION_DELETE_PROJECT, {
     context: { session },
     onCompleted: () => {
       projectUserRoleTables = projectUserRoleTables.filter((p) => {
-        if (p.id != data?.deleteProjectUserRole?.data?.id) {
+        if (p.project.id != data?.deleteProject?.data?.id) {
           return p
         }
       })
 
       setProjects(projectUserRoleTables)
       setQuantityProjectsPage(projectUserRoleTables.length)
+      if (activeProjectId == data?.deleteProject?.data?.id) {
+        setActiveProjectId('')
+        setActiveProjectSideBar(null)
+      }
     }
   })
 
@@ -209,6 +224,8 @@ export default function CustomizedTables({
         id: id
       }
     })
+
+    setOpenModalDelete(false)
   }
 
   const [activeProjectGraphql, { data: dataActive }] = useMutation<
@@ -243,10 +260,15 @@ export default function CustomizedTables({
     })
   }
 
+  const removeProjectSelect = (id: string) => {
+    setOpenModalDelete(true)
+    setProjectToRemoveId(id)
+  }
+
   const tableData = projectsToTableMapper(
     projects,
     editProject,
-    removeProject,
+    removeProjectSelect,
     activeProject,
     activeProjectId
   )
@@ -289,15 +311,19 @@ export default function CustomizedTables({
 
   return (
     <>
-      {/* <Modal
-        isOpen={openModal}
-        // onAfterOpen={afterOpenModal}
-        // onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Example Modal"
+      <Dialog
+        open={openModalDelete}
+        fullWidth={true}
+        maxWidth="xs"
+        onClose={handleClose}
       >
-        <FormProject />
-      </Modal> */}
+        <Confirm
+          buttonLabel="Deletar"
+          message="Você tem certeza que quer deletar esse projeto?"
+          closeModal={() => setOpenModalDelete(false)}
+          actionFunction={() => removeProject(projectToRemoveId || '')}
+        />
+      </Dialog>
       <Dialog
         open={openModal}
         fullWidth={true}

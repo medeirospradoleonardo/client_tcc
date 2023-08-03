@@ -41,7 +41,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const apolloClient = initializeApollo(null, session)
 
   if (!session) {
-    return { props: {} }
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/sign-in'
+      },
+      props: {}
+    }
   }
 
   const { data } = await apolloClient.query<
@@ -51,7 +57,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     query: QUERY_PROFILE_ME,
     variables: {
       identifier: session?.id as string
-    }
+    },
+    fetchPolicy: 'no-cache'
   })
 
   const {
@@ -66,6 +73,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
     fetchPolicy: 'no-cache'
   })
+
+  console.log(projectUserRoles)
 
   return {
     props: {

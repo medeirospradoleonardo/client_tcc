@@ -18,7 +18,7 @@ export type UserDropdownProps = {
 
 const UserDropdown = ({ username }: UserDropdownProps) => {
   const { push } = useRouter()
-
+  const router = useRouter()
   return (
     <Dropdown
       title={
@@ -30,19 +30,30 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
       }
     >
       <S.Nav>
-        <Link href="/profile" passHref>
-          <S.Link>
-            <AccountCircle />
-            <span>Meu Perfil</span>
-          </S.Link>
-        </Link>
+        <S.Link
+          onClick={() =>
+            router.push({
+              pathname: '/profile',
+              query: { confirm: true }
+            })
+          }
+        >
+          <AccountCircle />
+          <span>Meu Perfil</span>
+        </S.Link>
 
-        <Link href="/" passHref>
-          <S.Link>
-            <FavoriteBorder />
-            <span>Home</span>
-          </S.Link>
-        </Link>
+        <S.Link
+          onClick={() =>
+            router.push({
+              pathname: '/',
+              query: { confirm: true }
+            })
+          }
+        >
+          <FavoriteBorder />
+          <span>Home</span>
+        </S.Link>
+
         <S.Link
           role="button"
           title="Sair"

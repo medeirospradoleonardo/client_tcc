@@ -16,6 +16,8 @@ import { useMutation } from '@apollo/client'
 import { MUTATION_CREATE_PROJECT_USER_ROLE } from 'graphql/mutations/projectUserRole'
 import { MUTATION_CREATE_PROJECT } from 'graphql/mutations/project'
 import { Session } from 'next-auth'
+import { Project, ProjectUserRoleType } from 'templates/Projects'
+import { data } from 'msw/lib/types/context'
 
 export type FormProjectProps = {
   nameProject?: string
@@ -27,6 +29,9 @@ export type FormProjectProps = {
   scrumMastersReceived: selectValue
   productOwnersReceived: selectValue
   membersReceived: selectValue
+  projectUserRoleTables: ProjectUserRoleType[]
+  setProjects: React.Dispatch<React.SetStateAction<ProjectUserRoleType[]>>
+  setQuantityProjectsPage: (quantity: number) => void
 }
 
 type selectValue = MultiValue<{
@@ -43,7 +48,10 @@ const FormProject = ({
   session,
   scrumMastersReceived,
   productOwnersReceived,
-  membersReceived
+  membersReceived,
+  projectUserRoleTables,
+  setProjects,
+  setQuantityProjectsPage
 }: FormProjectProps) => {
   const [scrumMasters, setScrumMasters] =
     useState<selectValue>(scrumMastersReceived)
@@ -89,7 +97,17 @@ const FormProject = ({
     }
   )
 
-  const createProject = () => {
+  const [createProjectUserRoleGraphQL] = useMutation(
+    MUTATION_CREATE_PROJECT_USER_ROLE,
+    {
+      context: { session },
+      onError: (err) => {
+        setFormError(err?.graphQLErrors[0]?.message)
+      }
+    }
+  )
+
+  const createProject = async () => {
     if (
       scrumMasters.length == 0 &&
       productOwners.length == 0 &&
@@ -118,24 +136,85 @@ const FormProject = ({
     }
     setFieldError({})
 
-    createProjectGraphQL({
-      variables: {
-        nameProject: name
+    const { data: project, errors: errorsCreateProject } =
+      await createProjectGraphQL({
+        variables: {
+          nameProject: name
+        }
+      })
+
+    if (errorsCreateProject) {
+      return
+    }
+    scrumMasters.map(async (u) => {
+      if (u.value == user.id) {
+        const { data: dataUser } = await createProjectUserRoleGraphQL({
+          variables: {
+            role: 'scrumMaster',
+            userId: u.value,
+            projectId: project.createProject.data.id
+          }
+        })
+        projectUserRoleTables = projectUserRoleTables.concat([
+          {
+            id: dataUser.createProjectUserRole.data.id,
+            project: { id: project.createProject.data.id, name: name },
+            role: 'scrumMaster'
+          }
+        ])
+        setProjects(projectUserRoleTables)
+        setQuantityProjectsPage(projectUserRoleTables.length)
+      } else {
+        createProjectUserRoleGraphQL({
+          variables: {
+            role: 'scrumMaster',
+            userId: u.value,
+            projectId: project.createProject.data.id
+          }
+        })
       }
     })
 
-    if (error) {
-      console.log(error)
-      return
-    }
-    // scrumMasters.map((u) => {
-    //   createProjectUserRole({
-    //     variables: {
-    //       role: 'scrumMaster',
-    //       userId: u.value
-    //     }
-    //   })
-    // })
+    productOwners.map(async (u) => {
+      if (u.value == user.id) {
+        const { data: dataUser } = await createProjectUserRoleGraphQL({
+          variables: {
+            role: 'scrumMaster',
+            userId: u.value,
+            projectId: project.createProject.data.id
+          }
+        })
+        projectUserRoleTables = projectUserRoleTables.concat([
+          {
+            id: dataUser.createProjectUserRole.data.id,
+            project: { id: project.createProject.data.id, name: name },
+            role: 'productOwner'
+          }
+        ])
+        setProjects(projectUserRoleTables)
+        setQuantityProjectsPage(projectUserRoleTables.length)
+      } else {
+        createProjectUserRoleGraphQL({
+          variables: {
+            role: 'productOwner',
+            userId: u.value,
+            projectId: project.createProject.data.id
+          }
+        })
+      }
+    })
+
+    members.map((u) => {
+      createProjectUserRoleGraphQL({
+        variables: {
+          role: 'member',
+          userId: u.value,
+          projectId: project.createProject.data.id
+        }
+      })
+    })
+
+    closeModal()
   }
 
   const editProject = () => {
@@ -195,20 +274,21 @@ const FormProject = ({
         <Container>
           <S.Heading>
             <Heading lineBottom color="black" size="small">
-              Selecione o seu papel no projeto
+              Detalhes do projeto
             </Heading>
           </S.Heading>
           <S.ContentFirstForm>
             <S.Select>
               <SelectChips
                 isMulti={false}
-                label="Membro"
+                label="Selecione o seu papel no projeto"
                 setData={handleFirstForm}
                 defaultValues={[]}
                 options={[
                   { label: 'Scrum Master', value: 'scrumMaster' },
                   { label: 'Product Owner', value: 'productOwner' }
                 ]}
+                placeholder="Selecione o seu papel no projeto"
               />
             </S.Select>
           </S.ContentFirstForm>
@@ -238,8 +318,6 @@ const FormProject = ({
             </FormError>
           )}
           <S.Content>
-            <S.Left></S.Left>
-            <S.Right></S.Right>
             <TextField
               name="name"
               icon={<NewLabel />}
@@ -257,6 +335,7 @@ const FormProject = ({
                 defaultValues={scrumMasters}
                 options={users}
                 maxMenuHeight={250}
+                placeholder="Selecione um Scrum Master para o projeto"
               />
               <SelectChips
                 label="Product Owner"
@@ -264,12 +343,14 @@ const FormProject = ({
                 defaultValues={productOwners}
                 options={users}
                 maxMenuHeight={160}
+                placeholder="Selecione um Product Owner para o projeto"
               />
               <SelectChips
                 label="Membro"
                 setData={setDataMembers}
                 defaultValues={members}
                 options={users}
+                placeholder="Selecione um Membro para o projeto"
               />
             </S.Select>
             <S.ButtonContainer>

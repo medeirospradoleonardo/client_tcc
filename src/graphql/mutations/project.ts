@@ -9,3 +9,13 @@ export const MUTATION_CREATE_PROJECT = gql`
     }
   }
 `
+
+export const MUTATION_DELETE_PROJECT = gql`
+  mutation MutationDeleteProject($id: ID!) {
+    deleteProject(id: $id) {
+      data {
+        id
+      }
+    }
+  }
+`

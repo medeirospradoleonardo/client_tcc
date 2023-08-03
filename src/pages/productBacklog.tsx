@@ -32,7 +32,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const apolloClient = initializeApollo(null, session)
 
   if (!session) {
-    return { props: {} }
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/sign-in'
+      },
+      props: {}
+    }
   }
 
   const {
