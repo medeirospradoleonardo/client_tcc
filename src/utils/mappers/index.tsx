@@ -1,4 +1,4 @@
-import { QueryProjectUserRolesFull_projectUserRoles_data } from 'graphql/generated/QueryProjectUserRolesFull'
+import { QueryProjectUserRolesFull } from 'graphql/generated/QueryProjectUserRolesFull'
 import { ProjectUserRoleType } from 'templates/Projects'
 import { IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -6,10 +6,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import CheckIcon from '@mui/icons-material/Check'
 import { QueryAllUsers_usersPermissionsUsers_data } from 'graphql/generated/QueryAllUsers'
 
-export const projectsMapper = (
-  projectUserRoles: QueryProjectUserRolesFull_projectUserRoles_data[]
-) => {
-  return projectUserRoles.map((projectUserRole) => ({
+export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
+  return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
     id: projectUserRole.id,
     role: projectUserRole.attributes?.role,
     project: {

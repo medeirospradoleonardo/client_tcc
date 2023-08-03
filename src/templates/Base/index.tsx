@@ -9,7 +9,7 @@ import { Project } from 'templates/Projects'
 export type BaseTemplateProps = {
   children: React.ReactNode
   projectsQuantity?: number
-  activeProject?: Project
+  activeProject?: Project | null
 }
 
 export default function Base({

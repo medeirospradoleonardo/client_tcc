@@ -66,22 +66,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       session,
-      projectUserRoles: projectsMapper(data.projectUserRoles.data),
+      projectUserRoles: projectsMapper(data),
       user: {
         id: usersPermissionsUser?.data?.id,
         activeProjectId:
-          usersPermissionsUser.data?.attributes?.activeProject?.data?.id ||
-          null,
-        name: usersPermissionsUser.data?.attributes?.username
+          usersPermissionsUser?.data?.attributes?.activeProject?.data?.id || '',
+        name: usersPermissionsUser?.data?.attributes?.username || ''
       },
-      activeProject: {
-        id:
-          usersPermissionsUser.data?.attributes?.activeProject?.data?.id ||
-          null,
-        name:
-          usersPermissionsUser.data?.attributes?.activeProject?.data?.attributes
-            ?.name || null
-      }
+      activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
+        ? {
+            id:
+              usersPermissionsUser?.data?.attributes?.activeProject?.data?.id ||
+              '',
+            name:
+              usersPermissionsUser?.data?.attributes?.activeProject?.data
+                ?.attributes?.name || ''
+          }
+        : null
     }
   }
 }

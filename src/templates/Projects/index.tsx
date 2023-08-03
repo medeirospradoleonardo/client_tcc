@@ -27,7 +27,7 @@ export type ProjectsTemplateProps = {
   projectUserRoles: ProjectUserRoleType[]
   user: User
   session: Session
-  activeProject: Project
+  activeProject: Project | null
 }
 
 const Projects = ({
@@ -58,7 +58,7 @@ const Projects = ({
                 setQuantity(quantity)
               }
               user={user}
-              setActiveProjectSideBar={(project: Project) =>
+              setActiveProjectSideBar={(project: Project | null) =>
                 setProject(project)
               }
             />

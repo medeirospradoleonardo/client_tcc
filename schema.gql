@@ -62,6 +62,7 @@ input IDFilterInput {
   eq: ID
   eqi: ID
   ne: ID
+  nei: ID
   startsWith: ID
   endsWith: ID
   contains: ID
@@ -86,6 +87,7 @@ input BooleanFilterInput {
   eq: Boolean
   eqi: Boolean
   ne: Boolean
+  nei: Boolean
   startsWith: Boolean
   endsWith: Boolean
   contains: Boolean
@@ -110,6 +112,7 @@ input StringFilterInput {
   eq: String
   eqi: String
   ne: String
+  nei: String
   startsWith: String
   endsWith: String
   contains: String
@@ -134,6 +137,7 @@ input IntFilterInput {
   eq: Int
   eqi: Int
   ne: Int
+  nei: Int
   startsWith: Int
   endsWith: Int
   contains: Int
@@ -158,6 +162,7 @@ input FloatFilterInput {
   eq: Float
   eqi: Float
   ne: Float
+  nei: Float
   startsWith: Float
   endsWith: Float
   contains: Float
@@ -182,6 +187,7 @@ input DateFilterInput {
   eq: Date
   eqi: Date
   ne: Date
+  nei: Date
   startsWith: Date
   endsWith: Date
   contains: Date
@@ -206,6 +212,7 @@ input DateTimeFilterInput {
   eq: DateTime
   eqi: DateTime
   ne: DateTime
+  nei: DateTime
   startsWith: DateTime
   endsWith: DateTime
   contains: DateTime
@@ -230,6 +237,7 @@ input JSONFilterInput {
   eq: JSON
   eqi: JSON
   ne: JSON
+  nei: JSON
   startsWith: JSON
   endsWith: JSON
   contains: JSON

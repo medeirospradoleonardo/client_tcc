@@ -74,22 +74,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     fetchPolicy: 'no-cache'
   })
 
-  console.log(projectUserRoles)
-
   return {
     props: {
       session,
       username: data.usersPermissionsUser?.data?.attributes?.username,
       email: data.usersPermissionsUser?.data?.attributes?.email,
-      projectUserRoles: projectUserRoles.data,
-      activeProject: {
-        id:
-          data.usersPermissionsUser.data?.attributes?.activeProject?.data?.id ||
-          null,
-        name:
-          data.usersPermissionsUser.data?.attributes?.activeProject?.data
-            ?.attributes?.name || null
-      }
+      projectUserRoles: projectUserRoles?.data,
+      activeProject: data.usersPermissionsUser?.data?.attributes?.activeProject
+        ?.data
+        ? {
+            id:
+              data.usersPermissionsUser?.data?.attributes?.activeProject?.data
+                ?.id || '',
+            name:
+              data.usersPermissionsUser?.data?.attributes?.activeProject?.data
+                ?.attributes?.name || ''
+          }
+        : null
     }
   }
 }
