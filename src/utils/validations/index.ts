@@ -2,15 +2,25 @@ import { UsersPermissionsRegisterInput } from 'graphql/generated/globalTypes'
 import Joi from 'joi'
 
 const fieldsValidationsSignUp = {
-  username: Joi.string().min(5).required(),
+  username: Joi.string().min(5).required().messages({
+    'string.empty': `O campo nome não pode ficar vazio`
+  }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
-    .required(),
-  password: Joi.string().required(),
+    .required()
+    .messages({
+      'string.empty': `O campo Email não pode ficar vazio`
+    }),
+  password: Joi.string().required().messages({
+    'string.empty': `O campo Senha não pode ficar vazio`
+  }),
   confirm_password: Joi.string()
     .valid(Joi.ref('password'))
     .required()
-    .messages({ 'any.only': 'confirm password does not match with password' })
+    .messages({
+      'any.only': 'A senha de confirmação não e a mesma que a senha escolhida',
+      'string.empty': `O campo Confirmar senha não pode ficar vazio`
+    })
 }
 
 export type FieldErrors = {

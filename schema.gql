@@ -554,9 +554,9 @@ type UsersPermissionsUser {
   role: UsersPermissionsRoleEntityResponse
   profilePhoto: UploadFileEntityResponse
   type: ENUM_USERSPERMISSIONSUSER_TYPE!
-  ownerBoards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
+  ownerBoards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryRelationResponseCollection
-  responsibleboards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
+  responsibleboards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeRelationResponseCollection
   projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleRelationResponseCollection
   activeProject: ProjectEntityResponse
@@ -606,9 +606,9 @@ input BoardFiltersInput {
   responsible: UsersPermissionsUserFiltersInput
   author: UsersPermissionsUserFiltersInput
   status: StringFilterInput
+  project: ProjectFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
   and: [BoardFiltersInput]
   or: [BoardFiltersInput]
   not: BoardFiltersInput
@@ -625,7 +625,7 @@ input BoardInput {
   responsible: ID
   author: ID
   status: ENUM_BOARD_STATUS
-  publishedAt: DateTime
+  project: ID
 }
 
 type Board {
@@ -639,9 +639,9 @@ type Board {
   responsible: UsersPermissionsUserEntityResponse
   author: UsersPermissionsUserEntityResponse
   status: ENUM_BOARD_STATUS
+  project: ProjectEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 type BoardEntity {
@@ -684,7 +684,7 @@ input CategoryInput {
 
 type Category {
   name: String!
-  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
+  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   knowledge: KnowledgeEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
@@ -811,6 +811,7 @@ input ProjectFiltersInput {
   name: StringFilterInput
   sprints: SprintFiltersInput
   projectUserRoles: ProjectUserRoleFiltersInput
+  boards: BoardFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [ProjectFiltersInput]
@@ -822,12 +823,14 @@ input ProjectInput {
   name: String
   sprints: [ID]
   projectUserRoles: [ID]
+  boards: [ID]
 }
 
 type Project {
   name: String!
-  sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): SprintRelationResponseCollection
+  sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): SprintRelationResponseCollection
   projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleRelationResponseCollection
+  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -905,7 +908,6 @@ input SprintFiltersInput {
   project: ProjectFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
   and: [SprintFiltersInput]
   or: [SprintFiltersInput]
   not: SprintFiltersInput
@@ -917,18 +919,16 @@ input SprintInput {
   finalDate: Date
   boards: [ID]
   project: ID
-  publishedAt: DateTime
 }
 
 type Sprint {
   name: String!
   initialDate: Date!
   finalDate: Date!
-  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardRelationResponseCollection
+  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   project: ProjectEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 type SprintEntity {
@@ -1025,7 +1025,7 @@ type Query {
   usersPermissionsUser(id: ID): UsersPermissionsUserEntityResponse
   usersPermissionsUsers(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserEntityResponseCollection
   board(id: ID): BoardEntityResponse
-  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): BoardEntityResponseCollection
+  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardEntityResponseCollection
   category(id: ID): CategoryEntityResponse
   categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): CategoryEntityResponseCollection
   comentary(id: ID): ComentaryEntityResponse
@@ -1037,7 +1037,7 @@ type Query {
   projectUserRole(id: ID): ProjectUserRoleEntityResponse
   projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleEntityResponseCollection
   sprint(id: ID): SprintEntityResponse
-  sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): SprintEntityResponseCollection
+  sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): SprintEntityResponseCollection
   me: UsersPermissionsMe
 }
 

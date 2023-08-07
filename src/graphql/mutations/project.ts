@@ -19,3 +19,13 @@ export const MUTATION_DELETE_PROJECT = gql`
     }
   }
 `
+
+export const MUTATION_UPDATE_PROJECT = gql`
+  mutation MutationUpdateProject($id: ID!, $nameProject: String!) {
+    updateProject(id: $id, data: { name: $nameProject }) {
+      data {
+        id
+      }
+    }
+  }
+`

@@ -12,12 +12,21 @@ import { FormError } from 'components/Form'
 import { ErrorOutline, NewLabel } from '@styled-icons/material-outlined'
 import { FieldErrors, createProjectValidate } from 'utils/validations'
 import { User } from 'components/Table'
-import { useMutation } from '@apollo/client'
-import { MUTATION_CREATE_PROJECT_USER_ROLE } from 'graphql/mutations/projectUserRole'
-import { MUTATION_CREATE_PROJECT } from 'graphql/mutations/project'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import {
+  MUTATION_CREATE_PROJECT_USER_ROLE,
+  MUTATION_DELETE_PROJECT_USER_ROLE,
+  MUTATION_UPDATE_PROJECT_USER_ROLE
+} from 'graphql/mutations/projectUserRole'
+import {
+  MUTATION_CREATE_PROJECT,
+  MUTATION_UPDATE_PROJECT
+} from 'graphql/mutations/project'
 import { Session } from 'next-auth'
 import { Project, ProjectUserRoleType } from 'templates/Projects'
 import { data } from 'msw/lib/types/context'
+import { QueryProjectUserRolesByUserAndProject } from 'graphql/generated/QueryProjectUserRolesByUserAndProject'
+import { QUERY_PROJECT_USER_ROLE_BY_USER_AND_PROJECT } from 'graphql/queries/projectUserRole'
 
 export type FormProjectProps = {
   nameProject?: string
@@ -32,6 +41,9 @@ export type FormProjectProps = {
   projectUserRoleTables: ProjectUserRoleType[]
   setProjects: React.Dispatch<React.SetStateAction<ProjectUserRoleType[]>>
   setQuantityProjectsPage: (quantity: number) => void
+  editProjectId?: string | null
+  activeProjectId: string
+  setActiveProjectSideBar: (project: Project | null) => void
 }
 
 type selectValue = MultiValue<{
@@ -51,7 +63,10 @@ const FormProject = ({
   membersReceived,
   projectUserRoleTables,
   setProjects,
-  setQuantityProjectsPage
+  setQuantityProjectsPage,
+  editProjectId,
+  activeProjectId,
+  setActiveProjectSideBar
 }: FormProjectProps) => {
   const [scrumMasters, setScrumMasters] =
     useState<selectValue>(scrumMastersReceived)
@@ -217,8 +232,183 @@ const FormProject = ({
     closeModal()
   }
 
-  const editProject = () => {
-    console.log('edit')
+  const [deleteProjectUserRoleGraphQL] = useMutation(
+    MUTATION_DELETE_PROJECT_USER_ROLE,
+    {
+      context: { session },
+      onError: (err) => {
+        setFormError(err?.graphQLErrors[0]?.message)
+      }
+    }
+  )
+
+  const [editProjectUserRoleGraphQL] = useMutation(
+    MUTATION_UPDATE_PROJECT_USER_ROLE,
+    {
+      context: { session },
+      onError: (err) => {
+        setFormError(err?.graphQLErrors[0]?.message)
+      }
+    }
+  )
+
+  const [getProjectUserRoleGraphQL] =
+    useLazyQuery<QueryProjectUserRolesByUserAndProject>(
+      QUERY_PROJECT_USER_ROLE_BY_USER_AND_PROJECT,
+      {
+        context: { session }
+      }
+    )
+
+  const [editProjectGraphQL] = useMutation(MUTATION_UPDATE_PROJECT, {
+    context: { session },
+    onError: (err) => {
+      err?.graphQLErrors[0]?.message == 'This attribute must be unique'
+        ? setFormError('Nome do projeto já existente')
+        : setFormError(err?.graphQLErrors[0]?.message)
+    }
+  })
+
+  const editProject = async () => {
+    if (
+      scrumMasters.length == 0 &&
+      productOwners.length == 0 &&
+      members.length == 0
+    ) {
+      setFormError(
+        'O projeto precisa ter pelo menos um integrante para ser editado'
+      )
+      return
+    }
+    if (
+      !scrumMasters.find((e) => e.value == user.id) &&
+      !productOwners.find((e) => e.value == user.id)
+    ) {
+      setFormError(
+        'O usuário editor do projeto precisa ter papel de Scrum Master ou Product Owner'
+      )
+      return
+    }
+    const errors = createProjectValidate(name)
+
+    if (Object.keys(errors).length) {
+      setFieldError(errors)
+      return
+    }
+    setFieldError({})
+
+    const { errors: errorsEditProject } = await editProjectGraphQL({
+      variables: {
+        id: editProjectId,
+        nameProject: name
+      }
+    })
+
+    if (errorsEditProject) {
+      return
+    }
+
+    const newUsersArray = scrumMasters.concat(productOwners).concat(members)
+
+    newUsersArray.map(async (u) => {
+      const role = scrumMasters.find(
+        (element) => element.label == u.label && element.value == u.value
+      )
+        ? 'scrumMaster'
+        : productOwners.find(
+            (element) => element.label == u.label && element.value == u.value
+          )
+        ? 'productOwner'
+        : 'member'
+
+      if (
+        scrumMastersReceived.find(
+          (element) => element.label == u.label && element.value == u.value
+        ) ||
+        productOwnersReceived.find(
+          (element) => element.label == u.label && element.value == u.value
+        ) ||
+        membersReceived.find(
+          (element) => element.label == u.label && element.value == u.value
+        )
+      ) {
+        const { data: projectUserRole } = await getProjectUserRoleGraphQL({
+          variables: {
+            userId: u.value,
+            projectId: editProjectId
+          },
+          fetchPolicy: 'no-cache'
+        })
+        editProjectUserRoleGraphQL({
+          variables: {
+            role: role,
+            userId: u.value,
+            projectId: editProjectId,
+            projectUserRoleId: projectUserRole?.projectUserRoles?.data[0].id
+          }
+        })
+      } else {
+        createProjectUserRoleGraphQL({
+          variables: {
+            role: role,
+            userId: u.value,
+            projectId: editProjectId
+          }
+        })
+      }
+    })
+
+    const oldUsersArray = scrumMastersReceived
+      .concat(productOwnersReceived)
+      .concat(membersReceived)
+
+    oldUsersArray.map(async (u) => {
+      if (
+        !scrumMasters.find(
+          (element) => element.label == u.label && element.value == u.value
+        ) &&
+        !productOwners.find(
+          (element) => element.label == u.label && element.value == u.value
+        ) &&
+        !members.find(
+          (element) => element.label == u.label && element.value == u.value
+        )
+      ) {
+        const { data } = await getProjectUserRoleGraphQL({
+          variables: {
+            userId: u.value,
+            projectId: editProjectId
+          },
+          fetchPolicy: 'no-cache'
+        })
+        deleteProjectUserRoleGraphQL({
+          variables: {
+            id: data?.projectUserRoles?.data[0].id
+          }
+        })
+      }
+    })
+
+    projectUserRoleTables.map((p) => {
+      if (p.project.id == editProjectId) {
+        p.role = scrumMasters.find(
+          (element) => element.label == user.name && element.value == user.id
+        )
+          ? 'scrumMaster'
+          : productOwners.find(
+              (element) =>
+                element.label == user.name && element.value == user.id
+            )
+          ? 'productOwner'
+          : 'member'
+        p.project.name = name
+      }
+    })
+    setProjects(projectUserRoleTables)
+    if (activeProjectId == editProjectId) {
+      setActiveProjectSideBar({ id: editProjectId || '', name: name })
+    }
+    closeModal()
   }
 
   const handleFirstForm = (value: any) => {

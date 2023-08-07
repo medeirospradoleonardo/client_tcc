@@ -7,7 +7,7 @@ export const QUERY_PROJECT = gql`
         id
         attributes {
           name
-          projectUserRoles {
+          projectUserRoles(filters: { user: { type: { eq: "default" } } }) {
             data {
               id
               attributes {

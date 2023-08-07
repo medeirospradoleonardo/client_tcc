@@ -11,7 +11,6 @@ import { StyledTableCell } from './styles'
 import { Dialog, Icon, TableFooter, TablePagination } from '@mui/material'
 import TablePaginationActions from './TablePagination'
 import Button from 'components/Button'
-import SelectChips from 'components/SelectChips'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -95,7 +94,9 @@ export default function CustomizedTables({
     membersReceived: [],
     projectUserRoleTables: projects,
     setProjects,
-    setQuantityProjectsPage
+    setQuantityProjectsPage,
+    activeProjectId,
+    setActiveProjectSideBar
   }
 
   const [propsModalProject, setPropsModalProject] =
@@ -176,7 +177,7 @@ export default function CustomizedTables({
             }
           }
         )
-
+        propsModalProjectNew.editProjectId = QueryProject?.project?.data?.id
         setPropsModalProject(propsModalProjectNew)
       }
     }
@@ -203,14 +204,14 @@ export default function CustomizedTables({
   >(MUTATION_DELETE_PROJECT, {
     context: { session },
     onCompleted: () => {
-      projectUserRoleTables = projectUserRoleTables.filter((p) => {
+      const projectsNew = projects.filter((p) => {
         if (p.project.id != data?.deleteProject?.data?.id) {
           return p
         }
       })
 
-      setProjects(projectUserRoleTables)
-      setQuantityProjectsPage(projectUserRoleTables.length)
+      setProjects(projectsNew)
+      setQuantityProjectsPage(projectsNew.length)
       if (activeProjectId == data?.deleteProject?.data?.id) {
         setActiveProjectId('')
         setActiveProjectSideBar(null)
@@ -319,7 +320,7 @@ export default function CustomizedTables({
       >
         <Confirm
           buttonLabel="Deletar"
-          message="Você tem certeza que quer deletar esse projeto?"
+          message="Você tem certeza que deseja deletar esse projeto?"
           closeModal={() => setOpenModalDelete(false)}
           actionFunction={() => removeProject(projectToRemoveId || '')}
         />

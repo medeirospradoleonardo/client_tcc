@@ -44,3 +44,18 @@ export const QUERY_PROJECT_USER_ROLES_FULL = gql`
     }
   }
 `
+
+export const QUERY_PROJECT_USER_ROLE_BY_USER_AND_PROJECT = gql`
+  query QueryProjectUserRolesByUserAndProject($userId: ID!, $projectId: ID!) {
+    projectUserRoles(
+      filters: {
+        user: { id: { eq: $userId } }
+        project: { id: { eq: $projectId } }
+      }
+    ) {
+      data {
+        id
+      }
+    }
+  }
+`

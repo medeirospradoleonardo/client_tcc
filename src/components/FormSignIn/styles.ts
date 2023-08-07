@@ -3,6 +3,7 @@ import { lighten } from 'polished'
 
 export const ForgotPassword = styled.a`
   ${({ theme }) => css`
+    cursor: pointer;
     display: block;
     font-size: ${theme.font.sizes.small};
     color: ${theme.colors.black};

@@ -33,7 +33,6 @@ import {
   AiOutlineBulb
 } from 'react-icons/ai'
 import { MdOutlineAnalytics } from 'react-icons/md'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 const Sidebar = ({ session, projectsQuantity, activeProject }) => {
@@ -80,11 +79,16 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           isActive={pathname === to}
           session={session}
           title={!session ? 'Você precisa estar logado' : ''}
-          onClick={() =>
-            router.push({
-              pathname: to,
-              query: { confirm: true }
-            })
+          onClick={
+            session
+              ? () =>
+                  router.push({
+                    pathname: to,
+                    query: { confirm: true }
+                  })
+              : () => {
+                  return
+                }
           }
         >
           <SLink session={session}>
@@ -105,11 +109,16 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           isActive={pathname === to}
           session={session}
           title={!session ? 'Você precisa estar logado' : ''}
-          onClick={() =>
-            router.push({
-              pathname: to,
-              query: { confirm: true }
-            })
+          onClick={
+            session
+              ? () =>
+                  router.push({
+                    pathname: to,
+                    query: { confirm: true }
+                  })
+              : () => {
+                  return
+                }
           }
         >
           <SLink session={session}>
@@ -136,11 +145,16 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           isActive={pathname === to}
           session={session}
           title={!session ? 'Você precisa estar logado' : ''}
-          onClick={() =>
-            router.push({
-              pathname: to,
-              query: { confirm: true }
-            })
+          onClick={
+            session
+              ? () =>
+                  router.push({
+                    pathname: to,
+                    query: { confirm: true }
+                  })
+              : () => {
+                  return
+                }
           }
         >
           <SLink session={session}>

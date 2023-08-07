@@ -15,6 +15,7 @@ export const Wrapper = styled.menu<MenuFullProps>`
 `
 
 export const LogoWrapper = styled.div`
+  cursor: pointer;
   ${media.lessThan('medium')`
     position: absolute;
     left: 50%;
@@ -56,7 +57,7 @@ export const MenuNav = styled.div`
   `}
 `
 
-export const MenuLink = styled.a`
+export const MenuLink = styled.div`
   ${({ theme }) => css`
     position: relative;
     color: ${theme.colors.white};

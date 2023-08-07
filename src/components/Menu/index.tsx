@@ -8,6 +8,7 @@ import Button from 'components/Button'
 import MediaMatch from 'components/MediaMatch'
 import Link from 'next/link'
 import UserDropdown from 'components/UserDropdown'
+import { useRouter } from 'next/router'
 
 export type MenuProps = {
   username?: string | null
@@ -16,6 +17,7 @@ export type MenuProps = {
 
 const Menu = ({ username, loading }: MenuProps) => {
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   return (
     <S.Wrapper isOpen={isOpen}>
@@ -24,21 +26,31 @@ const Menu = ({ username, loading }: MenuProps) => {
           <MenuIcon aria-label="Open Menu" />
         </S.IconWrapper>
       </MediaMatch>
-      <S.LogoWrapper>
-        <Link href="/" passHref>
-          <a>
-            <Logo color="black" />
-          </a>
-        </Link>
+      <S.LogoWrapper
+        onClick={() =>
+          router.push({
+            pathname: '',
+            query: { confirm: true }
+          })
+        }
+      >
+        <Logo color="black" />
       </S.LogoWrapper>
       {!loading && (
         <>
           <S.MenuGroup>
             <MediaMatch greaterThan="medium">
               {!username ? (
-                <Link href="/sign-in" passHref>
-                  <Button as="a">Entrar</Button>
-                </Link>
+                <Button
+                  onClick={() =>
+                    router.push({
+                      pathname: '/sign-in',
+                      query: { confirm: true }
+                    })
+                  }
+                >
+                  Entrar
+                </Button>
               ) : (
                 <UserDropdown username={username} />
               )}
@@ -51,28 +63,59 @@ const Menu = ({ username, loading }: MenuProps) => {
               onClick={() => setIsOpen(false)}
             />
             <S.MenuNav>
-              <Link href="/" passHref>
-                <S.MenuLink href="#">Home</S.MenuLink>
-              </Link>
+              <S.MenuLink
+                onClick={() =>
+                  router.push({
+                    pathname: '/',
+                    query: { confirm: true }
+                  })
+                }
+              >
+                Home
+              </S.MenuLink>
+
               {!!username && (
                 <>
-                  <Link href="/profile" passHref>
-                    <S.MenuLink href="#">Meu Perfil</S.MenuLink>
-                  </Link>
+                  <S.MenuLink
+                    onClick={() =>
+                      router.push({
+                        pathname: '/profile',
+                        query: { confirm: true }
+                      })
+                    }
+                  >
+                    Meu Perfil
+                  </S.MenuLink>
                 </>
               )}
             </S.MenuNav>
             {!username && (
               <S.RegisterBox>
-                <Link href="/sign-in" passHref>
-                  <Button fullWidth size="large" as="a">
-                    Entrar
-                  </Button>
-                </Link>
+                <Button
+                  fullWidth
+                  size="large"
+                  onClick={() =>
+                    router.push({
+                      pathname: '/sign-in',
+                      query: { confirm: true }
+                    })
+                  }
+                >
+                  Entrar
+                </Button>
                 <span>or</span>
-                <Link href="/sign-up" passHref>
-                  <S.CreateAccount title="Sign Up">Criar conta</S.CreateAccount>
-                </Link>
+
+                <S.CreateAccount
+                  title="Sign Up"
+                  onClick={() =>
+                    router.push({
+                      pathname: '/sign-up',
+                      query: { confirm: true }
+                    })
+                  }
+                >
+                  Criar conta
+                </S.CreateAccount>
               </S.RegisterBox>
             )}
           </S.MenuFull>

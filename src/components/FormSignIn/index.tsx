@@ -45,14 +45,13 @@ const FormSignIn = () => {
     })
 
     if (result?.url) {
-      console.log(result?.url)
       return push(result?.url)
     }
 
     setLoading(false)
 
     // jogar o erro
-    setFormError('username or password is invalid')
+    setFormError('Email ou senha inválidos.')
   }
 
   return (
@@ -79,18 +78,34 @@ const FormSignIn = () => {
           onInputChange={(v) => handleInput('password', v)}
           icon={<Lock />}
         />
-        <Link href="/forgot-password" passHref>
-          <S.ForgotPassword>Esqueceu sua senha?</S.ForgotPassword>
-        </Link>
+
+        <S.ForgotPassword
+          onClick={() =>
+            routes.push({
+              pathname: '/forgot-password',
+              query: { confirm: true }
+            })
+          }
+        >
+          Esqueceu sua senha?
+        </S.ForgotPassword>
+
         <Button type="submit" size="large" fullWidth disabled={loading}>
           {loading ? <FormLoading /> : <span>Entrar</span>}
         </Button>
 
         <FormLink>
           Não possui conta?{' '}
-          <Link href="/sign-up">
-            <a>Criar conta</a>
-          </Link>
+          <span
+            onClick={() =>
+              routes.push({
+                pathname: '/sign-up',
+                query: { confirm: true }
+              })
+            }
+          >
+            <span>Criar conta</span>
+          </span>
         </FormLink>
       </form>
     </FormWrapper>

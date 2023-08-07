@@ -22,8 +22,10 @@ import { MUTATION_REGISTER } from 'graphql/mutations/register'
 import { signIn } from 'next-auth/client'
 import { FieldErrors, signUpValidate } from 'utils/validations'
 import Radio from 'components/Radio'
+import { useRouter } from 'next/router'
 
 const FormSignUp = () => {
+  const router = useRouter()
   const [formError, setFormError] = useState('')
   const [fieldError, setFieldError] = useState<FieldErrors>({})
   const [values, setValues] = useState<UsersPermissionsRegisterInput>({
@@ -34,10 +36,10 @@ const FormSignUp = () => {
 
   const [createUser, { error, loading }] = useMutation(MUTATION_REGISTER, {
     onError: (err) => {
-      setFormError(
-        // err?.graphQLErrors[0]?.extensions?.exception.data.message[0].messages[0].message
-        err?.graphQLErrors[0]?.message
-      )
+      console.log(err?.graphQLErrors[0]?.message)
+      err?.graphQLErrors[0]?.message == 'Email or Username are already taken'
+        ? setFormError('Nome ou Email já existente.')
+        : setFormError(err?.graphQLErrors[0]?.message)
     },
     onCompleted: () => {
       !error &&
@@ -124,10 +126,17 @@ const FormSignUp = () => {
         </Button>
 
         <FormLink>
-          Já possui conta?{' '}
-          <Link href="/sign-in">
-            <a>Entrar</a>
-          </Link>
+          Já possui conta?
+          <span
+            onClick={() =>
+              router.push({
+                pathname: '/sign-in',
+                query: { confirm: true }
+              })
+            }
+          >
+            <span>Entrar</span>
+          </span>
         </FormLink>
       </form>
     </FormWrapper>
