@@ -28,6 +28,7 @@ export default function Me(
       activeProject={props.activeProject}
     >
       <FormProfile
+        userId={props.userId}
         session={props.session}
         email={props.email}
         username={props.username}
@@ -78,6 +79,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: {
       session,
       username: data.usersPermissionsUser?.data?.attributes?.username,
+      userId: data.usersPermissionsUser?.data?.id,
       email: data.usersPermissionsUser?.data?.attributes?.email,
       projectUserRoles: projectUserRoles?.data,
       activeProject: data.usersPermissionsUser?.data?.attributes?.activeProject

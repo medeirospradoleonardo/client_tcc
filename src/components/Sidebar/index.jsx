@@ -15,7 +15,9 @@ import {
   STheme,
   SThemeLabel,
   SThemeToggler,
-  SToggleThumb
+  SToggleThumb,
+  SDividerContainer,
+  SDividerTitle
 } from './styles'
 
 import logoSVG from '../../../public/img/logo.svg'
@@ -71,7 +73,11 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
             </div>
           )}
         </SProjectTitleContainer>
-        <SDivider />
+        <SDividerContainer>
+          <SDivider />
+          {/* <SDividerTitle>Projeto</SDividerTitle> */}
+          <SDivider />
+        </SDividerContainer>
       </>
       {linksArray.map(({ icon, label, to }) => (
         <SLinkContainer
@@ -190,12 +196,6 @@ const linksArray = [
     to: '/',
     notification: 0
   },
-  // {
-  //   label: 'Linha do tempo',
-  //   icon: <AiOutlineCalendar />,
-  //   to: '/timeline',
-  //   notification: 0
-  // },
   {
     label: 'Backlog do produto',
     icon: <AiOutlineDatabase />,

@@ -596,7 +596,7 @@ enum ENUM_BOARD_STATUS {
 
 input BoardFiltersInput {
   id: IDFilterInput
-  Title: StringFilterInput
+  title: StringFilterInput
   timeEstimated: IntFilterInput
   type: StringFilterInput
   description: StringFilterInput
@@ -615,7 +615,7 @@ input BoardFiltersInput {
 }
 
 input BoardInput {
-  Title: String
+  title: String
   timeEstimated: Int
   type: ENUM_BOARD_TYPE
   description: String
@@ -629,7 +629,7 @@ input BoardInput {
 }
 
 type Board {
-  Title: String!
+  title: String!
   timeEstimated: Int!
   type: ENUM_BOARD_TYPE!
   description: String
@@ -923,8 +923,8 @@ input SprintInput {
 
 type Sprint {
   name: String!
-  initialDate: Date!
-  finalDate: Date!
+  initialDate: Date
+  finalDate: Date
   boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   project: ProjectEntityResponse
   createdAt: DateTime

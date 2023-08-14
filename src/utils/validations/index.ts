@@ -1,3 +1,4 @@
+import { SprintValues } from 'components/FormSprint'
 import { UsersPermissionsRegisterInput } from 'graphql/generated/globalTypes'
 import Joi from 'joi'
 
@@ -87,4 +88,22 @@ export function createProjectValidate(name: string) {
   const schema = Joi.object(fieldsValidationsProject)
 
   return getFieldErrors(schema.validate({ name }, { abortEarly: false }))
+}
+
+const fieldsValidationsSprint = {
+  name: Joi.string().required().messages({
+    'string.empty': `O campo nome não pode ficar vazio`
+  }),
+  initialDate: Joi.string().required().messages({
+    'string.empty': `O campo data inicial não pode ficar vazio`
+  }),
+  finalDate: Joi.string().required().messages({
+    'string.empty': `O campo data final não pode ficar vazio`
+  })
+}
+
+export function createSprintValidate(values: SprintValues) {
+  const schema = Joi.object(fieldsValidationsSprint)
+
+  return getFieldErrors(schema.validate(values, { abortEarly: false }))
 }

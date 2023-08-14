@@ -15,5 +15,9 @@ module.exports = withPWA({
   pwa: {
     dest: 'public',
     disable: !isProd
+  },
+  compiler: {
+    // Enables the styled-components SWC transform
+    styledComponents: true
   }
 })

@@ -5,6 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import CheckIcon from '@mui/icons-material/Check'
 import { QueryAllUsers_usersPermissionsUsers_data } from 'graphql/generated/QueryAllUsers'
+import { QuerySprints } from 'graphql/generated/QuerySprints'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -21,6 +22,30 @@ export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
           })
         )
     }
+  }))
+}
+
+export const SprintsMapper = (sprints: QuerySprints) => {
+  return sprints.sprints?.data.map((s) => ({
+    id: s.id,
+    name: s.attributes?.name,
+    initialDate: s.attributes?.initialDate,
+    finalDate: s.attributes?.finalDate,
+    boards: s.attributes?.boards?.data.map((board) => ({
+      id: board.id,
+      title: board.attributes?.title,
+      timeEstimated: board.attributes?.timeEstimated,
+      description: board.attributes?.description,
+      author: {
+        id: board.attributes?.author?.data?.id,
+        name: board.attributes?.author?.data?.attributes?.username
+      },
+      responsible: {
+        id: board.attributes?.responsible?.data?.id,
+        name: board.attributes?.responsible?.data?.attributes?.username
+      },
+      status: board.attributes?.status
+    }))
   }))
 }
 

@@ -15,15 +15,22 @@ import ProductBacklog, {
 } from 'templates/ProductBacklog'
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
+import {
+  QuerySprints,
+  QuerySprintsVariables
+} from 'graphql/generated/QuerySprints'
+import { QUERY_SPRINT } from 'graphql/queries/sprint'
+import { SprintsMapper } from 'utils/mappers'
+import { resetServerContext } from 'react-beautiful-dnd'
 
 export default function ProductBacklogPage(props: ProductBacklogTemplateProps) {
   return (
     <ProductBacklog
+      session={props.session}
+      sprintsData={props.sprintsData}
       projectUserRoles={props?.projectUserRoles}
       activeProject={props?.activeProject}
-    >
-      <h1>Backlog do produto</h1>
-    </ProductBacklog>
+    />
   )
 }
 
@@ -40,7 +47,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       props: {}
     }
   }
-
+  resetServerContext()
   const {
     data: { usersPermissionsUser }
   } = await apolloClient.query<QueryProfileMe, QueryProfileMeVariables>({
@@ -64,8 +71,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     fetchPolicy: 'no-cache'
   })
 
+  const dataSprint = usersPermissionsUser?.data?.attributes?.activeProject?.data
+    ?.id
+    ? await apolloClient.query<QuerySprints, QuerySprintsVariables>({
+        query: QUERY_SPRINT,
+        variables: {
+          projectId:
+            usersPermissionsUser?.data?.attributes?.activeProject?.data?.id ||
+            ''
+        },
+        fetchPolicy: 'no-cache'
+      })
+    : null
+
   return {
     props: {
+      session,
       projectUserRoles: projectUserRoles?.data,
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {
@@ -76,7 +97,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
               usersPermissionsUser?.data?.attributes?.activeProject?.data
                 ?.attributes?.name || ''
           }
-        : null
+        : null,
+      sprintsData: dataSprint != null ? SprintsMapper(dataSprint?.data) : null
     }
   }
 }

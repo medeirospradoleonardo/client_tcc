@@ -20,11 +20,6 @@ import { projectsToTableMapper, usersToSelectMapper } from 'utils/mappers'
 import { Session } from 'next-auth'
 
 import {
-  MutationDeleteProjectUserRole,
-  MutationDeleteProjectUserRoleVariables
-} from 'graphql/generated/MutationDeleteProjectUserRole'
-import { MUTATION_DELETE_PROJECT_USER_ROLE } from 'graphql/mutations/projectUserRole'
-import {
   MutationActiveProject,
   MutationActiveProjectVariables
 } from 'graphql/generated/MutationActiveProject'
@@ -101,8 +96,6 @@ export default function CustomizedTables({
 
   const [propsModalProject, setPropsModalProject] =
     React.useState<FormProjectProps>(modalProjectPropsDefault)
-
-  const [usersOptions, setUsersOptions] = React.useState([])
 
   const [getAllUsers, { data: QueryAllUsers }] = useLazyQuery<QueryAllUsers>(
     QUERY_ALL_USERS,

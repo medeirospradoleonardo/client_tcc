@@ -17,10 +17,16 @@ import { useRouter } from 'next/router'
 export type FormProfileProps = {
   username?: string
   email?: string
+  userId: string
   session: Session
 }
 
-const FormProfile = ({ email, username, session }: FormProfileProps) => {
+const FormProfile = ({
+  email,
+  username,
+  session,
+  userId
+}: FormProfileProps) => {
   const [fieldError, setFieldError] = useState<FieldErrors>({})
   const [formError, setFormError] = useState('')
   const [name, setName] = useState<string>(username ? username : '')
@@ -44,7 +50,7 @@ const FormProfile = ({ email, username, session }: FormProfileProps) => {
     event.preventDefault()
     await updateUserName({
       variables: {
-        id: 1,
+        id: userId,
         username: name
       }
     })

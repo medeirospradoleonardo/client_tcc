@@ -82,6 +82,17 @@ export const SSearchIcon = styled.button`
   }
 `
 
+export const SDividerContainer = styled.div`
+  display: flex;
+  vertical-align: center;
+`
+
+export const SDividerTitle = styled.span`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray};
+  `}
+`
+
 export const SDivider = styled.div`
   height: 1px;
   width: 100%;

@@ -1,15 +1,84 @@
+import Logo from 'components/Logo'
+import {
+  QueryProfileMe,
+  QueryProfileMeVariables
+} from 'graphql/generated/QueryProfileMe'
+import {
+  QueryProjectUserRolesLight,
+  QueryProjectUserRolesLightVariables
+} from 'graphql/generated/QueryProjectUserRolesLight'
+import { QUERY_PROJECT_USER_ROLES_LIGHT } from 'graphql/queries/projectUserRole'
+import { QUERY_PROFILE_ME } from 'graphql/queries/user'
+import { GetServerSidePropsContext } from 'next'
 import React from 'react'
-import Home from 'templates/Home'
+import Home, { HomeTemplateProps } from 'templates/Home'
+import { initializeApollo } from 'utils/apollo'
+import protectedRoutes from 'utils/protected-routes'
 
-const Project = () => {
-  // if (!data) return <PageLoader />
-  // if (error) return <PageError />
-
+export default function HomePage(props: HomeTemplateProps) {
   return (
-    <Home>
-      <h1>Home</h1>
+    <Home
+      projectUserRoles={props?.projectUserRoles}
+      activeProject={props?.activeProject}
+    >
+      <Logo color="black" />
+      <h1 style={{ marginLeft: '20px' }}>
+        A sua ferramenta de gestão ágil de conhecimento
+      </h1>
     </Home>
   )
 }
 
-export default Project
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await protectedRoutes(context)
+  const apolloClient = initializeApollo(null, session)
+
+  if (!session) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/sign-in'
+      },
+      props: {}
+    }
+  }
+
+  const {
+    data: { usersPermissionsUser }
+  } = await apolloClient.query<QueryProfileMe, QueryProfileMeVariables>({
+    query: QUERY_PROFILE_ME,
+    variables: {
+      identifier: session?.id as string
+    },
+    fetchPolicy: 'no-cache'
+  })
+
+  const {
+    data: { projectUserRoles }
+  } = await apolloClient.query<
+    QueryProjectUserRolesLight,
+    QueryProjectUserRolesLightVariables
+  >({
+    query: QUERY_PROJECT_USER_ROLES_LIGHT,
+    variables: {
+      email: session?.user?.email as string
+    },
+    fetchPolicy: 'no-cache'
+  })
+
+  return {
+    props: {
+      projectUserRoles: projectUserRoles?.data,
+      activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
+        ? {
+            id:
+              usersPermissionsUser?.data?.attributes?.activeProject?.data?.id ||
+              '',
+            name:
+              usersPermissionsUser?.data?.attributes?.activeProject?.data
+                ?.attributes?.name || ''
+          }
+        : null
+    }
+  }
+}
