@@ -9,12 +9,16 @@ import { useState } from 'react'
 import TextField from 'components/TextField'
 import { FieldErrors, createSprintValidate } from 'utils/validations'
 import { useMutation } from '@apollo/client'
-import { MUTATION_CREATE_SPRINT } from 'graphql/mutations/sprint'
+import {
+  MUTATION_CREATE_SPRINT,
+  MUTATION_UPDATE_SPRINT
+} from 'graphql/mutations/sprint'
 import { Session } from 'next-auth'
 import { Project } from 'templates/Projects'
 import { Sprint } from 'templates/ProductBacklog'
 
 export type FormSprintProps = {
+  initialSprint: Sprint
   session: Session
   activeProject: Project
   closeModal: () => void
@@ -29,6 +33,7 @@ export type SprintValues = {
 }
 
 const FormSprint = ({
+  initialSprint,
   session,
   activeProject,
   closeModal,
@@ -38,19 +43,30 @@ const FormSprint = ({
   const [formError, setFormError] = useState('')
   const [fieldError, setFieldError] = useState<FieldErrors>({})
   const [values, setValues] = useState<SprintValues>({
-    name: '',
-    initialDate: '',
-    finalDate: ''
+    name: initialSprint.name,
+    initialDate: initialSprint.initialDate,
+    finalDate: initialSprint.finalDate
   })
 
   const [createSprintGraphQL] = useMutation(MUTATION_CREATE_SPRINT, {
     context: { session },
     onError: (err) => {
       setFormError(err?.graphQLErrors[0]?.message)
+    },
+    onCompleted: (data) => {
+      setSprints({
+        id: data.createSprint.data.id,
+        name: data.createSprint.data.attributes.name,
+        initialDate: data.createSprint.data.attributes.initialDate,
+        finalDate: data.createSprint.data.attributes.finalDate,
+        boards: []
+      })
+
+      closeModal()
     }
   })
 
-  const createSprint = async () => {
+  const createSprint = () => {
     const errors = createSprintValidate(values)
 
     if (Object.keys(errors).length) {
@@ -80,32 +96,72 @@ const FormSprint = ({
 
     setFormError('')
 
-    const { data: sprint, errors: errorsCreateSprint } =
-      await createSprintGraphQL({
-        variables: {
-          projectId: activeProject.id,
-          name: values.name,
-          initialDate: values.initialDate,
-          finalDate: values.finalDate
-        }
+    createSprintGraphQL({
+      variables: {
+        projectId: activeProject.id,
+        name: values.name,
+        initialDate: values.initialDate,
+        finalDate: values.finalDate
+      }
+    })
+  }
+
+  const [updateSprintGraphQL] = useMutation(MUTATION_UPDATE_SPRINT, {
+    context: { session },
+    onError: (err) => {
+      setFormError(err?.graphQLErrors[0]?.message)
+    },
+    onCompleted: (data) => {
+      setSprints({
+        id: data.updateSprint.data.id,
+        name: data.updateSprint.data.attributes.name,
+        initialDate: data.updateSprint.data.attributes.initialDate,
+        finalDate: data.updateSprint.data.attributes.finalDate,
+        boards: []
       })
 
-    if (errorsCreateSprint) {
+      closeModal()
+    }
+  })
+
+  const editSprint = () => {
+    const errors = createSprintValidate(values)
+
+    if (Object.keys(errors).length) {
+      setFieldError(errors)
       return
     }
 
-    setSprints({
-      id: sprint.createSprint.data.id as string,
-      name: sprint.createSprint.data.attributes.name as string,
-      initialDate: sprint.createSprint.data.attributes.initialDate as string,
-      finalDate: sprint.createSprint.data.attributes.finalDate as string,
-      boards: []
-    })
-    closeModal()
-  }
+    setFieldError({})
 
-  const editSprint = () => {
-    //
+    const dateToday = new Date()
+    const dateTodayString =
+      dateToday.getFullYear() +
+      '-' +
+      (dateToday.getMonth() + 1) +
+      '-' +
+      (dateToday.getDate() - 1)
+
+    if (values.initialDate >= values.finalDate) {
+      setFormError(
+        'A data inicial nao pode ser maior ou igual que a data final'
+      )
+      return
+    } else if (new Date(values.initialDate) < new Date(dateTodayString)) {
+      setFormError('A data inicial nao pode ser mais antiga que a atual')
+      return
+    }
+
+    setFormError('')
+
+    updateSprintGraphQL({
+      variables: {
+        id: initialSprint.id,
+        name: values.name,
+        initialDate: values.initialDate,
+        finalDate: values.finalDate
+      }
+    })
   }
 
   const handleInput = (field: string, value: string) => {

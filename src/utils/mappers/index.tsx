@@ -134,3 +134,23 @@ export const usersToSelectMapper = (
     value: `${user.id}`
   }))
 }
+
+export const getBoardStatus = (status: string) => {
+  switch (status) {
+    case 'notInitiated':
+      return {
+        title: 'NÃO INICIADO',
+        color: '#DA5757'
+      }
+    case 'inProgress':
+      return {
+        title: 'EM PROGRESSO',
+        color: '#a6b805'
+      }
+    case 'concluded':
+      return {
+        title: 'CONCLUÍDO',
+        color: '#11831a'
+      }
+  }
+}

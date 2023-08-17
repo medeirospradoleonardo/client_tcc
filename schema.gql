@@ -589,9 +589,9 @@ enum ENUM_BOARD_TYPE {
 }
 
 enum ENUM_BOARD_STATUS {
-  Nao_iniciado
-  Em_progresso
-  Concluido
+  notInitiated
+  inProgress
+  concluded
 }
 
 input BoardFiltersInput {
@@ -605,8 +605,8 @@ input BoardFiltersInput {
   sprint: SprintFiltersInput
   responsible: UsersPermissionsUserFiltersInput
   author: UsersPermissionsUserFiltersInput
-  status: StringFilterInput
   project: ProjectFiltersInput
+  status: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [BoardFiltersInput]
@@ -624,8 +624,8 @@ input BoardInput {
   sprint: ID
   responsible: ID
   author: ID
-  status: ENUM_BOARD_STATUS
   project: ID
+  status: ENUM_BOARD_STATUS
 }
 
 type Board {
@@ -638,8 +638,8 @@ type Board {
   sprint: SprintEntityResponse
   responsible: UsersPermissionsUserEntityResponse
   author: UsersPermissionsUserEntityResponse
-  status: ENUM_BOARD_STATUS
   project: ProjectEntityResponse
+  status: ENUM_BOARD_STATUS
   createdAt: DateTime
   updatedAt: DateTime
 }

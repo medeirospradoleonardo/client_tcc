@@ -8,9 +8,9 @@
 //==============================================================
 
 export enum ENUM_BOARD_STATUS {
-  Concluido = "Concluido",
-  Em_progresso = "Em_progresso",
-  Nao_iniciado = "Nao_iniciado",
+  concluded = "concluded",
+  inProgress = "inProgress",
+  notInitiated = "notInitiated",
 }
 
 export enum ENUM_PROJECTUSERROLE_ROLE {

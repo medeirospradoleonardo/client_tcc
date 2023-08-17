@@ -19,7 +19,7 @@ import {
   QuerySprints,
   QuerySprintsVariables
 } from 'graphql/generated/QuerySprints'
-import { QUERY_SPRINT } from 'graphql/queries/sprint'
+import { QUERY_SPRINTS } from 'graphql/queries/sprint'
 import { SprintsMapper } from 'utils/mappers'
 import { resetServerContext } from 'react-beautiful-dnd'
 
@@ -74,7 +74,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const dataSprint = usersPermissionsUser?.data?.attributes?.activeProject?.data
     ?.id
     ? await apolloClient.query<QuerySprints, QuerySprintsVariables>({
-        query: QUERY_SPRINT,
+        query: QUERY_SPRINTS,
         variables: {
           projectId:
             usersPermissionsUser?.data?.attributes?.activeProject?.data?.id ||

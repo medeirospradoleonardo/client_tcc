@@ -63,7 +63,7 @@ export const Wrapper = styled.button<WrapperProps>`
     text-decoration: none;
 
     &:focus {
-      outline: 1px dashed;
+      /* outline: 1px dashed; */
     }
 
     &:hover {

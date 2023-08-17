@@ -15,6 +15,16 @@ export const Content = styled.div`
   `} */
 `
 
+export const Menu = styled.div`
+  position: fixed;
+  width: 100%;
+`
+
+export const Sidebar = styled.div`
+  position: fixed;
+  width: 100%;
+`
+
 export const SectionFooter = styled.section`
   ${({ theme }) => css`
     margin-top: ${theme.spacings.large};

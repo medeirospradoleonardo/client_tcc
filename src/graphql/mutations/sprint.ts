@@ -62,3 +62,26 @@ export const MUTATION_DELETE_SPRINT = gql`
     }
   }
 `
+
+export const MUTATION_UPDATE_SPRINT = gql`
+  mutation MutationUpdateSprint(
+    $id: ID!
+    $name: String!
+    $initialDate: Date!
+    $finalDate: Date!
+  ) {
+    updateSprint(
+      id: $id
+      data: { name: $name, initialDate: $initialDate, finalDate: $finalDate }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          initialDate
+          finalDate
+        }
+      }
+    }
+  }
+`
