@@ -67,6 +67,7 @@ export interface QuerySprints_sprints_data_attributes {
   name: string;
   initialDate: any | null;
   finalDate: any | null;
+  expand: boolean | null;
   boards: QuerySprints_sprints_data_attributes_boards | null;
 }
 

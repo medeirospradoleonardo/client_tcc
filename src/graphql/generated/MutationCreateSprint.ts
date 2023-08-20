@@ -67,6 +67,7 @@ export interface MutationCreateSprint_createSprint_data_attributes {
   name: string;
   initialDate: any | null;
   finalDate: any | null;
+  expand: boolean | null;
   boards: MutationCreateSprint_createSprint_data_attributes_boards | null;
 }
 

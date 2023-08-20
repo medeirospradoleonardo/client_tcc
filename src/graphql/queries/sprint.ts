@@ -9,6 +9,7 @@ export const QUERY_SPRINTS = gql`
           name
           initialDate
           finalDate
+          expand
           boards {
             data {
               id

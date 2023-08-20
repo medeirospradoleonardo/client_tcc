@@ -31,6 +31,7 @@ export const SprintsMapper = (sprints: QuerySprints) => {
     name: s.attributes?.name,
     initialDate: s.attributes?.initialDate,
     finalDate: s.attributes?.finalDate,
+    expand: s.attributes?.expand,
     boards: s.attributes?.boards?.data.map((board) => ({
       id: board.id,
       title: board.attributes?.title,

@@ -8,21 +8,33 @@ import Button from 'components/Button'
 import { useState } from 'react'
 import TextField from 'components/TextField'
 import { FieldErrors } from 'utils/validations'
+import { Board } from 'templates/ProductBacklog'
 
 export type FormBoardProps = {
+  initialBoard: Board
   closeModal: () => void
   option?: 'create' | 'edit'
 }
 
-const FormBoard = ({ closeModal, option = 'create' }: FormBoardProps) => {
+const FormBoard = ({
+  initialBoard,
+  closeModal,
+  option = 'create'
+}: FormBoardProps) => {
   const [formError, setFormError] = useState('')
   const [fieldError, setFieldError] = useState<FieldErrors>({})
 
-  const createBoard = () => {}
+  const createBoard = () => {
+    //
+  }
 
-  const editBoard = () => {}
+  const editBoard = () => {
+    //
+  }
 
-  const handleInput = (value: string) => {}
+  const handleInput = (value: string) => {
+    //
+  }
   return (
     <Container>
       <S.Heading>
@@ -37,58 +49,74 @@ const FormBoard = ({ closeModal, option = 'create' }: FormBoardProps) => {
         </FormError>
       )}
       <S.Content>
-        <TextField
-          name="name"
-          placeholder="Nome do projeto"
-          label="Nome do projeto"
-          // initialValue={name}
-          error={fieldError?.name}
-          onInputChange={(v) => handleInput(v)}
-          style={{ height: '30px' }}
-        />
-        {/* <S.Select>
-          <SelectChips
-            label="Scrum Master"
-            setData={setDataScrumMaster}
-            defaultValues={scrumMasters}
-            options={users}
-            maxMenuHeight={250}
-            placeholder="Selecione um Scrum Master para o projeto"
+        <div style={{ marginRight: '30px' }}>
+          <TextField
+            name="title"
+            placeholder="Titulo"
+            label="Titulo"
+            // initialValue={name}
+            error={fieldError?.name}
+            onInputChange={(v) => handleInput(v)}
+            style={{ height: '30px' }}
           />
-          <SelectChips
-            label="Product Owner"
-            setData={setDataProductOwner}
-            defaultValues={productOwners}
-            options={users}
-            maxMenuHeight={160}
-            placeholder="Selecione um Product Owner para o projeto"
-          />
-          <SelectChips
-            label="Membro"
-            setData={setDataMembers}
-            defaultValues={members}
-            options={users}
-            placeholder="Selecione um Membro para o projeto"
-          />
-        </S.Select> */}
-        <S.ButtonContainer>
-          <Button
-            minimal
-            size="small"
-            style={{ marginBottom: '10px' }}
-            onClick={closeModal}
-          >
-            Cancelar
-          </Button>
-          <Button
-            size="small"
-            style={{ marginBottom: '10px' }}
-            onClick={option == 'create' ? createBoard : editBoard}
-          >
-            {option == 'create' ? 'Criar board' : 'Editar board'}
-          </Button>
-        </S.ButtonContainer>
+        </div>
+        <S.Right>
+          <S.Select>
+            <SelectChips
+              isMulti={false}
+              label="Status"
+              setData={() => console.log()}
+              defaultValues={[]}
+              options={[
+                { label: 'Nao iniciado', value: 'notInitiated' },
+                { label: 'Em progresso', value: 'inProgress' },
+                { label: 'Concluído', value: 'concluded' }
+              ]}
+              maxMenuHeight={250}
+              placeholder="Selecione um status"
+            />
+            <SelectChips
+              isMulti={false}
+              label="Responsável"
+              setData={() => console.log()}
+              defaultValues={[]}
+              options={[
+                { label: 'Nao iniciado', value: 'notInitiated' },
+                { label: 'Em progresso', value: 'inProgress' },
+                { label: 'Concluído', value: 'concluded' }
+              ]}
+              maxMenuHeight={250}
+              placeholder="Selecione um responsável"
+            />
+            <TextField
+              name="timeEstimated"
+              placeholder="Tempo estimado (em horas)"
+              label="Tempo estimado (em horas)"
+              // initialValue={name}
+              error={fieldError?.name}
+              onInputChange={(v) => handleInput(v)}
+              style={{ height: '30px' }}
+            />
+          </S.Select>
+        </S.Right>
       </S.Content>
+      <S.ButtonContainer>
+        <Button
+          minimal
+          size="small"
+          style={{ marginBottom: '10px' }}
+          onClick={closeModal}
+        >
+          Cancelar
+        </Button>
+        <Button
+          size="small"
+          style={{ marginBottom: '10px' }}
+          onClick={option == 'create' ? createBoard : editBoard}
+        >
+          {option == 'create' ? 'Criar board' : 'Editar board'}
+        </Button>
+      </S.ButtonContainer>
     </Container>
   )
 }

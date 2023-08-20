@@ -34,3 +34,21 @@ export const QUERY_ALL_USERS = gql`
     }
   }
 `
+
+export const QUERY_ALL_USERS_IN_PROJECT = gql`
+  query QueryAllUsersInProject($projectId: ID!) {
+    usersPermissionsUsers(
+      filters: {
+        type: { eqi: "default" }
+        projectUserRoles: { project: { id: { eq: $projectId } } }
+      }
+    ) {
+      data {
+        id
+        attributes {
+          username
+        }
+      }
+    }
+  }
+`

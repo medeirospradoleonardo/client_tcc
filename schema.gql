@@ -906,6 +906,7 @@ input SprintFiltersInput {
   finalDate: DateFilterInput
   boards: BoardFiltersInput
   project: ProjectFiltersInput
+  expand: BooleanFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [SprintFiltersInput]
@@ -919,6 +920,7 @@ input SprintInput {
   finalDate: Date
   boards: [ID]
   project: ID
+  expand: Boolean
 }
 
 type Sprint {
@@ -927,6 +929,7 @@ type Sprint {
   finalDate: Date
   boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   project: ProjectEntityResponse
+  expand: Boolean
   createdAt: DateTime
   updatedAt: DateTime
 }

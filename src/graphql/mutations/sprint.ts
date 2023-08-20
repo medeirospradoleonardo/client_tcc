@@ -21,6 +21,7 @@ export const MUTATION_CREATE_SPRINT = gql`
           name
           initialDate
           finalDate
+          expand
           boards {
             data {
               id
@@ -80,6 +81,23 @@ export const MUTATION_UPDATE_SPRINT = gql`
           name
           initialDate
           finalDate
+          expand
+        }
+      }
+    }
+  }
+`
+
+export const MUTATION_SPRINT_TOGGLE_EXPAND = gql`
+  mutation MutationSprintToggleExpand($id: ID!, $expand: Boolean!) {
+    updateSprint(id: $id, data: { expand: $expand }) {
+      data {
+        id
+        attributes {
+          name
+          initialDate
+          finalDate
+          expand
         }
       }
     }

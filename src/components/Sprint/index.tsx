@@ -8,70 +8,37 @@ import { Dialog, IconButton } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined'
+import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined'
 import ArrowRightAltOutlinedIcon from '@mui/icons-material/ArrowRightAltOutlined'
 import TextField from 'components/TextField'
 import Heading from 'components/Heading'
 import Button from 'components/Button'
 import Confirm from 'components/Confirm'
-
-// const Container = styled.div`
-//   margin: ${grid}px;
-//   display: flex;
-//   flex-direction: column;
-// `
-
-// const Header = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   border-top-left-radius: ${borderRadius}px;
-//   border-top-right-radius: ${borderRadius}px;
-//   background-color: ${({ isDragging }) =>
-//     isDragging ? colors.G50 : colors.N30};
-//   transition: background-color 0.2s ease;
-//   &:hover {
-//     background-color: ${colors.G50};
-//   }
-// `
-
-// export type User = {
-//   id: string
-//   name: string
-// }
-
-// type Board = {
-//   id: string
-//   title: string
-//   timeEstimated: number
-//   description: string
-//   author: User
-//   responsible: User
-//   status: 'Não iniciado' | 'Em progresso' | 'Concluído'
-// }
-
-// export type Sprint = {
-//   id: string
-//   name: string | undefined
-//   initialDate: Date
-//   finalDate: Date
-//   boards: Board[]
-// }
+import { useState } from 'react'
+import { useMutation } from '@apollo/client'
+import { MUTATION_SPRINT_TOGGLE_EXPAND } from 'graphql/mutations/sprint'
+import { Session } from 'next-auth'
 
 export type SprintProps = {
+  session: Session
   sprint: Sprint
-  openModal: () => void
+  openBoardModal: () => void
   deleteSprint: (id: string) => void
   deleteBoard: (id: string) => void
   editSprint: (id: string) => void
 }
 
 export default function SprintComponent({
+  session,
   sprint,
-  openModal,
+  openBoardModal,
   deleteSprint,
   deleteBoard,
   editSprint
 }: SprintProps) {
+  const [expandSprint, setExpandSprint] = useState<boolean>(sprint.expand)
+
   const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
     background: 'white',
     padding: '10px',
@@ -94,14 +61,45 @@ export default function SprintComponent({
     ].join('/')
   }
 
+  const [toggleSprintExpandGraphQL] = useMutation(
+    MUTATION_SPRINT_TOGGLE_EXPAND,
+    {
+      context: { session },
+      onCompleted: () => {
+        setExpandSprint(!expandSprint)
+      }
+    }
+  )
+
+  const toggleSprintExpand = (id: string) => {
+    toggleSprintExpandGraphQL({
+      variables: {
+        id: id,
+        expand: !expandSprint
+      }
+    })
+  }
+
   return (
     <>
       <Droppable droppableId={sprint.name || ''}>
         {(provided) => (
-          <S.ContainerSprint>
+          <S.ContainerSprint ref={provided.innerRef}>
             <S.ContainerHeader>
+              <IconButton onClick={() => toggleSprintExpand(sprint.id)}>
+                {expandSprint ? (
+                  <KeyboardArrowDownOutlinedIcon
+                    style={{ color: '#030517' }}
+                    fontSize="large"
+                  />
+                ) : (
+                  <KeyboardArrowRightOutlinedIcon
+                    style={{ color: '#030517' }}
+                    fontSize="large"
+                  />
+                )}
+              </IconButton>
               <S.ContainerTitle>
-                {/* <S.Title>{sprint.name}</S.Title> */}
                 <S.Title>
                   <Heading size="medium" color="black" lineBottom>
                     {sprint.name}
@@ -127,51 +125,54 @@ export default function SprintComponent({
                 </div>
               </S.Right>
             </S.ContainerHeader>
-            <S.Content>
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {sprint.boards &&
-                  sprint.boards.map((board: Board, index: number) => (
-                    <Draggable
-                      key={board.id}
-                      index={index}
-                      draggableId={`draggable-${board.id}`}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={getItemStyle(
-                            snapshot.isDragging,
-                            provided.draggableProps.style
-                          )}
-                          onClick={openModal}
-                        >
-                          <Item
-                            deleteBoard={deleteBoard}
-                            key={board.id}
-                            id={board.id}
-                            title={board.title}
-                            timeEstimated={board.timeEstimated}
-                            responsible={board.responsible.name}
-                            status={board.status}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
+            {expandSprint && (
+              <S.Content>
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {sprint.boards &&
+                    sprint.boards.map((board: Board, index: number) => (
+                      <Draggable
+                        key={board.id}
+                        index={index}
+                        draggableId={`draggable-${board.id}`}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle(
+                              snapshot.isDragging,
+                              provided.draggableProps.style
+                            )}
+                            onClick={openBoardModal}
+                          >
+                            <Item
+                              deleteBoard={deleteBoard}
+                              key={board.id}
+                              id={board.id}
+                              title={board.title}
+                              timeEstimated={board.timeEstimated}
+                              responsible={board.responsible.name}
+                              status={board.status}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
 
-                {provided.placeholder}
-              </div>
-              <Button
-                style={{ color: '#000' }}
-                icon={<AddIcon />}
-                minimal
-                size="small"
-              >
-                Criar item
-              </Button>
-            </S.Content>
+                  {provided.placeholder}
+                </div>
+                <Button
+                  style={{ color: '#000' }}
+                  icon={<AddIcon />}
+                  minimal
+                  size="small"
+                  onClick={openBoardModal}
+                >
+                  Criar item
+                </Button>
+              </S.Content>
+            )}
           </S.ContainerSprint>
         )}
       </Droppable>

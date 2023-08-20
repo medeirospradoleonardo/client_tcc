@@ -59,6 +59,7 @@ const FormSprint = ({
         name: data.createSprint.data.attributes.name,
         initialDate: data.createSprint.data.attributes.initialDate,
         finalDate: data.createSprint.data.attributes.finalDate,
+        expand: data.createSprint.data.attributes.expand,
         boards: []
       })
 
@@ -117,6 +118,7 @@ const FormSprint = ({
         name: data.updateSprint.data.attributes.name,
         initialDate: data.updateSprint.data.attributes.initialDate,
         finalDate: data.updateSprint.data.attributes.finalDate,
+        expand: data.updateSprint.data.attributes.expand,
         boards: []
       })
 

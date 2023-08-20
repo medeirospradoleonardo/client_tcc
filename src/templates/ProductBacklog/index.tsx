@@ -14,7 +14,10 @@ import Button from 'components/Button'
 import FormSprint, { FormSprintProps } from 'components/FormSprint'
 import { Session } from 'next-auth'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { MUTATION_DELETE_SPRINT } from 'graphql/mutations/sprint'
+import {
+  MUTATION_DELETE_SPRINT,
+  MUTATION_SPRINT_TOGGLE_EXPAND
+} from 'graphql/mutations/sprint'
 import { QuerySprint } from 'graphql/generated/QuerySprint'
 import { QUERY_SPRINT } from 'graphql/queries/sprint'
 import Confirm from 'components/Confirm'
@@ -32,7 +35,7 @@ export type Board = {
   description: string
   author: User
   responsible: User
-  status: 'Não iniciado' | 'Em progresso' | 'Concluído'
+  status: string
 }
 
 export type Sprint = {
@@ -40,6 +43,7 @@ export type Sprint = {
   name: string | undefined
   initialDate: string
   finalDate: string
+  expand: boolean
   boards: Board[]
 }
 
@@ -60,7 +64,7 @@ const ProductBacklog = ({
   activeProject,
   sprintsData
 }: ProductBacklogTemplateProps) => {
-  const [openModalBoard, setOpenModalBoard] = useState(false)
+  const [openModalBoard, setOpenModalBoard] = useState(true)
   const [openModalSprint, setOpenModalSprint] = useState(false)
   const [openModalDeleteSprint, setOpenModalDeleteSprint] = useState(false)
   const [openModalDeleteBoard, setOpenModalDeleteBoard] = useState(false)
@@ -81,9 +85,11 @@ const ProductBacklog = ({
     let edit = false
     sprints.map((s) => {
       if (s.id == sprint.id) {
+        console.log('fa')
         s.name = sprint.name
         s.initialDate = sprint.initialDate
         s.finalDate = sprint.finalDate
+        s.expand = sprint.expand
         setSprints(sprints)
         edit = true
         return
@@ -99,6 +105,7 @@ const ProductBacklog = ({
       name: '',
       initialDate: '',
       finalDate: '',
+      expand: true,
       boards: []
     },
     session: session,
@@ -110,6 +117,26 @@ const ProductBacklog = ({
   const [propsModalSprint, setPropsModalSprint] = useState<FormSprintProps>(
     modalSprintPropsDefault
   )
+
+  const modalBoardPropsDefault = {
+    initialBoard: {
+      id: '',
+      title: '',
+      timeEstimated: 0,
+      description: '',
+      author: {
+        id: '',
+        name: ''
+      },
+      responsible: {
+        id: '',
+        name: ''
+      },
+      status: 'Não iniciado'
+    },
+    activeProject: activeProject,
+    closeModal: () => setOpenModalBoard(false)
+  }
 
   const createSprint = () => {
     setPropsModalSprint(modalSprintPropsDefault)
@@ -128,6 +155,7 @@ const ProductBacklog = ({
           name: sprintsQueryData?.sprint?.data?.attributes?.name,
           initialDate: sprintsQueryData?.sprint?.data?.attributes?.initialDate,
           finalDate: sprintsQueryData?.sprint?.data?.attributes?.finalDate,
+          expand: true,
           boards: []
         }
         setPropsModalSprint(propsModalSprintNew)
@@ -175,7 +203,6 @@ const ProductBacklog = ({
         sprints.map((s) => {
           s.boards = s.boards.filter((b) => {
             if (b.id != data.deleteBoard.data.id) {
-              console.log('fesfs')
               return b
             }
           })
@@ -203,6 +230,32 @@ const ProductBacklog = ({
     setOpenModalDeleteBoard(true)
     setBoardToRemoveId(id)
   }
+
+  // const [toggleSprintExpandGraphQL] = useMutation(
+  //   MUTATION_SPRINT_TOGGLE_EXPAND,
+  //   {
+  //     context: { session },
+  //     onCompleted: (data) => {
+  //       refreshSprints({
+  //         id: data.updateSprint.data.id,
+  //         name: data.updateSprint.data.attributes.name,
+  //         initialDate: data.updateSprint.data.attributes.initialDate,
+  //         finalDate: data.updateSprint.data.attributes.finalDate,
+  //         expand: data.updateSprint.data.attributes.expand,
+  //         boards: []
+  //       })
+  //     }
+  //   }
+  // )
+
+  // const toggleSprintExpand = (id: string, expand: boolean) => {
+  //   toggleSprintExpandGraphQL({
+  //     variables: {
+  //       id: id,
+  //       expand: expand
+  //     }
+  //   })
+  // }
 
   return (
     <>
@@ -244,7 +297,7 @@ const ProductBacklog = ({
               maxWidth="xs"
               onClose={handleClose}
             >
-              <FormBoard closeModal={() => setOpenModalBoard(false)} />
+              <FormBoard {...modalBoardPropsDefault} />
             </Dialog>
             <Dialog
               open={openModalSprint}
@@ -272,12 +325,13 @@ const ProductBacklog = ({
                   <DragDropContext onDragEnd={() => console.log('Oi')}>
                     {sprints.map((sprint) => (
                       <Sprint
+                        session={session}
                         deleteBoard={removeBoardSelect}
                         editSprint={editSprint}
                         deleteSprint={removeSprintSelect}
                         key={sprint.id}
                         sprint={sprint}
-                        openModal={() => setOpenModalBoard(true)}
+                        openBoardModal={() => setOpenModalBoard(true)}
                       />
                     ))}
                   </DragDropContext>

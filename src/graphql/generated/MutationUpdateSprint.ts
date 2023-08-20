@@ -12,6 +12,7 @@ export interface MutationUpdateSprint_updateSprint_data_attributes {
   name: string;
   initialDate: any | null;
   finalDate: any | null;
+  expand: boolean | null;
 }
 
 export interface MutationUpdateSprint_updateSprint_data {

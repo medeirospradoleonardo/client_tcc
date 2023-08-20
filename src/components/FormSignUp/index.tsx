@@ -36,7 +36,6 @@ const FormSignUp = () => {
 
   const [createUser, { error, loading }] = useMutation(MUTATION_REGISTER, {
     onError: (err) => {
-      console.log(err?.graphQLErrors[0]?.message)
       err?.graphQLErrors[0]?.message == 'Email or Username are already taken'
         ? setFormError('Nome ou Email já existente.')
         : setFormError(err?.graphQLErrors[0]?.message)
