@@ -9,23 +9,7 @@ export const Wrapper = styled.div`
 `
 
 export const Content = styled.div`
-  /* ${({ theme }) => css`
-    margin-top: ${theme.spacings.large};
-    flex: 1 0 auto;
-  `} */
-  /* overflow: -moz-scrollbars-vertical; */
-  /* overflow-y: scroll; */
   margin-top: 50px;
-`
-
-export const Menu = styled.div`
-  position: fixed;
-  width: 100%;
-  z-index: 3;
-`
-
-export const Sidebar = styled.div`
-  z-index: 2;
 `
 
 export const SectionFooter = styled.section`
