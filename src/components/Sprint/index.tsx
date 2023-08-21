@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as S from './styles'
 
 import { Draggable, Droppable } from 'react-beautiful-dnd'
-import Item from './Item'
+import Item from 'components/Item'
 import { Board, Sprint } from 'templates/ProductBacklog'
 import { Dialog, IconButton } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'

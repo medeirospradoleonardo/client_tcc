@@ -1,6 +1,11 @@
 import styled, { css } from 'styled-components'
 
 import { btnReset, v } from './variables'
+
+export const SContainer = styled.div`
+  position: fixed;
+`
+
 export const SSidebar = styled.div`
   width: ${({ isOpen }) => (!isOpen ? `auto` : v.sidebarWidth)};
   background: ${({ theme }) => theme.colors.white};

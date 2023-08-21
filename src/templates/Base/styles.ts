@@ -13,16 +13,19 @@ export const Content = styled.div`
     margin-top: ${theme.spacings.large};
     flex: 1 0 auto;
   `} */
+  /* overflow: -moz-scrollbars-vertical; */
+  /* overflow-y: scroll; */
+  margin-top: 50px;
 `
 
 export const Menu = styled.div`
   position: fixed;
   width: 100%;
+  z-index: 3;
 `
 
 export const Sidebar = styled.div`
-  position: fixed;
-  width: 100%;
+  z-index: 2;
 `
 
 export const SectionFooter = styled.section`
@@ -45,6 +48,8 @@ export const SLayout = styled.div`
 export const SMain = styled.main`
   padding: calc(8 * 2);
   flex: min-content;
+  margin-left: 300px;
+  margin-top: 300px;
   ${({ theme }) => css`
     margin-top: ${theme.spacings.large};
   `}

@@ -5,6 +5,7 @@ import Base from 'templates/Base'
 import Table from 'components/Table'
 import { Session } from 'next-auth'
 import { useState } from 'react'
+import { Board } from 'templates/ProductBacklog'
 
 type User = {
   id: string
@@ -15,6 +16,7 @@ type User = {
 export type Project = {
   id: string
   name: string | undefined
+  boards?: Board[]
 }
 
 export type ProjectUserRoleType = {

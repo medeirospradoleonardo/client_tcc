@@ -21,14 +21,18 @@ export default function Base({
 
   return (
     <S.Wrapper>
-      <Menu username={session?.user?.name} loading={loading} />
+      <S.Menu>
+        <Menu username={session?.user?.name} loading={loading} />
+      </S.Menu>
       <S.Content>
         <SLayout>
-          <Sidebar
-            session={session}
-            projectsQuantity={projectsQuantity}
-            activeProject={activeProject}
-          />
+          <S.Sidebar>
+            <Sidebar
+              session={session}
+              projectsQuantity={projectsQuantity}
+              activeProject={activeProject}
+            />
+          </S.Sidebar>
           <SMain>{children}</SMain>
         </SLayout>
       </S.Content>

@@ -17,7 +17,8 @@ import {
   SThemeToggler,
   SToggleThumb,
   SDividerContainer,
-  SDividerTitle
+  SDividerTitle,
+  SContainer
 } from './styles'
 
 import logoSVG from '../../../public/img/logo.svg'
@@ -43,92 +44,62 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
   const router = useRouter()
 
   return (
-    <SSidebar isOpen={sidebarOpen}>
-      <>
-        <SSidebarButton
-          isOpen={sidebarOpen}
-          onClick={() => setSidebarOpen((p) => !p)}
-        >
-          <AiOutlineLeft />
-        </SSidebarButton>
-      </>
+    <SContainer>
+      <SSidebar isOpen={sidebarOpen}>
+        <>
+          <SSidebarButton
+            isOpen={sidebarOpen}
+            onClick={() => setSidebarOpen((p) => !p)}
+          >
+            <AiOutlineLeft />
+          </SSidebarButton>
+        </>
 
-      <>
-        <SProjectTitleContainer>
-          <SLinkIcon>
-            <AiOutlineCodepen />
-          </SLinkIcon>
-          {sidebarOpen && (
-            <div>
-              {activeProject != null && activeProject.name != null ? (
-                <>
-                  <SProjectTitle>{activeProject.name}</SProjectTitle>
-                </>
-              ) : (
-                <>
-                  <SProjectTitle>Selecione um projeto</SProjectTitle>
-                  <SProjectHelp>Vá em &quot;Meus Projetos&quot;</SProjectHelp>
-                </>
-              )}
-            </div>
-          )}
-        </SProjectTitleContainer>
-        <SDividerContainer>
-          <SDivider />
-          {/* <SDividerTitle>Projeto</SDividerTitle> */}
-          <SDivider />
-        </SDividerContainer>
-      </>
-      {linksArray.map(({ icon, label, to }) => (
-        <SLinkContainer
-          key={label}
-          isActive={pathname === to}
-          session={session}
-          title={!session ? 'Você precisa estar logado' : ''}
-          onClick={
-            session
-              ? () =>
-                  router.push({
-                    pathname: to,
-                    query: { confirm: true }
-                  })
-              : () => {
-                  return
-                }
-          }
-        >
-          <SLink session={session}>
-            <SLinkIcon>{icon}</SLinkIcon>
+        <>
+          <SProjectTitleContainer>
+            <SLinkIcon>
+              <AiOutlineCodepen />
+            </SLinkIcon>
             {sidebarOpen && (
-              <>
-                <SLinkLabel session={session}>{label}</SLinkLabel>
-                {!session && <SNaoLogado>Não logado</SNaoLogado>}
-              </>
+              <div>
+                {activeProject != null && activeProject.name != null ? (
+                  <>
+                    <SProjectTitle>{activeProject.name}</SProjectTitle>
+                  </>
+                ) : (
+                  <>
+                    <SProjectTitle>Selecione um projeto</SProjectTitle>
+                    <SProjectHelp>Vá em &quot;Meus Projetos&quot;</SProjectHelp>
+                  </>
+                )}
+              </div>
             )}
-          </SLink>
-        </SLinkContainer>
-      ))}
-      <SDivider />
-      {secondaryLinksArray.map(({ icon, label, to }) => (
-        <SLinkContainer
-          key={label}
-          isActive={pathname === to}
-          session={session}
-          title={!session ? 'Você precisa estar logado' : ''}
-          onClick={
-            session
-              ? () =>
-                  router.push({
-                    pathname: to,
-                    query: { confirm: true }
-                  })
-              : () => {
-                  return
-                }
-          }
-        >
-          <SLink session={session}>
-            <>
+          </SProjectTitleContainer>
+          <SDividerContainer>
+            <SDivider />
+            {/* <SDividerTitle>Projeto</SDividerTitle> */}
+            <SDivider />
+          </SDividerContainer>
+        </>
+        {linksArray.map(({ icon, label, to }) => (
+          <SLinkContainer
+            key={label}
+            isActive={pathname === to}
+            session={session}
+            title={!session ? 'Você precisa estar logado' : ''}
+            onClick={
+              session
+                ? () =>
+                    router.push({
+                      pathname: to,
+                      query: { confirm: true }
+                    })
+                : () => {
+                    return
+                  }
+            }
+          >
+            <SLink session={session}>
               <SLinkIcon>{icon}</SLinkIcon>
               {sidebarOpen && (
                 <>
@@ -136,47 +107,78 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
                   {!session && <SNaoLogado>Não logado</SNaoLogado>}
                 </>
               )}
+            </SLink>
+          </SLinkContainer>
+        ))}
+        <SDivider />
+        {secondaryLinksArray.map(({ icon, label, to }) => (
+          <SLinkContainer
+            key={label}
+            isActive={pathname === to}
+            session={session}
+            title={!session ? 'Você precisa estar logado' : ''}
+            onClick={
+              session
+                ? () =>
+                    router.push({
+                      pathname: to,
+                      query: { confirm: true }
+                    })
+                : () => {
+                    return
+                  }
+            }
+          >
+            <SLink session={session}>
+              <>
+                <SLinkIcon>{icon}</SLinkIcon>
+                {sidebarOpen && (
+                  <>
+                    <SLinkLabel session={session}>{label}</SLinkLabel>
+                    {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                  </>
+                )}
 
-              {sidebarOpen && !!session && projectsQuantity >= 0 && (
-                <SLinkNotification>{projectsQuantity}</SLinkNotification>
-              )}
-            </>
-          </SLink>
-        </SLinkContainer>
-      ))}
-      <SDivider />
-      {terciaryLinksArray.map(({ icon, label, to }) => (
-        <SLinkContainer
-          key={label}
-          isActive={pathname === to}
-          session={session}
-          title={!session ? 'Você precisa estar logado' : ''}
-          onClick={
-            session
-              ? () =>
-                  router.push({
-                    pathname: to,
-                    query: { confirm: true }
-                  })
-              : () => {
-                  return
-                }
-          }
-        >
-          <SLink session={session}>
-            <>
-              <SLinkIcon>{icon}</SLinkIcon>
-              {sidebarOpen && (
-                <>
-                  <SLinkLabel session={session}>{label}</SLinkLabel>
-                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
-                </>
-              )}
-            </>
-          </SLink>
-        </SLinkContainer>
-      ))}
-      {/* <STheme>
+                {sidebarOpen && !!session && projectsQuantity >= 0 && (
+                  <SLinkNotification>{projectsQuantity}</SLinkNotification>
+                )}
+              </>
+            </SLink>
+          </SLinkContainer>
+        ))}
+        <SDivider />
+        {terciaryLinksArray.map(({ icon, label, to }) => (
+          <SLinkContainer
+            key={label}
+            isActive={pathname === to}
+            session={session}
+            title={!session ? 'Você precisa estar logado' : ''}
+            onClick={
+              session
+                ? () =>
+                    router.push({
+                      pathname: to,
+                      query: { confirm: true }
+                    })
+                : () => {
+                    return
+                  }
+            }
+          >
+            <SLink session={session}>
+              <>
+                <SLinkIcon>{icon}</SLinkIcon>
+                {sidebarOpen && (
+                  <>
+                    <SLinkLabel session={session}>{label}</SLinkLabel>
+                    {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                  </>
+                )}
+              </>
+            </SLink>
+          </SLinkContainer>
+        ))}
+        {/* <STheme>
         {sidebarOpen && <SThemeLabel>Dark Mode</SThemeLabel>}
         <SThemeToggler
           isActive={theme === 'dark'}
@@ -185,7 +187,8 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           <SToggleThumb style={theme === 'dark' ? { right: '1px' } : {}} />
         </SThemeToggler>
       </STheme> */}
-    </SSidebar>
+      </SSidebar>
+    </SContainer>
   )
 }
 

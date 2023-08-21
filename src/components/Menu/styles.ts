@@ -1,6 +1,12 @@
 import styled, { css } from 'styled-components'
 import media from 'styled-media-query'
 
+export const Container = styled.div`
+  position: fixed;
+  width: 100%;
+  z-index: 3;
+`
+
 export const Wrapper = styled.menu<MenuFullProps>`
   ${({ theme, isOpen }) => css`
     background-color: ${theme.colors.lightBg};

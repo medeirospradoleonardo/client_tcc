@@ -22,6 +22,7 @@ import { QuerySprint } from 'graphql/generated/QuerySprint'
 import { QUERY_SPRINT } from 'graphql/queries/sprint'
 import Confirm from 'components/Confirm'
 import { MUTATION_DELETE_BOARD } from 'graphql/mutations/board'
+import ProductBacklogComponent from 'components/ProductBacklogComponent'
 
 export type User = {
   id: string
@@ -231,32 +232,6 @@ const ProductBacklog = ({
     setBoardToRemoveId(id)
   }
 
-  // const [toggleSprintExpandGraphQL] = useMutation(
-  //   MUTATION_SPRINT_TOGGLE_EXPAND,
-  //   {
-  //     context: { session },
-  //     onCompleted: (data) => {
-  //       refreshSprints({
-  //         id: data.updateSprint.data.id,
-  //         name: data.updateSprint.data.attributes.name,
-  //         initialDate: data.updateSprint.data.attributes.initialDate,
-  //         finalDate: data.updateSprint.data.attributes.finalDate,
-  //         expand: data.updateSprint.data.attributes.expand,
-  //         boards: []
-  //       })
-  //     }
-  //   }
-  // )
-
-  // const toggleSprintExpand = (id: string, expand: boolean) => {
-  //   toggleSprintExpandGraphQL({
-  //     variables: {
-  //       id: id,
-  //       expand: expand
-  //     }
-  //   })
-  // }
-
   return (
     <>
       <Dialog
@@ -334,6 +309,11 @@ const ProductBacklog = ({
                         openBoardModal={() => setOpenModalBoard(true)}
                       />
                     ))}
+                    <ProductBacklogComponent
+                      project={activeProject}
+                      deleteBoard={removeBoardSelect}
+                      openBoardModal={() => setOpenModalBoard(true)}
+                    />
                   </DragDropContext>
                 </S.Content>
               </S.Main>
