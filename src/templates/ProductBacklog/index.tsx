@@ -5,7 +5,7 @@ import Base from 'templates/Base'
 import { Project, ProjectsTemplateProps } from 'templates/Projects'
 import Logo from 'components/Logo'
 import Sprint from 'components/Sprint'
-import { DragDropContext } from 'react-beautiful-dnd'
+import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import { Dialog } from '@mui/material'
@@ -16,7 +16,7 @@ import { Session } from 'next-auth'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   MUTATION_DELETE_SPRINT,
-  MUTATION_SPRINT_TOGGLE_EXPAND
+  MUTATION_UPDATE_BOARDS
 } from 'graphql/mutations/sprint'
 import { QuerySprint } from 'graphql/generated/QuerySprint'
 import { QUERY_SPRINT } from 'graphql/queries/sprint'
@@ -36,6 +36,7 @@ export type Board = {
   description: string
   author: User
   responsible: User
+  sprint: string
   status: string
 }
 
@@ -73,6 +74,7 @@ const ProductBacklog = ({
   const [boardToRemoveId, setBoardToRemoveId] = useState<string>()
 
   const [sprints, setSprints] = useState(sprintsData)
+  const [project, setProject] = useState(activeProject)
 
   const handleClose = (event: React.MouseEventHandler, reason: string) => {
     if (reason && reason == 'backdropClick') return
@@ -86,7 +88,6 @@ const ProductBacklog = ({
     let edit = false
     sprints.map((s) => {
       if (s.id == sprint.id) {
-        console.log('fa')
         s.name = sprint.name
         s.initialDate = sprint.initialDate
         s.finalDate = sprint.finalDate
@@ -133,6 +134,7 @@ const ProductBacklog = ({
         id: '',
         name: ''
       },
+      sprint: '',
       status: 'Não iniciado'
     },
     activeProject: activeProject,
@@ -232,6 +234,222 @@ const ProductBacklog = ({
     setBoardToRemoveId(id)
   }
 
+  const [UpdateSprintBoardsGraphQL] = useMutation(MUTATION_UPDATE_BOARDS, {
+    context: { session },
+    onCompleted: () => {
+      //
+    }
+  })
+
+  const refreshBoards = async (
+    idBoard: string,
+    idSprintSource: string | null,
+    idSprintDestination: string | null,
+    idProjectSource: string | null,
+    idProjectDestination: string | null,
+    indexDestination: number
+  ) => {
+    let board: Board
+    const sprintsNew = [] as Sprint[]
+    const sprintsOld = [] as Sprint[]
+
+    const projectNew = {
+      id: project.id,
+      name: project.name,
+      boards: project.boards?.slice()
+    }
+
+    const projectOld = {
+      id: project.id,
+      name: project.name,
+      boards: project.boards?.slice()
+    }
+
+    sprints.map((s) => {
+      sprintsNew.push({
+        id: s.id,
+        name: s.name,
+        expand: s.expand,
+        initialDate: s.initialDate,
+        finalDate: s.finalDate,
+        boards: s.boards.slice()
+      })
+
+      sprintsOld.push({
+        id: s.id,
+        name: s.name,
+        expand: s.expand,
+        initialDate: s.initialDate,
+        finalDate: s.finalDate,
+        boards: s.boards.slice()
+      })
+    })
+
+    const projectSourceBoardsIds = [] as string[]
+    if (idProjectSource) {
+      projectNew.boards = projectNew.boards?.filter((b) => {
+        if (b.id != idBoard) {
+          if (b.sprint == null) {
+            projectSourceBoardsIds.push(b.id)
+          }
+          return b
+        } else {
+          board = b
+        }
+      })
+    }
+
+    const sprintSourceBoardsIds = [] as string[]
+    idSprintSource &&
+      sprintsNew.map((s) => {
+        if (s.id == idSprintSource) {
+          s.boards = s.boards.filter((b) => {
+            if (b.id != idBoard) {
+              sprintSourceBoardsIds.push(b.id)
+              return b
+            } else {
+              board = b
+            }
+          })
+        }
+      })
+
+    let sprintDestinationBoardsIds
+    idSprintDestination &&
+      sprintsNew.map((s) => {
+        if (s.id == idSprintDestination) {
+          s.boards.splice(indexDestination, 0, board)
+          sprintDestinationBoardsIds = s.boards.map((b) => b.id)
+        }
+      })
+
+    let projectDestinationBoardsIds
+    if (idProjectDestination) {
+      projectNew.boards?.splice(indexDestination, 0, board)
+      projectDestinationBoardsIds = projectNew.boards?.map((b) => b.id)
+    }
+
+    setSprints(sprintsNew)
+    setProject(projectNew)
+
+    if (idSprintDestination) {
+      const { errors: errorsUpdateSprint, data: dataUpdateSprint } =
+        await UpdateSprintBoardsGraphQL({
+          variables: {
+            id: idSprintDestination,
+            boardsIds: sprintDestinationBoardsIds
+          }
+        })
+
+      if (
+        errorsUpdateSprint != null ||
+        dataUpdateSprint.updateSprint.data == null
+      ) {
+        setSprints(sprintsOld)
+      }
+    } else if (idSprintSource) {
+      const { errors: errorsUpdateSprint, data: dataUpdateSprint } =
+        await UpdateSprintBoardsGraphQL({
+          variables: {
+            id: idSprintSource,
+            boardsIds: sprintSourceBoardsIds
+          }
+        })
+
+      if (
+        errorsUpdateSprint != null ||
+        dataUpdateSprint.updateSprint.data == null
+      ) {
+        setSprints(sprintsOld)
+      }
+    }
+
+    if (idProjectDestination) {
+    }
+  }
+
+  const onDragEnd = async (result: DropResult) => {
+    // moveu e deixou em um lugar nao valido
+    if (!result.destination) {
+      return
+    }
+
+    const source = result.source
+    const destination = result.destination
+
+    // moveu e deixou no mesmo lugar
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
+      return
+    }
+
+    const sourceObj = result.source?.droppableId.includes('sprint-')
+      ? {
+          mode: 'sprint',
+          id: result.source?.droppableId.replace('sprint-', '')
+        }
+      : {
+          mode: 'project',
+          id: result.source?.droppableId.replace('productBacklog-', '')
+        }
+
+    const destinationObj = result.destination?.droppableId.includes('sprint-')
+      ? {
+          mode: 'sprint',
+          id: result.destination?.droppableId.replace('sprint-', '')
+        }
+      : {
+          mode: 'project',
+          id: result.destination?.droppableId.replace('productBacklog-', '')
+        }
+
+    const boardId = result.draggableId.replace('draggable-', '')
+
+    if (destinationObj.mode == 'sprint') {
+      if (sourceObj.mode == 'sprint') {
+        refreshBoards(
+          boardId,
+          sourceObj.id,
+          destinationObj.id,
+          null,
+          null,
+          destination.index
+        )
+      } else {
+        refreshBoards(
+          boardId,
+          null,
+          destinationObj.id,
+          sourceObj.id,
+          null,
+          destination.index
+        )
+      }
+    } else {
+      if (sourceObj.mode == 'project') {
+        refreshBoards(
+          boardId,
+          null,
+          null,
+          sourceObj.id,
+          destinationObj.id,
+          destination.index
+        )
+      } else {
+        refreshBoards(
+          boardId,
+          sourceObj.id,
+          null,
+          null,
+          destinationObj.id,
+          destination.index
+        )
+      }
+    }
+  }
+
   return (
     <>
       <Dialog
@@ -297,7 +515,7 @@ const ProductBacklog = ({
                   >
                     Criar sprint
                   </Button>
-                  <DragDropContext onDragEnd={() => console.log('Oi')}>
+                  <DragDropContext onDragEnd={onDragEnd}>
                     {sprints.map((sprint) => (
                       <Sprint
                         session={session}
@@ -310,7 +528,7 @@ const ProductBacklog = ({
                       />
                     ))}
                     <ProductBacklogComponent
-                      project={activeProject}
+                      project={project}
                       deleteBoard={removeBoardSelect}
                       openBoardModal={() => setOpenModalBoard(true)}
                     />

@@ -33,6 +33,11 @@ export const QUERY_SPRINTS = gql`
                     }
                   }
                 }
+                sprint {
+                  data {
+                    id
+                  }
+                }
                 status
               }
             }

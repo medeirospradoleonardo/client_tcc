@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as S from './styles'
 
-import { Draggable, Droppable } from 'react-beautiful-dnd'
+import { Draggable, DropResult, Droppable } from 'react-beautiful-dnd'
 import Item from 'components/Item'
 import { Board, Sprint } from 'templates/ProductBacklog'
 import { Dialog, IconButton } from '@mui/material'
@@ -82,50 +82,50 @@ export default function SprintComponent({
 
   return (
     <>
-      <Droppable droppableId={sprint.name || ''}>
-        {(provided) => (
-          <S.ContainerSprint ref={provided.innerRef}>
-            <S.ContainerHeader>
-              <IconButton onClick={() => toggleSprintExpand(sprint.id)}>
-                {expandSprint ? (
-                  <KeyboardArrowDownOutlinedIcon
-                    style={{ color: '#030517' }}
-                    fontSize="large"
-                  />
-                ) : (
-                  <KeyboardArrowRightOutlinedIcon
-                    style={{ color: '#030517' }}
-                    fontSize="large"
-                  />
-                )}
+      <S.ContainerSprint>
+        <S.ContainerHeader>
+          <IconButton onClick={() => toggleSprintExpand(sprint.id)}>
+            {expandSprint ? (
+              <KeyboardArrowDownOutlinedIcon
+                style={{ color: '#030517' }}
+                fontSize="large"
+              />
+            ) : (
+              <KeyboardArrowRightOutlinedIcon
+                style={{ color: '#030517' }}
+                fontSize="large"
+              />
+            )}
+          </IconButton>
+          <S.ContainerTitle>
+            <S.Title>
+              <Heading size="medium" color="black" lineBottom>
+                {sprint.name}
+              </Heading>
+            </S.Title>
+          </S.ContainerTitle>
+          <S.ContainerDate>
+            <h4>{formatDate(new Date(sprint.initialDate))}</h4>
+            <ArrowRightAltOutlinedIcon style={{ marginTop: '5px' }} />
+            <h4>{formatDate(new Date(sprint.finalDate))}</h4>
+          </S.ContainerDate>
+          <S.Right>
+            <div>
+              <IconButton onClick={() => editSprint(sprint.id)}>
+                <EditIcon style={{ color: '#030517' }} fontSize="large" />
               </IconButton>
-              <S.ContainerTitle>
-                <S.Title>
-                  <Heading size="medium" color="black" lineBottom>
-                    {sprint.name}
-                  </Heading>
-                </S.Title>
-              </S.ContainerTitle>
-              <S.ContainerDate>
-                <h4>{formatDate(new Date(sprint.initialDate))}</h4>
-                <ArrowRightAltOutlinedIcon style={{ marginTop: '5px' }} />
-                <h4>{formatDate(new Date(sprint.finalDate))}</h4>
-              </S.ContainerDate>
-              <S.Right>
-                <div>
-                  <IconButton onClick={() => editSprint(sprint.id)}>
-                    <EditIcon style={{ color: '#030517' }} fontSize="large" />
-                  </IconButton>
-                </div>
+            </div>
 
-                <div>
-                  <IconButton onClick={() => deleteSprint(sprint.id)}>
-                    <DeleteIcon style={{ color: '#030517' }} fontSize="large" />
-                  </IconButton>
-                </div>
-              </S.Right>
-            </S.ContainerHeader>
-            {expandSprint && (
+            <div>
+              <IconButton onClick={() => deleteSprint(sprint.id)}>
+                <DeleteIcon style={{ color: '#030517' }} fontSize="large" />
+              </IconButton>
+            </div>
+          </S.Right>
+        </S.ContainerHeader>
+        {expandSprint && (
+          <Droppable droppableId={`sprint-${sprint.id}`}>
+            {(provided) => (
               <S.Content>
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {sprint.boards &&
@@ -173,9 +173,9 @@ export default function SprintComponent({
                 </Button>
               </S.Content>
             )}
-          </S.ContainerSprint>
+          </Droppable>
         )}
-      </Droppable>
+      </S.ContainerSprint>
     </>
   )
 }

@@ -35,7 +35,7 @@ export default function ProductBacklogComponent({
 
   return (
     <>
-      <Droppable droppableId={project.name || ''}>
+      <Droppable droppableId={`productBacklog-${project.id}`}>
         {(provided) => (
           <S.Container ref={provided.innerRef}>
             <S.ContainerHeader>
@@ -50,36 +50,39 @@ export default function ProductBacklogComponent({
             <S.Content>
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {project.boards &&
-                  project.boards.map((board: Board, index: number) => (
-                    <Draggable
-                      key={board.id}
-                      index={index}
-                      draggableId={`draggable-${board.id}`}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={getItemStyle(
-                            snapshot.isDragging,
-                            provided.draggableProps.style
-                          )}
-                          onClick={openBoardModal}
+                  project.boards.map(
+                    (board: Board, index: number) =>
+                      board.sprint == null && (
+                        <Draggable
+                          key={board.id}
+                          index={index}
+                          draggableId={`draggable-${board.id}`}
                         >
-                          <Item
-                            deleteBoard={deleteBoard}
-                            key={board.id}
-                            id={board.id}
-                            title={board.title}
-                            timeEstimated={board.timeEstimated}
-                            responsible={board.responsible.name}
-                            status={board.status}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )}
+                              onClick={openBoardModal}
+                            >
+                              <Item
+                                deleteBoard={deleteBoard}
+                                key={board.id}
+                                id={board.id}
+                                title={board.title}
+                                timeEstimated={board.timeEstimated}
+                                responsible={board.responsible.name}
+                                status={board.status}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      )
+                  )}
 
                 {provided.placeholder}
               </div>

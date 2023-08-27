@@ -103,3 +103,19 @@ export const MUTATION_SPRINT_TOGGLE_EXPAND = gql`
     }
   }
 `
+
+export const MUTATION_UPDATE_BOARDS = gql`
+  mutation MutationUpdateSprintBoards($id: ID!, $boardsIds: [ID]!) {
+    updateSprint(id: $id, data: { boards: $boardsIds }) {
+      data {
+        id
+        attributes {
+          name
+          initialDate
+          finalDate
+          expand
+        }
+      }
+    }
+  }
+`

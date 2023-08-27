@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import CheckIcon from '@mui/icons-material/Check'
 import { QueryAllUsers_usersPermissionsUsers_data } from 'graphql/generated/QueryAllUsers'
 import { QuerySprints } from 'graphql/generated/QuerySprints'
+import { Sprint } from 'templates/ProductBacklog'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -45,9 +46,10 @@ export const SprintsMapper = (sprints: QuerySprints) => {
         id: board.attributes?.responsible?.data?.id,
         name: board.attributes?.responsible?.data?.attributes?.username
       },
+      sprint: board.attributes?.sprint?.data?.id,
       status: board.attributes?.status
     }))
-  }))
+  })) as Sprint[]
 }
 
 function roleConverter(role: string) {

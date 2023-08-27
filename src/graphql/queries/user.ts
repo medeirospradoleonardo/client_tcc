@@ -35,7 +35,7 @@ export const QUERY_PROFILE_ME_BOARDS = gql`
               id
               attributes {
                 name
-                boards(filters: { sprint: { id: { eq: null } } }) {
+                boards {
                   data {
                     id
                     attributes {
@@ -61,6 +61,11 @@ export const QUERY_PROFILE_ME_BOARDS = gql`
                           attributes {
                             username
                           }
+                        }
+                      }
+                      sprint {
+                        data {
+                          id
                         }
                       }
                       status

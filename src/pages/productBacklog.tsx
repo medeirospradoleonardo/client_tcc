@@ -115,6 +115,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
                     name: board.attributes?.responsible?.data?.attributes
                       ?.username
                   },
+                  sprint: board.attributes?.sprint?.data?.id || null,
                   status: board.attributes?.status
                 })
               )

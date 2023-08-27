@@ -41,6 +41,16 @@ export interface QuerySprints_sprints_data_attributes_boards_data_attributes_res
   data: QuerySprints_sprints_data_attributes_boards_data_attributes_responsible_data | null;
 }
 
+export interface QuerySprints_sprints_data_attributes_boards_data_attributes_sprint_data {
+  __typename: "SprintEntity";
+  id: string | null;
+}
+
+export interface QuerySprints_sprints_data_attributes_boards_data_attributes_sprint {
+  __typename: "SprintEntityResponse";
+  data: QuerySprints_sprints_data_attributes_boards_data_attributes_sprint_data | null;
+}
+
 export interface QuerySprints_sprints_data_attributes_boards_data_attributes {
   __typename: "Board";
   title: string;
@@ -48,6 +58,7 @@ export interface QuerySprints_sprints_data_attributes_boards_data_attributes {
   description: string | null;
   author: QuerySprints_sprints_data_attributes_boards_data_attributes_author | null;
   responsible: QuerySprints_sprints_data_attributes_boards_data_attributes_responsible | null;
+  sprint: QuerySprints_sprints_data_attributes_boards_data_attributes_sprint | null;
   status: ENUM_BOARD_STATUS | null;
 }
 
