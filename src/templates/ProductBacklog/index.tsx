@@ -23,6 +23,7 @@ import { QUERY_SPRINT } from 'graphql/queries/sprint'
 import Confirm from 'components/Confirm'
 import { MUTATION_DELETE_BOARD } from 'graphql/mutations/board'
 import ProductBacklogComponent from 'components/ProductBacklogComponent'
+import { MUTATION_UPDATE_PROJECT_BOARDS } from 'graphql/mutations/project'
 
 export type User = {
   id: string
@@ -36,7 +37,7 @@ export type Board = {
   description: string
   author: User
   responsible: User
-  sprint: string
+  sprint: string | null
   status: string
 }
 
@@ -212,6 +213,17 @@ const ProductBacklog = ({
           return s
         })
       )
+      const projectNew = {
+        id: project.id,
+        name: project.name,
+        boards: project.boards?.slice()
+      }
+      projectNew.boards = projectNew.boards?.filter((b) => {
+        if (b.id != data.deleteBoard.data.id) {
+          return b
+        }
+      })
+      setProject(projectNew)
       setOpenModalDeleteBoard(false)
     }
   })
@@ -241,6 +253,13 @@ const ProductBacklog = ({
     }
   })
 
+  const [UpdateProjectBoardsGraphQL] = useMutation(
+    MUTATION_UPDATE_PROJECT_BOARDS,
+    {
+      context: { session }
+    }
+  )
+
   const refreshBoards = async (
     idBoard: string,
     idSprintSource: string | null,
@@ -249,7 +268,22 @@ const ProductBacklog = ({
     idProjectDestination: string | null,
     indexDestination: number
   ) => {
-    let board: Board
+    let board: Board = {
+      id: '',
+      title: '',
+      timeEstimated: 0,
+      description: '',
+      author: {
+        id: '',
+        name: ''
+      },
+      responsible: {
+        id: '',
+        name: ''
+      },
+      sprint: '',
+      status: 'Não iniciado'
+    }
     const sprintsNew = [] as Sprint[]
     const sprintsOld = [] as Sprint[]
 
@@ -285,20 +319,15 @@ const ProductBacklog = ({
       })
     })
 
-    const projectSourceBoardsIds = [] as string[]
-    if (idProjectSource) {
+    if (idProjectSource || idProjectDestination) {
       projectNew.boards = projectNew.boards?.filter((b) => {
         if (b.id != idBoard) {
-          if (b.sprint == null) {
-            projectSourceBoardsIds.push(b.id)
-          }
           return b
         } else {
           board = b
         }
       })
     }
-
     const sprintSourceBoardsIds = [] as string[]
     idSprintSource &&
       sprintsNew.map((s) => {
@@ -318,15 +347,28 @@ const ProductBacklog = ({
     idSprintDestination &&
       sprintsNew.map((s) => {
         if (s.id == idSprintDestination) {
+          board.sprint = idSprintDestination
+          projectNew.boards = projectNew.boards?.concat([board])
           s.boards.splice(indexDestination, 0, board)
           sprintDestinationBoardsIds = s.boards.map((b) => b.id)
         }
       })
 
-    let projectDestinationBoardsIds
-    if (idProjectDestination) {
-      projectNew.boards?.splice(indexDestination, 0, board)
-      projectDestinationBoardsIds = projectNew.boards?.map((b) => b.id)
+    let projectDestinationBoardsIds: string[] = []
+    if (idProjectDestination && projectNew.boards) {
+      board.sprint = null
+      const boardsProjectWithSprint = projectNew.boards.filter(
+        (b) => b.sprint != null
+      )
+      const boardsProjectWithNoSprint = projectNew.boards.filter(
+        (b) => b.sprint == null
+      )
+      boardsProjectWithNoSprint.splice(indexDestination, 0, board)
+
+      projectNew.boards = boardsProjectWithSprint.concat(
+        boardsProjectWithNoSprint
+      )
+      projectDestinationBoardsIds = projectNew.boards.map((b) => b.id)
     }
 
     setSprints(sprintsNew)
@@ -365,6 +407,20 @@ const ProductBacklog = ({
     }
 
     if (idProjectDestination) {
+      const { errors: errorsUpdateProject, data: dataUpdateProject } =
+        await UpdateProjectBoardsGraphQL({
+          variables: {
+            id: idProjectDestination,
+            boardsIds: projectDestinationBoardsIds
+          }
+        })
+
+      if (
+        errorsUpdateProject != null ||
+        dataUpdateProject.updateProject.data == null
+      ) {
+        setProject(projectOld)
+      }
     }
   }
 

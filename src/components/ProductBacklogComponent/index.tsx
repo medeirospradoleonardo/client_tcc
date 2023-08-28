@@ -33,72 +33,73 @@ export default function ProductBacklogComponent({
     ...draggableStyle
   })
 
+  project.boards = project.boards?.filter((b) => b.sprint == null)
+
   return (
     <>
-      <Droppable droppableId={`productBacklog-${project.id}`}>
-        {(provided) => (
-          <S.Container ref={provided.innerRef}>
-            <S.ContainerHeader>
-              <S.ContainerTitle>
-                <S.Title>
-                  <Heading size="medium" color="black" lineBottom>
-                    Backlog do produto
-                  </Heading>
-                </S.Title>
-              </S.ContainerTitle>
-            </S.ContainerHeader>
-            <S.Content>
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {project.boards &&
-                  project.boards.map(
-                    (board: Board, index: number) =>
-                      board.sprint == null && (
-                        <Draggable
-                          key={board.id}
-                          index={index}
-                          draggableId={`draggable-${board.id}`}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={getItemStyle(
-                                snapshot.isDragging,
-                                provided.draggableProps.style
-                              )}
-                              onClick={openBoardModal}
-                            >
-                              <Item
-                                deleteBoard={deleteBoard}
-                                key={board.id}
-                                id={board.id}
-                                title={board.title}
-                                timeEstimated={board.timeEstimated}
-                                responsible={board.responsible.name}
-                                status={board.status}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      )
-                  )}
+      <S.Container>
+        <S.ContainerHeader>
+          <S.ContainerTitle>
+            <S.Title>
+              <Heading size="medium" color="black" lineBottom>
+                Backlog do produto
+              </Heading>
+            </S.Title>
+          </S.ContainerTitle>
+        </S.ContainerHeader>
+        <S.Content>
+          <Droppable droppableId={`productBacklog-${project.id}`}>
+            {(provided) => (
+              <>
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {project.boards &&
+                    project.boards.map((board: Board, index: number) => (
+                      <Draggable
+                        key={board.id}
+                        index={index}
+                        draggableId={`draggable-${board.id}`}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle(
+                              snapshot.isDragging,
+                              provided.draggableProps.style
+                            )}
+                            onClick={openBoardModal}
+                          >
+                            <Item
+                              deleteBoard={deleteBoard}
+                              key={board.id}
+                              id={board.id}
+                              title={board.title}
+                              timeEstimated={board.timeEstimated}
+                              responsible={board.responsible.name}
+                              status={board.status}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
 
-                {provided.placeholder}
-              </div>
-              <Button
-                style={{ color: '#000' }}
-                icon={<AddIcon />}
-                minimal
-                size="small"
-                onClick={openBoardModal}
-              >
-                Criar item
-              </Button>
-            </S.Content>
-          </S.Container>
-        )}
-      </Droppable>
+                  {provided.placeholder}
+                </div>
+                <Button
+                  style={{ color: '#000' }}
+                  icon={<AddIcon />}
+                  minimal
+                  size="small"
+                  onClick={openBoardModal}
+                >
+                  Criar item
+                </Button>
+              </>
+            )}
+          </Droppable>
+        </S.Content>
+      </S.Container>
     </>
   )
 }

@@ -29,3 +29,13 @@ export const MUTATION_UPDATE_PROJECT = gql`
     }
   }
 `
+
+export const MUTATION_UPDATE_PROJECT_BOARDS = gql`
+  mutation MutationUpdateProjectBoards($id: ID!, $boardsIds: [ID]!) {
+    updateProject(id: $id, data: { boards: $boardsIds }) {
+      data {
+        id
+      }
+    }
+  }
+`
