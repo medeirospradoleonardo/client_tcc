@@ -67,7 +67,7 @@ const ProductBacklog = ({
   activeProject,
   sprintsData
 }: ProductBacklogTemplateProps) => {
-  const [openModalBoard, setOpenModalBoard] = useState(false)
+  const [openModalBoard, setOpenModalBoard] = useState(true)
   const [openModalSprint, setOpenModalSprint] = useState(false)
   const [openModalDeleteSprint, setOpenModalDeleteSprint] = useState(false)
   const [openModalDeleteBoard, setOpenModalDeleteBoard] = useState(false)

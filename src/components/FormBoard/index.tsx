@@ -9,6 +9,7 @@ import { useState } from 'react'
 import TextField from 'components/TextField'
 import { FieldErrors } from 'utils/validations'
 import { Board } from 'templates/ProductBacklog'
+import SelectComponent from 'components/Select'
 
 export type FormBoardProps = {
   initialBoard: Board
@@ -62,19 +63,7 @@ const FormBoard = ({
         </div>
         <S.Right>
           <S.Select>
-            <SelectChips
-              isMulti={false}
-              label="Status"
-              setData={() => console.log()}
-              defaultValues={[]}
-              options={[
-                { label: 'Nao iniciado', value: 'notInitiated' },
-                { label: 'Em progresso', value: 'inProgress' },
-                { label: 'Concluído', value: 'concluded' }
-              ]}
-              maxMenuHeight={250}
-              placeholder="Selecione um status"
-            />
+            <SelectComponent label="Status" />
             <SelectChips
               isMulti={false}
               label="Responsável"
