@@ -62,3 +62,16 @@ export const QUERY_SPRINT = gql`
     }
   }
 `
+
+export const QUERY_SPRINTS_IN_PROJECT = gql`
+  query QuerySprintsInProject($projectId: ID!) {
+    sprints(filters: { project: { id: { eq: $projectId } } }) {
+      data {
+        id
+        attributes {
+          name
+        }
+      }
+    }
+  }
+`

@@ -28,9 +28,11 @@ export const ButtonContainerFirstForm = styled.div`
 
 export const Content = styled.div`
   display: flex;
+  height: 300px;
 `
 
 export const Right = styled.div`
   margin-left: auto;
   display: flex;
+  width: 360px;
 `

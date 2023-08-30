@@ -1,9 +1,5 @@
 import styled, { css } from 'styled-components'
 
-type AvatarContainerProps = {
-  responsible: string
-}
-
 type IdProps = {
   concluded: boolean
 }
@@ -134,7 +130,7 @@ export const Icon = styled.div`
   margin-bottom: -10px;
 `
 
-export const AvatarContainer = styled.div<AvatarContainerProps>`
+export const AvatarContainer = styled.div`
   ${({ theme }) => css`
     &:hover {
       position: relative;

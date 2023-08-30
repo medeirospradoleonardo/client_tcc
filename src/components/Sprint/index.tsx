@@ -23,7 +23,8 @@ import { Session } from 'next-auth'
 export type SprintProps = {
   session: Session
   sprint: Sprint
-  openBoardModal: () => void
+  createBoard: (idPath: string | null) => void
+  editBoard: (id: string) => void
   deleteSprint: (id: string) => void
   deleteBoard: (id: string) => void
   editSprint: (id: string) => void
@@ -32,7 +33,8 @@ export type SprintProps = {
 export default function SprintComponent({
   session,
   sprint,
-  openBoardModal,
+  createBoard,
+  editBoard,
   deleteSprint,
   deleteBoard,
   editSprint
@@ -144,7 +146,7 @@ export default function SprintComponent({
                               snapshot.isDragging,
                               provided.draggableProps.style
                             )}
-                            onClick={openBoardModal}
+                            onClick={() => editBoard(board.id)}
                           >
                             <Item
                               deleteBoard={deleteBoard}
@@ -167,7 +169,7 @@ export default function SprintComponent({
                   icon={<AddIcon />}
                   minimal
                   size="small"
-                  onClick={openBoardModal}
+                  onClick={() => createBoard(sprint.id)}
                 >
                   Criar item
                 </Button>

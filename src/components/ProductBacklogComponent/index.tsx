@@ -15,13 +15,15 @@ import { Project } from 'templates/Projects'
 export type ProductBacklogComponentProps = {
   project: Project
   deleteBoard: (id: string) => void
-  openBoardModal: () => void
+  createBoard: (idPath: string | null) => void
+  editBoard: (id: string) => void
 }
 
 export default function ProductBacklogComponent({
   project,
   deleteBoard,
-  openBoardModal
+  createBoard,
+  editBoard
 }: ProductBacklogComponentProps) {
   const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
     background: 'white',
@@ -68,7 +70,7 @@ export default function ProductBacklogComponent({
                               snapshot.isDragging,
                               provided.draggableProps.style
                             )}
-                            onClick={openBoardModal}
+                            onClick={() => editBoard(board.id)}
                           >
                             <Item
                               deleteBoard={deleteBoard}
@@ -91,7 +93,7 @@ export default function ProductBacklogComponent({
                   icon={<AddIcon />}
                   minimal
                   size="small"
-                  onClick={openBoardModal}
+                  onClick={() => createBoard(null)}
                 >
                   Criar item
                 </Button>

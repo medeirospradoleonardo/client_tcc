@@ -1,91 +1,71 @@
 import React from 'react'
-import chroma from 'chroma-js'
-import { ColourOption, colourOptions } from './data'
-import Select, { components, OptionProps, StylesConfig } from 'react-select'
+
+import Select, {
+  GroupBase,
+  OptionProps,
+  SingleValueProps,
+  StylesConfig,
+  components
+} from 'react-select'
 
 import * as S from './styles'
+import { SelectComponents } from 'react-select/dist/declarations/src/components'
 
-const dot = (color = 'transparent') => ({
-  alignItems: 'center',
-  color: '#FFF',
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: color
-})
-
-const Option = (props: OptionProps<ColourOption>) => {
-  return (
-    <components.Option {...props}>
-      <div
-        style={{
-          backgroundColor: props.data.color,
-          alignItems: 'center',
-          color: '#FFF',
-          display: 'flex',
-          paddingLeft: 10,
-          paddingRight: 10,
-          justifyContent: 'center'
-        }}
-      >
-        {props.label}
-      </div>
-    </components.Option>
-  )
-}
-
-const colourStyles: StylesConfig<ColourOption> = {
-  control: (styles, state) => ({
-    ...styles,
-    backgroundColor: '#EAEAEA',
-    border: 'none',
-    boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none',
-    ':focus': {
-      border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
-      boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none'
-    },
-    cursor: 'pointer',
-    ':hover': {
-      backgroundColor: '#dddcdc'
-    }
-  }),
-  option: (styles, { data, isSelected }) => {
-    const color = chroma(data.color)
-    return {
-      ...styles,
-      display: 'flex',
-      cursor: 'pointer',
-      justifyContent: 'center',
-      backgroundColor: isSelected ? color.alpha(0.3).css() : '#FFF',
-
-      ':hover': {
-        backgroundColor: color.alpha(0.3).css()
-      },
-
-      fontFamily:
-        "Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"
-    }
-  },
-  input: (styles) => ({ ...styles, ...dot() }),
-  placeholder: (styles) => ({ ...styles, ...dot('#ffffff') }),
-  singleValue: (styles, { data }) => ({ ...styles, ...dot(data.color) })
+export type OptionType = {
+  value: string
+  label: string
+  color?: string
 }
 
 type SelectComponentProps = {
   label?: string
+  customStyle?: StylesConfig<OptionType>
+  Option?: (props: OptionProps<OptionType>) => JSX.Element
+  SingleValue?: (props: SingleValueProps<OptionType>) => JSX.Element
+  options: OptionType[]
+  defaultOption?: OptionType
+  placeholder?: string
+  isSearchable?: boolean
+  maxMenuHeight?: number
 }
 
-const SelectComponent = ({ label }: SelectComponentProps) => (
-  <>
-    <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
-    <Select
-      components={{ Option }}
-      isSearchable={false}
-      inputId={`indicators-dropdown${label}`}
-      defaultValue={colourOptions[0]}
-      options={colourOptions}
-      styles={colourStyles}
-    />
-  </>
-)
+const SelectComponent = ({
+  label,
+  customStyle,
+  Option,
+  SingleValue,
+  options,
+  defaultOption,
+  placeholder,
+  isSearchable = false,
+  maxMenuHeight = 200
+}: SelectComponentProps) => {
+  const components: Partial<
+    SelectComponents<OptionType, boolean, GroupBase<OptionType>>
+  > = {}
+  if (Option) {
+    components.Option = Option
+  }
+
+  if (SingleValue) {
+    components.SingleValue = SingleValue
+  }
+
+  return (
+    <>
+      <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
+      <Select
+        placeholder={placeholder}
+        components={components}
+        isSearchable={isSearchable}
+        inputId={`indicators-dropdown${label}`}
+        maxMenuHeight={maxMenuHeight}
+        defaultValue={defaultOption}
+        options={options}
+        styles={customStyle}
+      />
+    </>
+  )
+}
 
 export default SelectComponent

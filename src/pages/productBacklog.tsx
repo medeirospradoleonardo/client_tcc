@@ -30,6 +30,7 @@ export default function ProductBacklogPage(props: ProductBacklogTemplateProps) {
       sprintsData={props.sprintsData}
       projectUserRoles={props?.projectUserRoles}
       activeProject={props?.activeProject}
+      user={props.user}
     />
   )
 }
@@ -90,6 +91,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       session,
+      user: {
+        id: usersPermissionsUser?.data?.id,
+        name: usersPermissionsUser?.data?.attributes?.username
+      },
       projectUserRoles: projectUserRoles?.data,
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {

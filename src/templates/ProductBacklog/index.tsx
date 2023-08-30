@@ -9,7 +9,7 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import { Dialog } from '@mui/material'
-import FormBoard from 'components/FormBoard'
+import FormBoard, { FormBoardProps } from 'components/FormBoard'
 import Button from 'components/Button'
 import FormSprint, { FormSprintProps } from 'components/FormSprint'
 import { Session } from 'next-auth'
@@ -19,11 +19,18 @@ import {
   MUTATION_UPDATE_BOARDS
 } from 'graphql/mutations/sprint'
 import { QuerySprint } from 'graphql/generated/QuerySprint'
-import { QUERY_SPRINT } from 'graphql/queries/sprint'
+import { QUERY_SPRINT, QUERY_SPRINTS_IN_PROJECT } from 'graphql/queries/sprint'
 import Confirm from 'components/Confirm'
 import { MUTATION_DELETE_BOARD } from 'graphql/mutations/board'
 import ProductBacklogComponent from 'components/ProductBacklogComponent'
 import { MUTATION_UPDATE_PROJECT_BOARDS } from 'graphql/mutations/project'
+import { QUERY_ALL_USERS_IN_PROJECT } from 'graphql/queries/user'
+
+import { pathToSelectMapper, usersToSelectMapper } from 'utils/mappers'
+import { QueryAllUsersInProject } from 'graphql/generated/QueryAllUsersInProject'
+import { QuerySprintsInProject } from 'graphql/generated/QuerySprintsInProject'
+import { QUERY_BOARD } from 'graphql/queries/board'
+import { QueryBoard } from 'graphql/generated/QueryBoard'
 
 export type User = {
   id: string
@@ -38,7 +45,7 @@ export type Board = {
   author: User
   responsible: User
   sprint: string | null
-  status: string
+  status: string | null
 }
 
 export type Sprint = {
@@ -59,15 +66,17 @@ export type ProductBacklogTemplateProps = {
   projectUserRoles: ProjectsTemplateProps[]
   activeProject: Project
   sprintsData: Sprint[]
+  user: User
 }
 
 const ProductBacklog = ({
   session,
   projectUserRoles,
   activeProject,
-  sprintsData
+  sprintsData,
+  user
 }: ProductBacklogTemplateProps) => {
-  const [openModalBoard, setOpenModalBoard] = useState(true)
+  const [openModalBoard, setOpenModalBoard] = useState(false)
   const [openModalSprint, setOpenModalSprint] = useState(false)
   const [openModalDeleteSprint, setOpenModalDeleteSprint] = useState(false)
   const [openModalDeleteBoard, setOpenModalDeleteBoard] = useState(false)
@@ -136,11 +145,19 @@ const ProductBacklog = ({
         name: ''
       },
       sprint: '',
-      status: 'Não iniciado'
+      status: ''
     },
+    options: 'create',
     activeProject: activeProject,
-    closeModal: () => setOpenModalBoard(false)
+    usersOptions: [{ label: '', value: '' }],
+    pathOptions: [{ label: '', value: '' }],
+    closeModal: () => setOpenModalBoard(false),
+    user: user
   }
+
+  const [propsModalBoard, setPropsModalBoard] = useState<FormBoardProps>(
+    modalBoardPropsDefault
+  )
 
   const createSprint = () => {
     setPropsModalSprint(modalSprintPropsDefault)
@@ -282,7 +299,7 @@ const ProductBacklog = ({
         name: ''
       },
       sprint: '',
-      status: 'Não iniciado'
+      status: null
     }
     const sprintsNew = [] as Sprint[]
     const sprintsOld = [] as Sprint[]
@@ -506,6 +523,113 @@ const ProductBacklog = ({
     }
   }
 
+  const [getBoardGraphql, { data: dataQueryBoard }] = useLazyQuery<QueryBoard>(
+    QUERY_BOARD,
+    {
+      context: { session },
+      onCompleted: () => {
+        const modalBoardPropsNew = propsModalBoard
+        modalBoardPropsNew.option = 'edit'
+        modalBoardPropsNew.initialBoard = {
+          id: dataQueryBoard?.board?.data?.id || '',
+          title: dataQueryBoard?.board?.data?.attributes?.title || '',
+          timeEstimated:
+            dataQueryBoard?.board?.data?.attributes?.timeEstimated || 0,
+          description:
+            dataQueryBoard?.board?.data?.attributes?.description || '',
+          author: {
+            id: dataQueryBoard?.board?.data?.attributes?.author?.data?.id || '',
+            name:
+              dataQueryBoard?.board?.data?.attributes?.author?.data?.attributes
+                ?.username || ''
+          },
+          responsible: {
+            id:
+              dataQueryBoard?.board?.data?.attributes?.responsible?.data?.id ||
+              '',
+            name:
+              dataQueryBoard?.board?.data?.attributes?.responsible?.data
+                ?.attributes?.username || ''
+          },
+          sprint:
+            dataQueryBoard?.board?.data?.attributes?.sprint?.data?.id || '',
+          status: `${dataQueryBoard?.board?.data?.attributes?.status}`
+        }
+        setPropsModalBoard(modalBoardPropsNew)
+      }
+    }
+  )
+
+  const [getAllUsersInProject, { data: QueryAllUsers }] =
+    useLazyQuery<QueryAllUsersInProject>(QUERY_ALL_USERS_IN_PROJECT, {
+      context: { session },
+      onCompleted: () => {
+        const modalBoardPropsNew = propsModalBoard
+        modalBoardPropsNew.usersOptions = usersToSelectMapper(
+          QueryAllUsers?.usersPermissionsUsers?.data || []
+        )
+        setPropsModalBoard(modalBoardPropsNew)
+      }
+    })
+
+  const [getAllSprintInProject, { data: QueryAllSprintsInProject }] =
+    useLazyQuery<QuerySprintsInProject>(QUERY_SPRINTS_IN_PROJECT, {
+      context: { session },
+      onCompleted: () => {
+        const modalBoardPropsNew = propsModalBoard
+        modalBoardPropsNew.pathOptions = pathToSelectMapper(
+          QueryAllSprintsInProject?.sprints?.data || [],
+          project.id
+        )
+        setPropsModalBoard(modalBoardPropsNew)
+      }
+    })
+
+  const createBoard = async (idPath: string | null) => {
+    setPropsModalBoard(modalBoardPropsDefault)
+    if (idPath) {
+      const modalBoardPropsNew = modalBoardPropsDefault
+      modalBoardPropsNew.initialBoard.sprint = idPath
+      setPropsModalBoard(modalBoardPropsNew)
+    }
+    await getAllUsersInProject({
+      variables: {
+        projectId: project.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    await getAllSprintInProject({
+      variables: {
+        projectId: project.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    setOpenModalBoard(true)
+  }
+
+  const editBoard = async (id: string) => {
+    setPropsModalBoard(modalBoardPropsDefault)
+    await getAllUsersInProject({
+      variables: {
+        projectId: project.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    await getAllSprintInProject({
+      variables: {
+        projectId: project.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    await getBoardGraphql({
+      variables: {
+        boardId: id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    setOpenModalBoard(true)
+  }
+
   return (
     <>
       <Dialog
@@ -543,10 +667,10 @@ const ProductBacklog = ({
             <Dialog
               open={openModalBoard}
               fullWidth={true}
-              maxWidth="xs"
+              maxWidth="md"
               onClose={handleClose}
             >
-              <FormBoard {...modalBoardPropsDefault} />
+              <FormBoard {...propsModalBoard} />
             </Dialog>
             <Dialog
               open={openModalSprint}
@@ -580,13 +704,15 @@ const ProductBacklog = ({
                         deleteSprint={removeSprintSelect}
                         key={sprint.id}
                         sprint={sprint}
-                        openBoardModal={() => setOpenModalBoard(true)}
+                        createBoard={createBoard}
+                        editBoard={editBoard}
                       />
                     ))}
                     <ProductBacklogComponent
                       project={project}
                       deleteBoard={removeBoardSelect}
-                      openBoardModal={() => setOpenModalBoard(true)}
+                      createBoard={createBoard}
+                      editBoard={editBoard}
                     />
                   </DragDropContext>
                 </S.Content>

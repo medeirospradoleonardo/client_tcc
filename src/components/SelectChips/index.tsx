@@ -35,6 +35,7 @@ type SelectChipsProps = {
 const customStyles: any = {
   container: (styles: any, state: any) => ({
     ...styles,
+    cursor: 'pointer',
     '&:hover': {
       border: state.isFocused ? 'none' : 'none',
       boxShadow: state.isFocused ? 'none' : 'none'
@@ -42,21 +43,25 @@ const customStyles: any = {
   }),
   control: (styles: any, state: any) => ({
     ...styles,
-    // backgroundColor: '#EAEAEA',
+    backgroundColor: '#f4f5f7',
+    cursor: 'pointer',
     border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
     boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none',
     ':focus': {
       border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
       boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none'
     },
+    ':hover': {
+      backgroundColor: '#f4f5f7'
+    },
     ':focus-within': {
       border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
       boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none'
     }
   }),
-  menuPortal: (styles: any) => ({
-    ...styles
-    // zIndex: 1000
+  option: (styles: any, state: any) => ({
+    ...styles,
+    cursor: 'pointer'
   })
 }
 

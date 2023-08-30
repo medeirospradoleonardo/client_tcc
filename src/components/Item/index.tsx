@@ -10,10 +10,24 @@ interface ItemProps {
   id: string
   title: string
   timeEstimated: number
-  status: string
+  status: string | null
   responsible: string
   deleteBoard: (id: string) => void
 }
+
+const colors = [
+  '#DA7657',
+  '#54ac44',
+  '#5784DA',
+  '#AA57DA',
+  '#DA5757',
+  '#DA5792',
+  '#0f3c61',
+  '#57A5DA'
+]
+
+export const getColorFromName = (name: string) =>
+  colors[name.toLocaleLowerCase().charCodeAt(0) % colors.length]
 
 const Item: React.FC<ItemProps> = ({
   id,
@@ -23,20 +37,6 @@ const Item: React.FC<ItemProps> = ({
   responsible,
   deleteBoard
 }) => {
-  const colors = [
-    '#DA7657',
-    '#54ac44',
-    '#5784DA',
-    '#AA57DA',
-    '#DA5757',
-    '#DA5792',
-    '#24887c',
-    '#57A5DA'
-  ]
-
-  const getColorFromName = (name: string) =>
-    colors[name.toLocaleLowerCase().charCodeAt(0) % colors.length]
-
   return (
     <S.Container>
       <S.Id concluded={status == 'concluded' ? true : false}>{id}</S.Id>
@@ -53,9 +53,9 @@ const Item: React.FC<ItemProps> = ({
           {getBoardStatus(status)?.title}
         </S.Status>
 
-        <S.AvatarContainer responsible="Teste">
+        <S.AvatarContainer>
           <S.Avatar color={getColorFromName(responsible)}>
-            <span>{responsible.charAt(0)}</span>
+            <span>{responsible?.charAt(0)}</span>
             <div>
               <span className="title">{responsible}</span>
             </div>

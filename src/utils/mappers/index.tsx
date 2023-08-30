@@ -7,6 +7,7 @@ import CheckIcon from '@mui/icons-material/Check'
 import { QueryAllUsers_usersPermissionsUsers_data } from 'graphql/generated/QueryAllUsers'
 import { QuerySprints } from 'graphql/generated/QuerySprints'
 import { Sprint } from 'templates/ProductBacklog'
+import { QuerySprintsInProject_sprints_data } from 'graphql/generated/QuerySprintsInProject'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -90,11 +91,6 @@ export const projectsToTableMapper = (
           fontSize="large"
         />
       </IconButton>,
-      // <AiTwotoneDelete
-      //   size={20}
-      //   key="a"
-      //   onClick={() => removeFunction(projectUserRole.id)}
-      // />,
       <IconButton
         key={`delete${projectUserRole.id}`}
         size="small"
@@ -132,13 +128,36 @@ export const projectsToTableMapper = (
 export const usersToSelectMapper = (
   users: QueryAllUsers_usersPermissionsUsers_data[]
 ) => {
-  return users.map((user) => ({
+  const usersSort = users.sort(function (a, b) {
+    const aUsername = a.attributes ? a.attributes.username : ''
+    const bUsername = b.attributes ? b.attributes.username : ''
+    if (aUsername < bUsername) {
+      return -1
+    }
+    if (aUsername > bUsername) {
+      return 1
+    }
+    return 0
+  })
+  return usersSort.map((user) => ({
     label: `${user.attributes?.username}`,
     value: `${user.id}`
   }))
 }
 
-export const getBoardStatus = (status: string) => {
+export const pathToSelectMapper = (
+  sprints: QuerySprintsInProject_sprints_data[],
+  projectId: string
+) => {
+  return [{ label: 'Backlog do produto', value: projectId }].concat(
+    sprints.map((sprint) => ({
+      label: `${sprint.attributes?.name}`,
+      value: `${sprint.id}`
+    }))
+  )
+}
+
+export const getBoardStatus = (status: string | null) => {
   switch (status) {
     case 'notInitiated':
       return {
@@ -155,5 +174,10 @@ export const getBoardStatus = (status: string) => {
         title: 'CONCLUÍDO',
         color: '#11831a'
       }
+  }
+
+  return {
+    title: 'NÃO INICIADO',
+    color: '#DA5757'
   }
 }
