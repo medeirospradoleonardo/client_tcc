@@ -20,6 +20,18 @@ import { useMutation } from '@apollo/client'
 import { MUTATION_SPRINT_TOGGLE_EXPAND } from 'graphql/mutations/sprint'
 import { Session } from 'next-auth'
 
+export function padTo2Digits(num: number) {
+  return num.toString().padStart(2, '0')
+}
+
+export function formatDate(date: Date) {
+  return [
+    padTo2Digits(date.getDate() + 1),
+    padTo2Digits(date.getMonth() + 1),
+    date.getFullYear()
+  ].join('/')
+}
+
 export type SprintProps = {
   session: Session
   sprint: Sprint
@@ -50,18 +62,6 @@ export default function SprintComponent({
 
     ...draggableStyle
   })
-
-  function padTo2Digits(num: number) {
-    return num.toString().padStart(2, '0')
-  }
-
-  function formatDate(date: Date) {
-    return [
-      padTo2Digits(date.getDate() + 1),
-      padTo2Digits(date.getMonth() + 1),
-      date.getFullYear()
-    ].join('/')
-  }
 
   const [toggleSprintExpandGraphQL] = useMutation(
     MUTATION_SPRINT_TOGGLE_EXPAND,

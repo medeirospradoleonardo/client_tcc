@@ -6,6 +6,8 @@ export const QUERY_BOARD = gql`
       data {
         id
         attributes {
+          createdAt
+          conclusionDate
           title
           timeEstimated
           description

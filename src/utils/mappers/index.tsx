@@ -8,6 +8,7 @@ import { QueryAllUsers_usersPermissionsUsers_data } from 'graphql/generated/Quer
 import { QuerySprints } from 'graphql/generated/QuerySprints'
 import { Sprint } from 'templates/ProductBacklog'
 import { QuerySprintsInProject_sprints_data } from 'graphql/generated/QuerySprintsInProject'
+import { User } from 'components/Table'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -65,6 +66,7 @@ function roleConverter(role: string) {
 }
 
 export const projectsToTableMapper = (
+  user: User,
   projectUserRoles: ProjectUserRoleType[],
   editFunction: (id: string) => void,
   removeFunction: (id: string) => void,
@@ -79,12 +81,16 @@ export const projectsToTableMapper = (
       <IconButton
         key={`edit${projectUserRole.id}`}
         size="small"
-        disabled={projectUserRole.role == 'member' ? true : false}
+        disabled={
+          projectUserRole.role == 'member' && user.type != 'admin'
+            ? true
+            : false
+        }
         onClick={() => editFunction(projectUserRole.project.id)}
       >
         <EditIcon
           style={
-            projectUserRole.role == 'member'
+            projectUserRole.role == 'member' && user.type != 'admin'
               ? { color: '#c5c5c5' }
               : { color: '#030517' }
           }
@@ -94,12 +100,16 @@ export const projectsToTableMapper = (
       <IconButton
         key={`delete${projectUserRole.id}`}
         size="small"
-        disabled={projectUserRole.role == 'member' ? true : false}
+        disabled={
+          projectUserRole.role == 'member' && user.type != 'admin'
+            ? true
+            : false
+        }
         onClick={() => removeFunction(projectUserRole.project.id)}
       >
         <DeleteIcon
           style={
-            projectUserRole.role == 'member'
+            projectUserRole.role == 'member' && user.type != 'admin'
               ? { color: '#c5c5c5' }
               : { color: '#030517' }
           }

@@ -31,8 +31,27 @@ export const Content = styled.div`
   height: 300px;
 `
 
+export const Left = styled.div`
+  margin-right: 15px;
+  width: 100%;
+`
+
 export const Right = styled.div`
   margin-left: auto;
   display: flex;
   width: 360px;
+`
+
+export const Dates = styled.div`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray};
+    /* margin-top: 10px; */
+    /* margin-top: 50px; */
+    margin-top: 68px;
+    /* margin-left: 149px; */
+  `}
+`
+
+export const Description = styled.div`
+  ${({ theme }) => css``}
 `

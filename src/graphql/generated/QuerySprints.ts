@@ -59,7 +59,7 @@ export interface QuerySprints_sprints_data_attributes_boards_data_attributes {
   author: QuerySprints_sprints_data_attributes_boards_data_attributes_author | null;
   responsible: QuerySprints_sprints_data_attributes_boards_data_attributes_responsible | null;
   sprint: QuerySprints_sprints_data_attributes_boards_data_attributes_sprint | null;
-  status: ENUM_BOARD_STATUS | null;
+  status: ENUM_BOARD_STATUS;
 }
 
 export interface QuerySprints_sprints_data_attributes_boards_data {

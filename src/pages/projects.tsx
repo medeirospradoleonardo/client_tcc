@@ -71,7 +71,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         id: usersPermissionsUser?.data?.id,
         activeProjectId:
           usersPermissionsUser?.data?.attributes?.activeProject?.data?.id || '',
-        name: usersPermissionsUser?.data?.attributes?.username || ''
+        name: usersPermissionsUser?.data?.attributes?.username || '',
+        type: usersPermissionsUser?.data?.attributes?.type
       },
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {

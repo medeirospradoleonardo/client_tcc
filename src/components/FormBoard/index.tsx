@@ -3,7 +3,7 @@ import * as S from './styles'
 import Heading from 'components/Heading'
 import { FormError } from 'components/Form'
 import { ErrorOutline } from '@styled-icons/material-outlined'
-import SelectChips from 'components/SelectChips'
+
 import Button from 'components/Button'
 import { useState } from 'react'
 import TextField from 'components/TextField'
@@ -12,14 +12,12 @@ import { Board, User } from 'templates/ProductBacklog'
 import SelectComponent, { OptionType } from 'components/Select'
 import {
   Option,
-  SingleValue,
+  SingleValue as SingleValueStatus,
   colourStylesStatus,
-  defaultOption,
   options
 } from 'components/Select/configSelectStatus'
 
 import {
-  Option as OptionResponsible,
   SingleValue as SingleValueResponsible,
   colourStylesStatus as colourStylesStatusResponsible
 } from 'components/Select/configSelectResponsible'
@@ -28,8 +26,14 @@ import { WatchLater } from '@styled-icons/material-outlined/WatchLater'
 import { Person } from '@styled-icons/material-outlined/Person'
 import { getBoardStatus } from 'utils/mappers'
 import { Project } from 'templates/Projects'
+import JoditComponent from 'components/JoditComponent'
+import { MultiValue, SingleValue } from 'react-select'
+import { MUTATION_CREATE_BOARD } from 'graphql/mutations/board'
+import { Session } from 'next-auth'
+import { useMutation } from '@apollo/client'
 
 export type FormBoardProps = {
+  session: Session
   initialBoard: Board
   closeModal: () => void
   activeProject: Project
@@ -37,16 +41,19 @@ export type FormBoardProps = {
   pathOptions: OptionType[]
   user: User
   option?: 'create' | 'edit'
+  refreshBoardForm: (board: Board) => void
 }
 
 const FormBoard = ({
+  session,
   initialBoard,
   closeModal,
   activeProject,
   usersOptions,
   pathOptions,
   user,
-  option = 'create'
+  option = 'create',
+  refreshBoardForm
 }: FormBoardProps) => {
   const [formError, setFormError] = useState('')
   const [fieldError, setFieldError] = useState<FieldErrors>({})
@@ -54,6 +61,16 @@ const FormBoard = ({
   const [values, setValues] = useState<Board>({
     id: initialBoard.id,
     title: initialBoard.title,
+    createdDate: initialBoard.createdDate
+      ? `${initialBoard.createdDate?.split('-')[2].split('T')[0]}/${
+          initialBoard.createdDate?.split('-')[1]
+        }/${initialBoard.createdDate?.split('-')[0]}`
+      : undefined,
+    conclusionDate: initialBoard.conclusionDate
+      ? `${initialBoard.conclusionDate?.split('-')[2]}/${
+          initialBoard.conclusionDate?.split('-')[1]
+        }/${initialBoard.conclusionDate?.split('-')[0]}`
+      : undefined,
     timeEstimated: initialBoard.timeEstimated,
     description: initialBoard.description,
     author: {
@@ -68,16 +85,78 @@ const FormBoard = ({
     status: initialBoard.status
   })
 
+  const [createBoardGraphQL] = useMutation(MUTATION_CREATE_BOARD, {
+    context: { session },
+    onCompleted: (data) => {
+      console.log(data.createBoard.data.id)
+      refreshBoardForm({
+        id: data.createBoard.data.id,
+        title: data.createBoard.data.attributes.title,
+        timeEstimated: data.createBoard.data.attributes.timeEstimated,
+        description: data.createBoard.data.attributes.description,
+        author: {
+          id: data.createBoard.data.attributes.author.data.id,
+          name: data.createBoard.data.attributes.author.data.attributes.username
+        },
+        responsible: {
+          id: data.createBoard.data.attributes.responsible.data.id,
+          name: data.createBoard.data.attributes.responsible.data.attributes
+            .username
+        },
+        sprint: data.createBoard.data.attributes.sprint.data.id,
+        status: data.createBoard.data.attributes.status
+      })
+    },
+    onError: (e) => {
+      console.log(e)
+    }
+  })
+
   const createBoard = () => {
-    //
+    console.log(values)
+    createBoardGraphQL({
+      variables: {
+        title: values.title,
+        description: values.description,
+        timeEstimated: values.timeEstimated,
+        status: values.status,
+        sprintId: values.sprint,
+        authorId: user.id,
+        responsibleId: values.responsible.id,
+        projectId: activeProject.id
+      }
+    })
   }
 
   const editBoard = () => {
     //
   }
 
-  const handleInput = (value: string) => {
-    //
+  const handleInput = (field: string, value: string | null | User | number) => {
+    setValues((s) => ({ ...s, [field]: value }))
+  }
+
+  const setStatus = (
+    option: MultiValue<OptionType> | SingleValue<OptionType>
+  ) => {
+    handleInput('status', option?.value)
+  }
+
+  const setPath = (
+    option: MultiValue<OptionType> | SingleValue<OptionType>
+  ) => {
+    option?.label != 'Backlog do produto'
+      ? handleInput('sprint', option?.value)
+      : handleInput('sprint', null)
+  }
+
+  const setResponsible = (
+    option: MultiValue<OptionType> | SingleValue<OptionType>
+  ) => {
+    handleInput('responsible', {
+      id: option?.value,
+      name: option?.label
+    })
   }
 
   const getLabelPathWithId = (id: string) => {
@@ -106,17 +185,27 @@ const FormBoard = ({
         </FormError>
       )}
       <S.Content>
-        <div style={{ marginRight: '30px' }}>
-          <TextField
-            name="title"
-            placeholder="Titulo"
-            label="Titulo"
-            initialValue={values.title}
-            // error={fieldError?.name}
-            onInputChange={(v) => handleInput(v)}
-            style={{ height: '30px' }}
-          />
-        </div>
+        <S.Left>
+          <div style={{ marginRight: '30px', width: '100%' }}>
+            <TextField
+              name="title"
+              placeholder="Titulo"
+              label="Titulo"
+              initialValue={values.title}
+              // error={fieldError?.name}
+              onInputChange={(v) => handleInput('title', v)}
+              style={{ height: '30px' }}
+            />
+          </div>
+          <S.Description>
+            <JoditComponent
+              description={values.description}
+              label="Descrição"
+              placeholder="Insira uma descrição"
+              setData={handleInput}
+            />
+          </S.Description>
+        </S.Left>
         <S.Right>
           <S.Select>
             <S.Right>
@@ -126,13 +215,13 @@ const FormBoard = ({
                 icon={<WatchLater />}
                 initialValue={`${values.timeEstimated}`}
                 // error={fieldError?.name}
-                // onInputChange={(v) => handleInput(v)}
+                onInputChange={(v) => handleInput('timeEstimated', parseInt(v))}
                 style={{ height: '34px', width: '72px' }}
               />
               <div style={{ marginLeft: '30px', width: '200px' }}>
                 <SelectComponent
                   Option={Option}
-                  SingleValue={SingleValue}
+                  SingleValue={SingleValueStatus}
                   customStyle={colourStylesStatus}
                   label="Status"
                   options={options}
@@ -149,6 +238,7 @@ const FormBoard = ({
                           color: '#DA5757'
                         }
                   }
+                  setData={setStatus}
                 />
               </div>
             </S.Right>
@@ -168,6 +258,7 @@ const FormBoard = ({
               customStyle={colourStylesStatusResponsible}
               label="Destino"
               options={pathOptions}
+              setData={setPath}
             />
             <SelectComponent
               isSearchable={true}
@@ -184,6 +275,7 @@ const FormBoard = ({
               customStyle={colourStylesStatusResponsible}
               label="Responsável"
               options={users}
+              setData={setResponsible}
             />
             <div>
               <TextField
@@ -195,10 +287,22 @@ const FormBoard = ({
                   values.author.name ? values.author.name : user.name
                 }
                 error={fieldError?.name}
-                onInputChange={(v) => handleInput(v)}
+                onInputChange={(v) => handleInput('author', v)}
                 style={{ height: '34px' }}
               />
             </div>
+            <S.Dates>
+              {values.createdDate && (
+                <div>
+                  <span>Criado em: {values.createdDate}</span>
+                </div>
+              )}
+              {values.conclusionDate && (
+                <div>
+                  <span>Concluído em: {values.conclusionDate}</span>
+                </div>
+              )}
+            </S.Dates>
           </S.Select>
         </S.Right>
       </S.Content>

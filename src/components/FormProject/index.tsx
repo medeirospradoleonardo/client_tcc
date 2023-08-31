@@ -135,7 +135,8 @@ const FormProject = ({
     }
     if (
       !scrumMasters.find((e) => e.value == user.id) &&
-      !productOwners.find((e) => e.value == user.id)
+      !productOwners.find((e) => e.value == user.id) &&
+      user.type != 'admin'
     ) {
       setFormError(
         'O usuário criador do projeto precisa ter papel de Scrum Master ou Product Owner'
@@ -282,7 +283,8 @@ const FormProject = ({
     }
     if (
       !scrumMasters.find((e) => e.value == user.id) &&
-      !productOwners.find((e) => e.value == user.id)
+      !productOwners.find((e) => e.value == user.id) &&
+      user.type != 'admin'
     ) {
       setFormError(
         'O usuário editor do projeto precisa ter papel de Scrum Master ou Product Owner'

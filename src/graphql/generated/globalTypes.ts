@@ -19,6 +19,11 @@ export enum ENUM_PROJECTUSERROLE_ROLE {
   scrumMaster = "scrumMaster",
 }
 
+export enum ENUM_USERSPERMISSIONSUSER_TYPE {
+  admin = "admin",
+  default = "default",
+}
+
 export interface UsersPermissionsRegisterInput {
   username: string;
   email: string;

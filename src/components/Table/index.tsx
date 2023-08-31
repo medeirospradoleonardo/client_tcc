@@ -46,6 +46,7 @@ export type User = {
   id: string
   activeProjectId: string
   name: string
+  type?: string
 }
 
 type Project = {
@@ -260,6 +261,7 @@ export default function CustomizedTables({
   }
 
   const tableData = projectsToTableMapper(
+    user,
     projects,
     editProject,
     removeProjectSelect,

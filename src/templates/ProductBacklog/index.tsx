@@ -46,6 +46,8 @@ export type Board = {
   responsible: User
   sprint: string | null
   status: string | null
+  createdDate?: string
+  conclusionDate?: string
 }
 
 export type Sprint = {
@@ -130,7 +132,45 @@ const ProductBacklog = ({
     modalSprintPropsDefault
   )
 
+  const refreshBoardForm = (board: Board) => {
+    const isCreate = !project.boards?.find((b) => b.id == board.id)
+    const sprintsNew = [] as Sprint[]
+    const projectNew = {
+      id: project.id,
+      name: project.name,
+      boards: project.boards?.slice()
+    }
+
+    sprints.map((s) => {
+      sprintsNew.push({
+        id: s.id,
+        name: s.name,
+        expand: s.expand,
+        initialDate: s.initialDate,
+        finalDate: s.finalDate,
+        boards: s.boards.slice()
+      })
+    })
+
+    if (isCreate) {
+      projectNew.boards?.push(board)
+      if (board.sprint != null) {
+        sprintsNew.map((s) => {
+          if (s.id == board.sprint) {
+            s.boards.push(board)
+          }
+        })
+
+        setSprints(sprintsNew)
+      }
+
+      setProject(projectNew)
+      setOpenModalBoard(false)
+    }
+  }
+
   const modalBoardPropsDefault = {
+    session: session,
     initialBoard: {
       id: '',
       title: '',
@@ -145,14 +185,15 @@ const ProductBacklog = ({
         name: ''
       },
       sprint: '',
-      status: ''
+      status: 'notInitiated'
     },
     options: 'create',
     activeProject: activeProject,
     usersOptions: [{ label: '', value: '' }],
     pathOptions: [{ label: '', value: '' }],
     closeModal: () => setOpenModalBoard(false),
-    user: user
+    user: user,
+    refreshBoardForm: refreshBoardForm
   }
 
   const [propsModalBoard, setPropsModalBoard] = useState<FormBoardProps>(
@@ -532,6 +573,9 @@ const ProductBacklog = ({
         modalBoardPropsNew.option = 'edit'
         modalBoardPropsNew.initialBoard = {
           id: dataQueryBoard?.board?.data?.id || '',
+          createdDate: dataQueryBoard?.board?.data?.attributes?.createdAt,
+          conclusionDate:
+            dataQueryBoard?.board?.data?.attributes?.conclusionDate,
           title: dataQueryBoard?.board?.data?.attributes?.title || '',
           timeEstimated:
             dataQueryBoard?.board?.data?.attributes?.timeEstimated || 0,

@@ -600,13 +600,12 @@ input BoardFiltersInput {
   timeEstimated: IntFilterInput
   type: StringFilterInput
   description: StringFilterInput
-  comentaries: ComentaryFiltersInput
-  categories: CategoryFiltersInput
   sprint: SprintFiltersInput
   responsible: UsersPermissionsUserFiltersInput
   author: UsersPermissionsUserFiltersInput
   project: ProjectFiltersInput
   status: StringFilterInput
+  conclusionDate: DateFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [BoardFiltersInput]
@@ -619,27 +618,25 @@ input BoardInput {
   timeEstimated: Int
   type: ENUM_BOARD_TYPE
   description: String
-  comentaries: [ID]
-  categories: [ID]
   sprint: ID
   responsible: ID
   author: ID
   project: ID
   status: ENUM_BOARD_STATUS
+  conclusionDate: Date
 }
 
 type Board {
   title: String!
   timeEstimated: Int!
-  type: ENUM_BOARD_TYPE!
+  type: ENUM_BOARD_TYPE
   description: String
-  comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryRelationResponseCollection
-  categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): CategoryRelationResponseCollection
   sprint: SprintEntityResponse
   responsible: UsersPermissionsUserEntityResponse
   author: UsersPermissionsUserEntityResponse
   project: ProjectEntityResponse
-  status: ENUM_BOARD_STATUS
+  status: ENUM_BOARD_STATUS!
+  conclusionDate: Date
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -665,7 +662,6 @@ type BoardRelationResponseCollection {
 input CategoryFiltersInput {
   id: IDFilterInput
   name: StringFilterInput
-  boards: BoardFiltersInput
   knowledge: KnowledgeFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
@@ -677,14 +673,12 @@ input CategoryFiltersInput {
 
 input CategoryInput {
   name: String
-  boards: [ID]
   knowledge: ID
   publishedAt: DateTime
 }
 
 type Category {
   name: String!
-  boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   knowledge: KnowledgeEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
@@ -712,7 +706,6 @@ type CategoryRelationResponseCollection {
 input ComentaryFiltersInput {
   id: IDFilterInput
   content: StringFilterInput
-  board: BoardFiltersInput
   author: UsersPermissionsUserFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
@@ -724,14 +717,12 @@ input ComentaryFiltersInput {
 
 input ComentaryInput {
   content: String
-  board: ID
   author: ID
   publishedAt: DateTime
 }
 
 type Comentary {
   content: String
-  board: BoardEntityResponse
   author: UsersPermissionsUserEntityResponse
   createdAt: DateTime
   updatedAt: DateTime

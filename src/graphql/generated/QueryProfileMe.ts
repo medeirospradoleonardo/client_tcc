@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { ENUM_USERSPERMISSIONSUSER_TYPE } from "./globalTypes";
+
 // ====================================================
 // GraphQL query operation: QueryProfileMe
 // ====================================================
@@ -27,6 +29,7 @@ export interface QueryProfileMe_usersPermissionsUser_data_attributes {
   __typename: "UsersPermissionsUser";
   email: string;
   username: string;
+  type: ENUM_USERSPERMISSIONSUSER_TYPE;
   activeProject: QueryProfileMe_usersPermissionsUser_data_attributes_activeProject | null;
 }
 

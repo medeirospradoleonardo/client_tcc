@@ -48,7 +48,7 @@ export interface MutationCreateSprint_createSprint_data_attributes_boards_data_a
   description: string | null;
   author: MutationCreateSprint_createSprint_data_attributes_boards_data_attributes_author | null;
   responsible: MutationCreateSprint_createSprint_data_attributes_boards_data_attributes_responsible | null;
-  status: ENUM_BOARD_STATUS | null;
+  status: ENUM_BOARD_STATUS;
 }
 
 export interface MutationCreateSprint_createSprint_data_attributes_boards_data {

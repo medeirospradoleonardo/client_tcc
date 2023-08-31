@@ -2,10 +2,11 @@ import React from 'react'
 
 import Select, {
   GroupBase,
+  MultiValue,
   OptionProps,
+  SingleValue,
   SingleValueProps,
-  StylesConfig,
-  components
+  StylesConfig
 } from 'react-select'
 
 import * as S from './styles'
@@ -27,6 +28,7 @@ type SelectComponentProps = {
   placeholder?: string
   isSearchable?: boolean
   maxMenuHeight?: number
+  setData: (e: MultiValue<OptionType> | SingleValue<OptionType>) => void
 }
 
 const SelectComponent = ({
@@ -38,7 +40,8 @@ const SelectComponent = ({
   defaultOption,
   placeholder,
   isSearchable = false,
-  maxMenuHeight = 200
+  maxMenuHeight = 200,
+  setData
 }: SelectComponentProps) => {
   const components: Partial<
     SelectComponents<OptionType, boolean, GroupBase<OptionType>>
@@ -63,6 +66,7 @@ const SelectComponent = ({
         defaultValue={defaultOption}
         options={options}
         styles={customStyle}
+        onChange={(e) => setData(e)}
       />
     </>
   )

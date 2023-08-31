@@ -8,6 +8,7 @@ export const QUERY_PROFILE_ME = gql`
         attributes {
           email
           username
+          type
           activeProject {
             data {
               id
@@ -88,6 +89,7 @@ export const QUERY_ALL_USERS = gql`
         id
         attributes {
           username
+          type
         }
       }
     }
@@ -106,6 +108,7 @@ export const QUERY_ALL_USERS_IN_PROJECT = gql`
         id
         attributes {
           username
+          type
         }
       }
     }

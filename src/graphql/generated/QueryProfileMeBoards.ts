@@ -59,7 +59,7 @@ export interface QueryProfileMeBoards_usersPermissionsUser_data_attributes_activ
   description: string | null;
   author: QueryProfileMeBoards_usersPermissionsUser_data_attributes_activeProject_data_attributes_boards_data_attributes_author | null;
   responsible: QueryProfileMeBoards_usersPermissionsUser_data_attributes_activeProject_data_attributes_boards_data_attributes_responsible | null;
-  status: ENUM_BOARD_STATUS | null;
+  status: ENUM_BOARD_STATUS;
 }
 
 export interface QueryProfileMeBoards_usersPermissionsUser_data_attributes_activeProject_data_attributes_boards_data {

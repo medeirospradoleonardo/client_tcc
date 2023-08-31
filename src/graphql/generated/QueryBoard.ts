@@ -53,13 +53,15 @@ export interface QueryBoard_board_data_attributes_sprint {
 
 export interface QueryBoard_board_data_attributes {
   __typename: "Board";
+  createdAt: any | null;
+  conclusionDate: any | null;
   title: string;
   timeEstimated: number;
   description: string | null;
   author: QueryBoard_board_data_attributes_author | null;
   responsible: QueryBoard_board_data_attributes_responsible | null;
   sprint: QueryBoard_board_data_attributes_sprint | null;
-  status: ENUM_BOARD_STATUS | null;
+  status: ENUM_BOARD_STATUS;
 }
 
 export interface QueryBoard_board_data {
