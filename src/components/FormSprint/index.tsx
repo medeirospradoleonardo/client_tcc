@@ -3,7 +3,7 @@ import * as S from './styles'
 import Heading from 'components/Heading'
 import { FormError } from 'components/Form'
 import { ErrorOutline } from '@styled-icons/material-outlined'
-import SelectChips from 'components/SelectChips'
+
 import Button from 'components/Button'
 import { useState } from 'react'
 import TextField from 'components/TextField'
@@ -136,21 +136,10 @@ const FormSprint = ({
 
     setFieldError({})
 
-    const dateToday = new Date()
-    const dateTodayString =
-      dateToday.getFullYear() +
-      '-' +
-      (dateToday.getMonth() + 1) +
-      '-' +
-      (dateToday.getDate() - 1)
-
     if (values.initialDate >= values.finalDate) {
       setFormError(
         'A data inicial nao pode ser maior ou igual que a data final'
       )
-      return
-    } else if (new Date(values.initialDate) < new Date(dateTodayString)) {
-      setFormError('A data inicial nao pode ser mais antiga que a atual')
       return
     }
 

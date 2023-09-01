@@ -2,7 +2,11 @@ import Heading from 'components/Heading'
 import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
-import { Project, ProjectsTemplateProps } from 'templates/Projects'
+import {
+  Project,
+  ProjectUserRoleType,
+  ProjectsTemplateProps
+} from 'templates/Projects'
 import Logo from 'components/Logo'
 import Sprint from 'components/Sprint'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
@@ -64,14 +68,16 @@ export type SprintProps = {
 }
 
 export type ProductBacklogTemplateProps = {
+  userRole: string
   session: Session
-  projectUserRoles: ProjectsTemplateProps[]
+  projectUserRoles: ProjectUserRoleType[]
   activeProject: Project
   sprintsData: Sprint[]
   user: User
 }
 
 const ProductBacklog = ({
+  userRole,
   session,
   projectUserRoles,
   activeProject,
@@ -166,10 +172,61 @@ const ProductBacklog = ({
 
       setProject(projectNew)
       setOpenModalBoard(false)
+    } else {
+      projectNew.boards?.map((b) => {
+        if (b.id == board.id) {
+          b.title = board.title
+          b.timeEstimated = board.timeEstimated
+          b.description = board.description
+          b.author = board.author
+          b.responsible = board.responsible
+          b.sprint = board.sprint
+          b.status = board.status
+        }
+      })
+      setProject(projectNew)
+
+      if (board.sprint == null) {
+        sprintsNew.map((s) => {
+          s.boards = s.boards.filter((b) => b.id != board.id)
+        })
+      } else {
+        let boardInTheDifferentSprint = true
+        sprintsNew.map((s) => {
+          if (s.id == board.sprint) {
+            boardInTheDifferentSprint = !s.boards?.find((b) => b.id == board.id)
+            boardInTheDifferentSprint
+              ? s.boards.push(board)
+              : s.boards.map((b) => {
+                  if (b.id == board.id) {
+                    b.title = board.title
+                    b.timeEstimated = board.timeEstimated
+                    b.description = board.description
+                    b.author = board.author
+                    b.responsible = board.responsible
+                    b.sprint = board.sprint
+                    b.status = board.status
+                  }
+                })
+          }
+        })
+
+        if (boardInTheDifferentSprint) {
+          sprintsNew.map((s) => {
+            if (s.id != board.sprint) {
+              s.boards = s.boards.filter((b) => b.id != board.id)
+            }
+          })
+        }
+      }
+      setSprints(sprintsNew)
+      setOpenModalBoard(false)
+      // fazer a edicao no front
     }
   }
 
   const modalBoardPropsDefault = {
+    permited: userRole != 'member',
     session: session,
     initialBoard: {
       id: '',
@@ -731,17 +788,21 @@ const ProductBacklog = ({
 
               <S.Main>
                 <S.Content>
-                  <Button
-                    size="small"
-                    icon={<AddIcon />}
-                    style={{ marginBottom: '10px' }}
-                    onClick={createSprint}
-                  >
-                    Criar sprint
-                  </Button>
+                  {userRole != 'member' && (
+                    <Button
+                      size="small"
+                      icon={<AddIcon />}
+                      style={{ marginBottom: '10px' }}
+                      onClick={createSprint}
+                    >
+                      Criar sprint
+                    </Button>
+                  )}
                   <DragDropContext onDragEnd={onDragEnd}>
                     {sprints.map((sprint) => (
                       <Sprint
+                        user={user}
+                        permited={userRole != 'member'}
                         session={session}
                         deleteBoard={removeBoardSelect}
                         editSprint={editSprint}
@@ -753,6 +814,8 @@ const ProductBacklog = ({
                       />
                     ))}
                     <ProductBacklogComponent
+                      user={user}
+                      permited={userRole != 'member'}
                       project={project}
                       deleteBoard={removeBoardSelect}
                       createBoard={createBoard}

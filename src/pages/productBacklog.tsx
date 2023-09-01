@@ -16,7 +16,7 @@ import {
   QuerySprintsVariables
 } from 'graphql/generated/QuerySprints'
 import { QUERY_SPRINTS } from 'graphql/queries/sprint'
-import { SprintsMapper } from 'utils/mappers'
+import { SprintsMapper, getUserRole } from 'utils/mappers'
 import { resetServerContext } from 'react-beautiful-dnd'
 import {
   QueryProfileMeBoards,
@@ -26,6 +26,7 @@ import {
 export default function ProductBacklogPage(props: ProductBacklogTemplateProps) {
   return (
     <ProductBacklog
+      userRole={props.userRole}
       session={props.session}
       sprintsData={props.sprintsData}
       projectUserRoles={props?.projectUserRoles}
@@ -96,6 +97,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         name: usersPermissionsUser?.data?.attributes?.username
       },
       projectUserRoles: projectUserRoles?.data,
+      userRole: usersPermissionsUser?.data?.attributes?.activeProject?.data?.id
+        ? getUserRole(
+            projectUserRoles?.data,
+            usersPermissionsUser?.data?.attributes?.activeProject?.data?.id
+          )
+        : '',
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {
             id:

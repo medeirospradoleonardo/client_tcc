@@ -7,6 +7,7 @@ import { IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 interface ItemProps {
+  permited: boolean
   id: string
   title: string
   timeEstimated: number
@@ -30,6 +31,7 @@ export const getColorFromName = (name: string) =>
   colors[name.toLocaleLowerCase().charCodeAt(0) % colors.length]
 
 const Item: React.FC<ItemProps> = ({
+  permited,
   id,
   title,
   timeEstimated,
@@ -37,10 +39,13 @@ const Item: React.FC<ItemProps> = ({
   responsible,
   deleteBoard
 }) => {
+  title = title.trim()
   return (
     <S.Container>
       <S.Id concluded={status == 'concluded' ? true : false}>{id}</S.Id>
-      <S.Title>{title}</S.Title>
+      <S.Title>
+        {title.length > 60 ? `${title.slice(0, 60)}...` : title}
+      </S.Title>
       <S.Right>
         <S.TimeEstimated>
           <div className="timeEstimated">
@@ -62,16 +67,18 @@ const Item: React.FC<ItemProps> = ({
           </S.Avatar>
         </S.AvatarContainer>
 
-        <S.Icon>
-          <IconButton
-            onClick={(e) => {
-              e.stopPropagation()
-              deleteBoard(id)
-            }}
-          >
-            <DeleteIcon style={{ color: '#030517' }} fontSize="large" />
-          </IconButton>
-        </S.Icon>
+        {permited && (
+          <S.Icon>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation()
+                deleteBoard(id)
+              }}
+            >
+              <DeleteIcon style={{ color: '#030517' }} fontSize="large" />
+            </IconButton>
+          </S.Icon>
+        )}
       </S.Right>
     </S.Container>
   )

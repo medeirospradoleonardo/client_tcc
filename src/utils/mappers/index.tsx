@@ -9,6 +9,7 @@ import { QuerySprints } from 'graphql/generated/QuerySprints'
 import { Sprint } from 'templates/ProductBacklog'
 import { QuerySprintsInProject_sprints_data } from 'graphql/generated/QuerySprintsInProject'
 import { User } from 'components/Table'
+import { QueryProjectUserRolesLight_projectUserRoles_data } from 'graphql/generated/QueryProjectUserRolesLight'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -63,6 +64,23 @@ function roleConverter(role: string) {
     case 'member':
       return 'Membro'
   }
+}
+
+export const getUserRole = (
+  projectUserRolesData:
+    | QueryProjectUserRolesLight_projectUserRoles_data[]
+    | undefined,
+  activeProjectId: string | null
+) => {
+  let role
+  projectUserRolesData?.map((p) => {
+    if (p.attributes?.project?.data?.id == activeProjectId) {
+      role = p.attributes?.role
+      return
+    }
+  })
+
+  return role
 }
 
 export const projectsToTableMapper = (

@@ -17,11 +17,10 @@ export const Id = styled.div<IdProps>`
   margin-right: 7px;
   text-decoration-style: double;
 `
-export const Title = styled.div`
-  max-width: 200px;
-  max-height: 40px;
-`
+export const Title = styled.div``
+
 export const Container = styled.div`
+  cursor: pointer;
   background: white;
   display: flex;
   justify-content: space-between;

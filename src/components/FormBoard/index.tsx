@@ -26,13 +26,18 @@ import { WatchLater } from '@styled-icons/material-outlined/WatchLater'
 import { Person } from '@styled-icons/material-outlined/Person'
 import { getBoardStatus } from 'utils/mappers'
 import { Project } from 'templates/Projects'
-import JoditComponent from 'components/JoditComponent'
+// import JoditComponent from 'components/JoditComponent'
+import TextEditor from 'components/TextEditor'
 import { MultiValue, SingleValue } from 'react-select'
-import { MUTATION_CREATE_BOARD } from 'graphql/mutations/board'
+import {
+  MUTATION_CREATE_BOARD,
+  MUTATION_UPDATE_BOARD
+} from 'graphql/mutations/board'
 import { Session } from 'next-auth'
 import { useMutation } from '@apollo/client'
 
 export type FormBoardProps = {
+  permited: boolean
   session: Session
   initialBoard: Board
   closeModal: () => void
@@ -45,6 +50,7 @@ export type FormBoardProps = {
 }
 
 const FormBoard = ({
+  permited,
   session,
   initialBoard,
   closeModal,
@@ -81,14 +87,36 @@ const FormBoard = ({
       id: initialBoard.responsible.id,
       name: initialBoard.responsible.name
     },
-    sprint: initialBoard.sprint,
+    sprint: initialBoard.sprint == '' ? null : initialBoard.sprint,
     status: initialBoard.status
+  })
+
+  const [editBoardGraphQL] = useMutation(MUTATION_UPDATE_BOARD, {
+    context: { session },
+    onCompleted: (data) => {
+      refreshBoardForm({
+        id: data.updateBoard.data.id,
+        title: data.updateBoard.data.attributes.title,
+        timeEstimated: data.updateBoard.data.attributes.timeEstimated,
+        description: data.updateBoard.data.attributes.description,
+        author: {
+          id: data.updateBoard.data.attributes.author.data.id,
+          name: data.updateBoard.data.attributes.author.data.attributes.username
+        },
+        responsible: {
+          id: data.updateBoard.data.attributes.responsible.data.id,
+          name: data.updateBoard.data.attributes.responsible.data.attributes
+            .username
+        },
+        sprint: data.updateBoard.data.attributes.sprint.data?.id,
+        status: data.updateBoard.data.attributes.status
+      })
+    }
   })
 
   const [createBoardGraphQL] = useMutation(MUTATION_CREATE_BOARD, {
     context: { session },
     onCompleted: (data) => {
-      console.log(data.createBoard.data.id)
       refreshBoardForm({
         id: data.createBoard.data.id,
         title: data.createBoard.data.attributes.title,
@@ -103,17 +131,13 @@ const FormBoard = ({
           name: data.createBoard.data.attributes.responsible.data.attributes
             .username
         },
-        sprint: data.createBoard.data.attributes.sprint.data.id,
+        sprint: data.createBoard.data.attributes.sprint.data?.id,
         status: data.createBoard.data.attributes.status
       })
-    },
-    onError: (e) => {
-      console.log(e)
     }
   })
 
   const createBoard = () => {
-    console.log(values)
     createBoardGraphQL({
       variables: {
         title: values.title,
@@ -129,7 +153,19 @@ const FormBoard = ({
   }
 
   const editBoard = () => {
-    //
+    editBoardGraphQL({
+      variables: {
+        boardId: values.id,
+        title: values.title,
+        description: values.description,
+        timeEstimated: values.timeEstimated,
+        status: values.status,
+        sprintId: values.sprint,
+        authorId: user.id,
+        responsibleId: values.responsible.id,
+        projectId: activeProject.id
+      }
+    })
   }
 
   const handleInput = (field: string, value: string | null | User | number) => {
@@ -198,12 +234,18 @@ const FormBoard = ({
             />
           </div>
           <S.Description>
-            <JoditComponent
+            {/* <JoditComponent
               description={values.description}
               label="Descrição"
               placeholder="Insira uma descrição"
               setData={handleInput}
-            />
+            /> */}
+            {/* <TextEditor
+              label="Descrição"
+              placeholder="Insira uma descrição"
+              defaultValue={values.description}
+              onChange={handleInput}
+            /> */}
           </S.Description>
         </S.Left>
         <S.Right>
@@ -211,7 +253,7 @@ const FormBoard = ({
             <S.Right>
               <TextField
                 name="timeEstimated"
-                label="Horas"
+                label="Tempo (Horas)"
                 icon={<WatchLater />}
                 initialValue={`${values.timeEstimated}`}
                 // error={fieldError?.name}
@@ -242,41 +284,47 @@ const FormBoard = ({
                 />
               </div>
             </S.Right>
-            <SelectComponent
-              defaultOption={
-                values.sprint
-                  ? {
-                      label: getLabelPathWithId(values.sprint),
-                      value: values.sprint
-                    }
-                  : {
-                      label: getLabelPathWithId(activeProject.id),
-                      value: activeProject.id
-                    }
-              }
-              placeholder="Selecione um destino"
-              customStyle={colourStylesStatusResponsible}
-              label="Destino"
-              options={pathOptions}
-              setData={setPath}
-            />
-            <SelectComponent
-              isSearchable={true}
-              SingleValue={SingleValueResponsible}
-              defaultOption={
-                values.responsible.name
-                  ? {
-                      label: values.responsible.name,
-                      value: values.responsible.id
-                    }
-                  : undefined
-              }
-              placeholder="Selecione um responsável"
-              customStyle={colourStylesStatusResponsible}
-              label="Responsável"
-              options={users}
-              setData={setResponsible}
-            />
+            <div style={{ cursor: `${permited ? 'pointer' : 'not-allowed'}` }}>
+              <SelectComponent
+                defaultOption={
+                  values.sprint
+                    ? {
+                        label: getLabelPathWithId(values.sprint),
+                        value: values.sprint
+                      }
+                    : {
+                        label: getLabelPathWithId(activeProject.id),
+                        value: activeProject.id
+                      }
+                }
+                placeholder="Selecione um destino"
+                customStyle={colourStylesStatusResponsible}
+                label="Destino"
+                options={pathOptions}
+                setData={setPath}
+                isDisabled={!permited}
+              />
+            </div>
+            <div style={{ cursor: `${permited ? 'pointer' : 'not-allowed'}` }}>
+              <SelectComponent
+                isSearchable={true}
+                SingleValue={SingleValueResponsible}
+                defaultOption={
+                  values.responsible.name
+                    ? {
+                        label: values.responsible.name,
+                        value: values.responsible.id
+                      }
+                    : undefined
+                }
+                placeholder="Selecione um responsável"
+                customStyle={colourStylesStatusResponsible}
+                label="Responsável"
+                options={users}
+                setData={setResponsible}
+                isDisabled={!permited}
+              />
+            </div>
             <div>
               <TextField
                 name="author"

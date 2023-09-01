@@ -5,6 +5,14 @@ export const QUERY_PROJECT_USER_ROLES_LIGHT = gql`
     projectUserRoles(filters: { user: { email: { eq: $email } } }) {
       data {
         id
+        attributes {
+          role
+          project {
+            data {
+              id
+            }
+          }
+        }
       }
     }
   }

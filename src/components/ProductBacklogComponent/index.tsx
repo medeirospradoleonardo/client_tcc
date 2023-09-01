@@ -3,7 +3,7 @@ import * as S from './styles'
 
 import { Draggable, Droppable } from 'react-beautiful-dnd'
 import Item from 'components/Item'
-import { Board } from 'templates/ProductBacklog'
+import { Board, User } from 'templates/ProductBacklog'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -13,17 +13,21 @@ import Button from 'components/Button'
 import { Project } from 'templates/Projects'
 
 export type ProductBacklogComponentProps = {
+  permited: boolean
   project: Project
   deleteBoard: (id: string) => void
   createBoard: (idPath: string | null) => void
   editBoard: (id: string) => void
+  user: User
 }
 
 export default function ProductBacklogComponent({
+  permited,
   project,
   deleteBoard,
   createBoard,
-  editBoard
+  editBoard,
+  user
 }: ProductBacklogComponentProps) {
   const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
     background: 'white',
@@ -35,7 +39,7 @@ export default function ProductBacklogComponent({
     ...draggableStyle
   })
 
-  project.boards = project.boards?.filter((b) => b.sprint == null)
+  const boards = project.boards?.filter((b) => b.sprint == null)
 
   return (
     <>
@@ -54,8 +58,8 @@ export default function ProductBacklogComponent({
             {(provided) => (
               <>
                 <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {project.boards &&
-                    project.boards.map((board: Board, index: number) => (
+                  {boards &&
+                    boards.map((board: Board, index: number) => (
                       <Draggable
                         key={board.id}
                         index={index}
@@ -70,9 +74,14 @@ export default function ProductBacklogComponent({
                               snapshot.isDragging,
                               provided.draggableProps.style
                             )}
-                            onClick={() => editBoard(board.id)}
+                            onClick={
+                              user.id == board.responsible.id
+                                ? () => editBoard(board.id)
+                                : undefined
+                            }
                           >
                             <Item
+                              permited={permited}
                               deleteBoard={deleteBoard}
                               key={board.id}
                               id={board.id}
@@ -88,15 +97,17 @@ export default function ProductBacklogComponent({
 
                   {provided.placeholder}
                 </div>
-                <Button
-                  style={{ color: '#000' }}
-                  icon={<AddIcon />}
-                  minimal
-                  size="small"
-                  onClick={() => createBoard(null)}
-                >
-                  Criar item
-                </Button>
+                {permited && (
+                  <Button
+                    style={{ color: '#000' }}
+                    icon={<AddIcon />}
+                    minimal
+                    size="small"
+                    onClick={() => createBoard(null)}
+                  >
+                    Criar item
+                  </Button>
+                )}
               </>
             )}
           </Droppable>

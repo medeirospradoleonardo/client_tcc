@@ -3,7 +3,7 @@ import * as S from './styles'
 
 import { Draggable, DropResult, Droppable } from 'react-beautiful-dnd'
 import Item from 'components/Item'
-import { Board, Sprint } from 'templates/ProductBacklog'
+import { Board, Sprint, User } from 'templates/ProductBacklog'
 import { Dialog, IconButton } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add'
@@ -33,6 +33,7 @@ export function formatDate(date: Date) {
 }
 
 export type SprintProps = {
+  permited: boolean
   session: Session
   sprint: Sprint
   createBoard: (idPath: string | null) => void
@@ -40,16 +41,19 @@ export type SprintProps = {
   deleteSprint: (id: string) => void
   deleteBoard: (id: string) => void
   editSprint: (id: string) => void
+  user: User
 }
 
 export default function SprintComponent({
+  permited,
   session,
   sprint,
   createBoard,
   editBoard,
   deleteSprint,
   deleteBoard,
-  editSprint
+  editSprint,
+  user
 }: SprintProps) {
   const [expandSprint, setExpandSprint] = useState<boolean>(sprint.expand)
 
@@ -102,7 +106,10 @@ export default function SprintComponent({
           <S.ContainerTitle>
             <S.Title>
               <Heading size="medium" color="black" lineBottom>
-                {sprint.name}
+                {/* {sprint.name} */}
+                {sprint.name && sprint.name.length > 50
+                  ? `${sprint.name?.slice(0, 50)}...`
+                  : sprint.name}
               </Heading>
             </S.Title>
           </S.ContainerTitle>
@@ -112,17 +119,20 @@ export default function SprintComponent({
             <h4>{formatDate(new Date(sprint.finalDate))}</h4>
           </S.ContainerDate>
           <S.Right>
-            <div>
-              <IconButton onClick={() => editSprint(sprint.id)}>
-                <EditIcon style={{ color: '#030517' }} fontSize="large" />
-              </IconButton>
-            </div>
-
-            <div>
-              <IconButton onClick={() => deleteSprint(sprint.id)}>
-                <DeleteIcon style={{ color: '#030517' }} fontSize="large" />
-              </IconButton>
-            </div>
+            {permited && (
+              <>
+                <div>
+                  <IconButton onClick={() => editSprint(sprint.id)}>
+                    <EditIcon style={{ color: '#030517' }} fontSize="large" />
+                  </IconButton>
+                </div>
+                <div>
+                  <IconButton onClick={() => deleteSprint(sprint.id)}>
+                    <DeleteIcon style={{ color: '#030517' }} fontSize="large" />
+                  </IconButton>
+                </div>
+              </>
+            )}
           </S.Right>
         </S.ContainerHeader>
         {expandSprint && (
@@ -136,6 +146,7 @@ export default function SprintComponent({
                         key={board.id}
                         index={index}
                         draggableId={`draggable-${board.id}`}
+                        isDragDisabled={!permited}
                       >
                         {(provided, snapshot) => (
                           <div
@@ -146,9 +157,14 @@ export default function SprintComponent({
                               snapshot.isDragging,
                               provided.draggableProps.style
                             )}
-                            onClick={() => editBoard(board.id)}
+                            onClick={
+                              user.id == board.responsible.id
+                                ? () => editBoard(board.id)
+                                : undefined
+                            }
                           >
                             <Item
+                              permited={permited}
                               deleteBoard={deleteBoard}
                               key={board.id}
                               id={board.id}
@@ -164,15 +180,17 @@ export default function SprintComponent({
 
                   {provided.placeholder}
                 </div>
-                <Button
-                  style={{ color: '#000' }}
-                  icon={<AddIcon />}
-                  minimal
-                  size="small"
-                  onClick={() => createBoard(sprint.id)}
-                >
-                  Criar item
-                </Button>
+                {permited && (
+                  <Button
+                    style={{ color: '#000' }}
+                    icon={<AddIcon />}
+                    minimal
+                    size="small"
+                    onClick={() => createBoard(sprint.id)}
+                  >
+                    Criar item
+                  </Button>
+                )}
               </S.Content>
             )}
           </Droppable>

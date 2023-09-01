@@ -1,9 +1,9 @@
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState } from 'react'
 import JoditEditor from 'jodit-react'
 
 import * as S from './styles'
 
-type JoditComponentProps = {
+export type JoditComponentProps = {
   placeholder: string
   label?: string
   description: string
@@ -16,7 +16,7 @@ const JoditComponent = ({
   description,
   setData
 }: JoditComponentProps) => {
-  const editor = useRef(null)
+  // const editor = useRef(null)
   const [content, setContent] = useState(description)
 
   const onChange = (newContent: string) => {
@@ -35,7 +35,7 @@ const JoditComponent = ({
     <>
       {!!label && <S.Label>{label}</S.Label>}
       <JoditEditor
-        ref={editor}
+        // ref={editor}
         value={content}
         config={config}
         onBlur={(newContent) => onChange(newContent)}

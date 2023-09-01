@@ -29,6 +29,7 @@ type SelectComponentProps = {
   isSearchable?: boolean
   maxMenuHeight?: number
   setData: (e: MultiValue<OptionType> | SingleValue<OptionType>) => void
+  isDisabled?: boolean
 }
 
 const SelectComponent = ({
@@ -41,7 +42,8 @@ const SelectComponent = ({
   placeholder,
   isSearchable = false,
   maxMenuHeight = 200,
-  setData
+  setData,
+  isDisabled = false
 }: SelectComponentProps) => {
   const components: Partial<
     SelectComponents<OptionType, boolean, GroupBase<OptionType>>
@@ -57,7 +59,9 @@ const SelectComponent = ({
   return (
     <>
       <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
+
       <Select
+        isDisabled={isDisabled}
         placeholder={placeholder}
         components={components}
         isSearchable={isSearchable}
