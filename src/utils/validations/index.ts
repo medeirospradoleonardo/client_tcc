@@ -1,3 +1,4 @@
+import { FormBoardValues } from 'components/FormBoard'
 import { SprintValues } from 'components/FormSprint'
 import { UsersPermissionsRegisterInput } from 'graphql/generated/globalTypes'
 import Joi from 'joi'
@@ -104,6 +105,21 @@ const fieldsValidationsSprint = {
 
 export function createSprintValidate(values: SprintValues) {
   const schema = Joi.object(fieldsValidationsSprint)
+
+  return getFieldErrors(schema.validate(values, { abortEarly: false }))
+}
+
+const fieldsValidationsBoard = {
+  title: Joi.string().required().messages({
+    'string.empty': `O campo título não pode ficar vazio.`
+  }),
+  timeEstimated: Joi.number().integer().min(1).messages({
+    'number.min': `O campo tempo precisa ser maior que 0.`
+  })
+}
+
+export function createBoardValidate(values: FormBoardValues) {
+  const schema = Joi.object(fieldsValidationsBoard)
 
   return getFieldErrors(schema.validate(values, { abortEarly: false }))
 }

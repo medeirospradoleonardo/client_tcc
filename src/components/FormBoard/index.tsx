@@ -7,7 +7,7 @@ import { ErrorOutline } from '@styled-icons/material-outlined'
 import Button from 'components/Button'
 import { useState } from 'react'
 import TextField from 'components/TextField'
-import { FieldErrors } from 'utils/validations'
+import { FieldErrors, createBoardValidate } from 'utils/validations'
 import { Board, User } from 'templates/ProductBacklog'
 import SelectComponent, { OptionType } from 'components/Select'
 import {
@@ -26,15 +26,19 @@ import { WatchLater } from '@styled-icons/material-outlined/WatchLater'
 import { Person } from '@styled-icons/material-outlined/Person'
 import { getBoardStatus } from 'utils/mappers'
 import { Project } from 'templates/Projects'
-// import JoditComponent from 'components/JoditComponent'
-import TextEditor from 'components/TextEditor'
-import { MultiValue, SingleValue } from 'react-select'
+
 import {
   MUTATION_CREATE_BOARD,
   MUTATION_UPDATE_BOARD
 } from 'graphql/mutations/board'
 import { Session } from 'next-auth'
 import { useMutation } from '@apollo/client'
+import RichText from 'components/RichText'
+
+export type FormBoardValues = {
+  title: string | undefined
+  timeEstimated: number
+}
 
 export type FormBoardProps = {
   permited: boolean
@@ -83,10 +87,15 @@ const FormBoard = ({
       id: initialBoard.author.id,
       name: initialBoard.author.name
     },
-    responsible: {
-      id: initialBoard.responsible.id,
-      name: initialBoard.responsible.name
-    },
+    responsible: initialBoard.responsible.id
+      ? {
+          id: initialBoard.responsible.id,
+          name: initialBoard.responsible.name
+        }
+      : {
+          id: user.id,
+          name: user.name
+        },
     sprint: initialBoard.sprint == '' ? null : initialBoard.sprint,
     status: initialBoard.status
   })
@@ -138,6 +147,16 @@ const FormBoard = ({
   })
 
   const createBoard = () => {
+    const errors = createBoardValidate({
+      title: values.title,
+      timeEstimated: values.timeEstimated
+    })
+
+    if (Object.keys(errors).length) {
+      setFieldError(errors)
+      return
+    }
+
     createBoardGraphQL({
       variables: {
         title: values.title,
@@ -153,6 +172,16 @@ const FormBoard = ({
   }
 
   const editBoard = () => {
+    const errors = createBoardValidate({
+      title: values.title,
+      timeEstimated: values.timeEstimated
+    })
+
+    if (Object.keys(errors).length) {
+      setFieldError(errors)
+      return
+    }
+
     editBoardGraphQL({
       variables: {
         boardId: values.id,
@@ -172,23 +201,17 @@ const FormBoard = ({
     setValues((s) => ({ ...s, [field]: value }))
   }
 
-  const setStatus = (
-    option: MultiValue<OptionType> | SingleValue<OptionType>
-  ) => {
-    handleInput('status', option?.value)
+  const setStatus = (option: any) => {
+    handleInput('status', option.value)
   }
 
-  const setPath = (
-    option: MultiValue<OptionType> | SingleValue<OptionType>
-  ) => {
+  const setPath = (option: any) => {
     option?.label != 'Backlog do produto'
       ? handleInput('sprint', option?.value)
       : handleInput('sprint', null)
   }
 
-  const setResponsible = (
-    option: MultiValue<OptionType> | SingleValue<OptionType>
-  ) => {
+  const setResponsible = (option: any) => {
     handleInput('responsible', {
       id: option?.value,
       name: option?.label
@@ -225,41 +248,38 @@ const FormBoard = ({
           <div style={{ marginRight: '30px', width: '100%' }}>
             <TextField
               name="title"
-              placeholder="Titulo"
-              label="Titulo"
+              placeholder="Título"
+              label="Título"
               initialValue={values.title}
-              // error={fieldError?.name}
+              error={fieldError?.title}
               onInputChange={(v) => handleInput('title', v)}
               style={{ height: '30px' }}
             />
           </div>
           <S.Description>
-            {/* <JoditComponent
-              description={values.description}
+            <RichText
+              content={values.description}
               label="Descrição"
-              placeholder="Insira uma descrição"
               setData={handleInput}
-            /> */}
-            {/* <TextEditor
-              label="Descrição"
-              placeholder="Insira uma descrição"
-              defaultValue={values.description}
-              onChange={handleInput}
-            /> */}
+            />
           </S.Description>
         </S.Left>
         <S.Right>
           <S.Select>
             <S.Right>
-              <TextField
-                name="timeEstimated"
-                label="Tempo (Horas)"
-                icon={<WatchLater />}
-                initialValue={`${values.timeEstimated}`}
-                // error={fieldError?.name}
-                onInputChange={(v) => handleInput('timeEstimated', parseInt(v))}
-                style={{ height: '34px', width: '72px' }}
-              />
+              <div style={{ width: '130px' }}>
+                <TextField
+                  name="timeEstimated"
+                  label="Tempo (Horas)"
+                  icon={<WatchLater />}
+                  initialValue={`${values.timeEstimated}`}
+                  error={fieldError?.timeEstimated}
+                  onInputChange={(v) =>
+                    handleInput('timeEstimated', parseInt(v))
+                  }
+                  style={{ height: '34px', width: '72px' }}
+                />
+              </div>
               <div style={{ marginLeft: '30px', width: '200px' }}>
                 <SelectComponent
                   Option={Option}

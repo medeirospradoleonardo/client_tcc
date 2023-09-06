@@ -7,3 +7,10 @@ export const Label = styled.label`
     cursor: pointer;
   `}
 `
+export const Container = styled.div`
+  ${({ theme }) => css`
+    width: 491px;
+    height: 20px;
+    border: 1px solid rgb(178, 185, 197);
+  `}
+`

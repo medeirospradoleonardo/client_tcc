@@ -75,7 +75,9 @@ export default function ProductBacklogComponent({
                               provided.draggableProps.style
                             )}
                             onClick={
-                              user.id == board.responsible.id
+                              permited
+                                ? () => editBoard(board.id)
+                                : user.id == board.responsible.id
                                 ? () => editBoard(board.id)
                                 : undefined
                             }

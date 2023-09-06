@@ -2,11 +2,7 @@ import Heading from 'components/Heading'
 import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
-import {
-  Project,
-  ProjectUserRoleType,
-  ProjectsTemplateProps
-} from 'templates/Projects'
+import { Project, ProjectUserRoleType } from 'templates/Projects'
 import Logo from 'components/Logo'
 import Sprint from 'components/Sprint'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
@@ -139,7 +135,6 @@ const ProductBacklog = ({
   )
 
   const refreshBoardForm = (board: Board) => {
-    const isCreate = !project.boards?.find((b) => b.id == board.id)
     const sprintsNew = [] as Sprint[]
     const projectNew = {
       id: project.id,
@@ -158,7 +153,12 @@ const ProductBacklog = ({
       })
     })
 
-    if (isCreate) {
+    const oldBoardProject = projectNew.boards?.find((b) => b.id == board.id)
+    const oldBoardSprint = sprintsNew
+      .find((s) => s.boards?.find((b) => b.id == board.id))
+      ?.boards.find((b) => b.id == board.id)
+
+    if (oldBoardProject == null) {
       projectNew.boards?.push(board)
       if (board.sprint != null) {
         sprintsNew.map((s) => {
@@ -173,31 +173,45 @@ const ProductBacklog = ({
       setProject(projectNew)
       setOpenModalBoard(false)
     } else {
-      projectNew.boards?.map((b) => {
-        if (b.id == board.id) {
-          b.title = board.title
-          b.timeEstimated = board.timeEstimated
-          b.description = board.description
-          b.author = board.author
-          b.responsible = board.responsible
-          b.sprint = board.sprint
-          b.status = board.status
-        }
-      })
-      setProject(projectNew)
+      // se nao for novo existem quantas situacoes?
 
-      if (board.sprint == null) {
+      // edit no sprint pro backlog
+      if (oldBoardProject.sprint != null && board.sprint == null) {
         sprintsNew.map((s) => {
-          s.boards = s.boards.filter((b) => b.id != board.id)
+          if (s.id == oldBoardProject?.sprint) {
+            s.boards = s.boards.filter((b) => b.id != board.id)
+          }
+        })
+
+        projectNew.boards = projectNew.boards?.filter((b) => b.id != board.id)
+        projectNew.boards?.push(board)
+
+        UpdateProjectBoardsGraphQL({
+          variables: {
+            id: projectNew.id,
+            boardsIds: projectNew.boards?.map((b) => b.id)
+          }
         })
       } else {
-        let boardInTheDifferentSprint = true
-        sprintsNew.map((s) => {
-          if (s.id == board.sprint) {
-            boardInTheDifferentSprint = !s.boards?.find((b) => b.id == board.id)
-            boardInTheDifferentSprint
-              ? s.boards.push(board)
-              : s.boards.map((b) => {
+        // edit no mesmo lugar (backlog)
+        projectNew.boards?.map((b) => {
+          if (b.id == board.id) {
+            b.title = board.title
+            b.timeEstimated = board.timeEstimated
+            b.description = board.description
+            b.author = board.author
+            b.responsible = board.responsible
+            b.sprint = board.sprint
+            b.status = board.status
+          }
+        })
+
+        if (oldBoardSprint?.sprint != null && board.sprint != null) {
+          // edit no mesmo lugar (sprint)
+          if (oldBoardSprint?.sprint == board.sprint) {
+            sprintsNew.map((s) => {
+              if (s.id == oldBoardSprint?.sprint) {
+                s.boards.map((b) => {
                   if (b.id == board.id) {
                     b.title = board.title
                     b.timeEstimated = board.timeEstimated
@@ -208,20 +222,28 @@ const ProductBacklog = ({
                     b.status = board.status
                   }
                 })
-          }
-        })
+              }
+            })
+          } // edit do sprint pro sprint
+          else {
+            sprintsNew.map((s) => {
+              if (s.id == oldBoardSprint?.sprint) {
+                s.boards = s.boards.filter((b) => b.id != board.id)
+              }
+            })
 
-        if (boardInTheDifferentSprint) {
-          sprintsNew.map((s) => {
-            if (s.id != board.sprint) {
-              s.boards = s.boards.filter((b) => b.id != board.id)
-            }
-          })
+            const sprint = sprintsNew.find((s) => s.id == board.sprint)
+            sprint && sprint.boards.push(board)
+          }
+        } else {
+          // edit do backlog pro sprint
+          const sprint = sprintsNew.find((s) => s.id == board.sprint)
+          sprint && sprint.boards.push(board)
         }
+        setProject(projectNew)
+        setSprints(sprintsNew)
+        setOpenModalBoard(false)
       }
-      setSprints(sprintsNew)
-      setOpenModalBoard(false)
-      // fazer a edicao no front
     }
   }
 
@@ -231,7 +253,7 @@ const ProductBacklog = ({
     initialBoard: {
       id: '',
       title: '',
-      timeEstimated: 0,
+      timeEstimated: 1,
       description: '',
       author: {
         id: '',

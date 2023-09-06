@@ -158,7 +158,9 @@ export default function SprintComponent({
                               provided.draggableProps.style
                             )}
                             onClick={
-                              user.id == board.responsible.id
+                              permited
+                                ? () => editBoard(board.id)
+                                : user.id == board.responsible.id
                                 ? () => editBoard(board.id)
                                 : undefined
                             }
