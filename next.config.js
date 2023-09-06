@@ -19,8 +19,5 @@ module.exports = withPWA({
   compiler: {
     // Enables the styled-components SWC transform
     styledComponents: true
-  },
-  experimental: {
-    esmExternals: false
   }
 })

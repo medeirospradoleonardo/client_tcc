@@ -20,13 +20,13 @@ const htmlToDraft =
 //   { ssr: false }
 // )
 
-type TextEditorProps = {
-  label?: string
-  content: string
-  setData: (field: string, value: string | null | User | number) => void
-}
+// type TextEditorProps = {
+//   label?: string
+//   content: string
+//   setData: (field: string, value: string | null | User | number) => void
+// }
 
-const TextEditor = ({ label, content, setData }: TextEditorProps) => {
+const TextEditor = ({ label, content, setData }) => {
   let editorState
   const contentBlock = htmlToDraft(content)
   if (contentBlock) {
@@ -35,11 +35,9 @@ const TextEditor = ({ label, content, setData }: TextEditorProps) => {
     )
     editorState = EditorState.createWithContent(contentState)
   }
-  const [editorStateData, setEditorStateData] = useState<
-    EditorState | undefined
-  >(editorState)
+  const [editorStateData, setEditorStateData] = useState(editorState)
 
-  const editorStateChange = (editorState: EditorState) => {
+  const editorStateChange = (editorState) => {
     setEditorStateData(editorState)
     setData(
       'description',
