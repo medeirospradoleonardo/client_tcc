@@ -13,7 +13,7 @@ import React from 'react'
 import Panel, { PanelTemplateProps } from 'templates/Panel'
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
-import { getActiveSprint } from 'utils/mappers'
+import { getActiveSprint, getUserRole } from 'utils/mappers'
 
 import {
   QUERY_SPRINTS_IN_PROJECT,
@@ -31,6 +31,7 @@ import {
 export default function PanelPage(props: PanelTemplateProps) {
   return (
     <Panel
+      userRole={props?.userRole}
       session={props.session}
       user={props?.user}
       projectUserRoles={props?.projectUserRoles}
@@ -121,6 +122,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         name: usersPermissionsUser?.data?.attributes?.username
       },
       projectUserRoles: projectUserRoles?.data,
+      userRole: usersPermissionsUser?.data?.attributes?.activeProject?.data?.id
+        ? getUserRole(
+            projectUserRoles?.data,
+            usersPermissionsUser?.data?.attributes?.activeProject?.data?.id
+          )
+        : '',
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {
             id:

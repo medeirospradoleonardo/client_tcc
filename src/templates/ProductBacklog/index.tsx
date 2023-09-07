@@ -172,7 +172,7 @@ const ProductBacklog = ({
 
     project.boards?.map((b) => {
       if (b.id == board.id) {
-        oldBoardProject.id = b.title
+        oldBoardProject.id = b.id
         oldBoardProject.title = b.title
         oldBoardProject.timeEstimated = b.timeEstimated
         oldBoardProject.description = b.description
@@ -206,7 +206,7 @@ const ProductBacklog = ({
     sprints.map((s) =>
       s.boards.map((b) => {
         if (b.id == board.id) {
-          oldBoardSprint.id = b.title
+          oldBoardSprint.id = b.id
           oldBoardSprint.title = b.title
           oldBoardSprint.timeEstimated = b.timeEstimated
           oldBoardSprint.description = b.description

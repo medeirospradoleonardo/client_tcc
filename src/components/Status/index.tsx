@@ -2,8 +2,8 @@ import * as React from 'react'
 import * as S from './styles'
 import Heading from 'components/Heading'
 import { Draggable, Droppable } from 'react-beautiful-dnd'
-import { Board } from 'templates/ProductBacklog'
-import { useState } from 'react'
+import { Board, User } from 'templates/ProductBacklog'
+
 import { getBoardStatus } from 'utils/mappers'
 import Item from 'components/Item'
 
@@ -12,13 +12,17 @@ export type StatusProps = {
   boards: Board[] | undefined
   permited: boolean
   deleteBoard: (id: string) => void
+  editBoard: (id: string) => void
+  user: User
 }
 
 export default function Status({
   statusType,
   boards,
   permited,
-  deleteBoard
+  deleteBoard,
+  editBoard,
+  user
 }: StatusProps) {
   const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
     background: 'white',
@@ -64,13 +68,13 @@ export default function Status({
                             snapshot.isDragging,
                             provided.draggableProps.style
                           )}
-                          // onClick={
-                          //   permited
-                          //     ? () => editBoard(board.id)
-                          //     : user.id == board.responsible.id
-                          //     ? () => editBoard(board.id)
-                          //     : undefined
-                          // }
+                          onClick={
+                            permited
+                              ? () => editBoard(board.id)
+                              : user.id == board.responsible.id
+                              ? () => editBoard(board.id)
+                              : undefined
+                          }
                         >
                           <Item
                             permited={permited}

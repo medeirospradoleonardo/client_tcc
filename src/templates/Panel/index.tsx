@@ -11,7 +11,10 @@ import { Board, User } from 'templates/ProductBacklog'
 
 import WithoutProject from 'components/WithoutProject'
 import { useState } from 'react'
-import { QUERY_SPRINT_BOARDS } from 'graphql/queries/sprint'
+import {
+  QUERY_SPRINTS_IN_PROJECT,
+  QUERY_SPRINT_BOARDS
+} from 'graphql/queries/sprint'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { QuerySprintBoards } from 'graphql/generated/QuerySprintBoards'
 import { Session } from 'next-auth'
@@ -22,6 +25,13 @@ import {
 import { MUTATION_DELETE_BOARD } from 'graphql/mutations/board'
 import Confirm from 'components/Confirm'
 import { Dialog } from '@mui/material'
+import FormBoard, { FormBoardProps } from 'components/FormBoard'
+import { QueryAllUsersInProject } from 'graphql/generated/QueryAllUsersInProject'
+import { QUERY_ALL_USERS_IN_PROJECT } from 'graphql/queries/user'
+import { pathToSelectMapper, usersToSelectMapper } from 'utils/mappers'
+import { QuerySprintsInProject } from 'graphql/generated/QuerySprintsInProject'
+import { QUERY_BOARD } from 'graphql/queries/board'
+import { QueryBoard } from 'graphql/generated/QueryBoard'
 
 type ActiveSprintType = {
   id: string
@@ -32,6 +42,7 @@ type ActiveSprintType = {
 }
 
 export type PanelTemplateProps = {
+  userRole: string
   session: Session
   user: User
   projectUserRoles: ProjectsTemplateProps[]
@@ -42,6 +53,7 @@ export type PanelTemplateProps = {
 }
 
 const Panel = ({
+  userRole,
   session,
   user,
   projectUserRoles,
@@ -54,6 +66,7 @@ const Panel = ({
   // const [boardsInProgress, setBoardsInProgress] = useState<Board[]>()
   // const [boardsConcluded, setBoardsConcluded] = useState<Board[]>()
 
+  const [openModalBoard, setOpenModalBoard] = useState(false)
   const [openModalDeleteBoard, setOpenModalDeleteBoard] = useState(false)
   const [boardToRemoveId, setBoardToRemoveId] = useState<string>()
 
@@ -65,11 +78,187 @@ const Panel = ({
     if (reason && reason == 'backdropClick') return
 
     setOpenModalDeleteBoard(false)
+    setOpenModalBoard(false)
   }
 
   const removeBoardSelect = (id: string) => {
     setOpenModalDeleteBoard(true)
     setBoardToRemoveId(id)
+  }
+  const refreshBoardForm = async (board: Board) => {
+    let boardsDataNew = boardsData?.slice()
+
+    // se mudar de destino
+    if (board.sprint != activeSprintData.sprint.id) {
+      boardsDataNew = boardsDataNew?.filter((b) => b.id != board.id)
+      setBoardsData(boardsDataNew)
+      setOpenModalBoard(false)
+      return
+    }
+
+    const oldBoard: Board = {
+      id: '',
+      title: '',
+      timeEstimated: 1,
+      description: '',
+      author: {
+        id: '',
+        name: ''
+      },
+      responsible: {
+        id: '',
+        name: ''
+      },
+      sprint: '',
+      status: ''
+    }
+
+    boardsData?.map((b) => {
+      if (b.id == board.id) {
+        oldBoard.id = b.id
+        oldBoard.title = b.title
+        oldBoard.timeEstimated = b.timeEstimated
+        oldBoard.description = b.description
+        oldBoard.author = b.author
+        oldBoard.responsible = b.responsible
+        oldBoard.sprint = b.sprint
+        oldBoard.status = b.status
+      }
+    })
+
+    boardsDataNew?.map((b) => {
+      if (b.id == board.id) {
+        b.id = board.id
+        b.title = board.title
+        b.timeEstimated = board.timeEstimated
+        b.description = board.description
+        b.author = board.author
+        b.responsible = board.responsible
+        b.sprint = board.sprint
+        b.status = board.status
+      }
+    })
+    setBoardsData(boardsDataNew)
+    setOpenModalBoard(false)
+  }
+  const modalBoardPropsDefault = {
+    permited: userRole != 'member',
+    session: session,
+    initialBoard: {
+      id: '',
+      title: '',
+      timeEstimated: 1,
+      description: '',
+      author: {
+        id: '',
+        name: ''
+      },
+      responsible: {
+        id: '',
+        name: ''
+      },
+      sprint: '',
+      status: 'notInitiated'
+    },
+    options: 'create',
+    activeProject: activeProject,
+    usersOptions: [{ label: '', value: '' }],
+    pathOptions: [{ label: '', value: '' }],
+    closeModal: () => setOpenModalBoard(false),
+    user: user,
+    refreshBoardForm: refreshBoardForm
+  }
+
+  const [propsModalBoard, setPropsModalBoard] = useState<FormBoardProps>(
+    modalBoardPropsDefault
+  )
+
+  const [getAllUsersInProject, { data: QueryAllUsers }] =
+    useLazyQuery<QueryAllUsersInProject>(QUERY_ALL_USERS_IN_PROJECT, {
+      context: { session },
+      onCompleted: () => {
+        const modalBoardPropsNew = propsModalBoard
+        modalBoardPropsNew.usersOptions = usersToSelectMapper(
+          QueryAllUsers?.usersPermissionsUsers?.data || []
+        )
+        setPropsModalBoard(modalBoardPropsNew)
+      }
+    })
+
+  const [getAllSprintInProject, { data: QueryAllSprintsInProject }] =
+    useLazyQuery<QuerySprintsInProject>(QUERY_SPRINTS_IN_PROJECT, {
+      context: { session },
+      onCompleted: () => {
+        const modalBoardPropsNew = propsModalBoard
+        modalBoardPropsNew.pathOptions = pathToSelectMapper(
+          QueryAllSprintsInProject?.sprints?.data || [],
+          activeProject.id
+        )
+        setPropsModalBoard(modalBoardPropsNew)
+      }
+    })
+
+  const [getBoardGraphql, { data: dataQueryBoard }] = useLazyQuery<QueryBoard>(
+    QUERY_BOARD,
+    {
+      context: { session },
+      onCompleted: () => {
+        const modalBoardPropsNew = propsModalBoard
+        modalBoardPropsNew.option = 'edit'
+        modalBoardPropsNew.initialBoard = {
+          id: dataQueryBoard?.board?.data?.id || '',
+          createdDate: dataQueryBoard?.board?.data?.attributes?.createdAt,
+          conclusionDate:
+            dataQueryBoard?.board?.data?.attributes?.conclusionDate,
+          title: dataQueryBoard?.board?.data?.attributes?.title || '',
+          timeEstimated:
+            dataQueryBoard?.board?.data?.attributes?.timeEstimated || 0,
+          description:
+            dataQueryBoard?.board?.data?.attributes?.description || '',
+          author: {
+            id: dataQueryBoard?.board?.data?.attributes?.author?.data?.id || '',
+            name:
+              dataQueryBoard?.board?.data?.attributes?.author?.data?.attributes
+                ?.username || ''
+          },
+          responsible: {
+            id:
+              dataQueryBoard?.board?.data?.attributes?.responsible?.data?.id ||
+              '',
+            name:
+              dataQueryBoard?.board?.data?.attributes?.responsible?.data
+                ?.attributes?.username || ''
+          },
+          sprint:
+            dataQueryBoard?.board?.data?.attributes?.sprint?.data?.id || '',
+          status: `${dataQueryBoard?.board?.data?.attributes?.status}`
+        }
+        setPropsModalBoard(modalBoardPropsNew)
+      }
+    }
+  )
+
+  const editBoard = async (id: string) => {
+    setPropsModalBoard(modalBoardPropsDefault)
+    await getAllUsersInProject({
+      variables: {
+        projectId: activeProject.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    await getAllSprintInProject({
+      variables: {
+        projectId: activeProject.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    await getBoardGraphql({
+      variables: {
+        boardId: id
+      },
+      fetchPolicy: 'no-cache'
+    })
+    setOpenModalBoard(true)
   }
 
   const [getSprint, { data: sprintQueryData }] =
@@ -203,6 +392,15 @@ const Panel = ({
           actionFunction={() => deleteBoard(boardToRemoveId || '')}
         />
       </Dialog>
+      <Dialog
+        open={openModalBoard}
+        fullWidth={true}
+        maxWidth="md"
+        onClose={handleClose}
+      >
+        <FormBoard {...propsModalBoard} />
+      </Dialog>
+
       <Base
         projectsQuantity={projectUserRoles?.length}
         activeProject={activeProject}
@@ -244,18 +442,24 @@ const Panel = ({
                         statusType="notInitiated"
                         boards={boardsNotInitiated}
                         permited={true}
+                        editBoard={editBoard}
+                        user={user}
                       />
                       <Status
                         deleteBoard={removeBoardSelect}
                         statusType="inProgress"
                         boards={boardsInProgress}
                         permited={true}
+                        editBoard={editBoard}
+                        user={user}
                       />
                       <Status
                         deleteBoard={removeBoardSelect}
                         statusType="concluded"
                         boards={boardsConcluded}
                         permited={true}
+                        editBoard={editBoard}
+                        user={user}
                       />
                     </DragDropContext>
                   </S.StatusContainer>
