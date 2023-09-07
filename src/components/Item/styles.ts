@@ -4,9 +4,19 @@ type IdProps = {
   concluded: boolean
 }
 
+type ContainerProps = {
+  panel: boolean
+}
+
 export const wrapperModifiers = {
   lineThrough: () => css`
     text-decoration: line-through;
+  `,
+  panelContainer: () => css`
+    height: 70px;
+  `,
+  panelRight: () => css`
+    margin-top: 40px;
   `
 }
 
@@ -19,21 +29,29 @@ export const Id = styled.div<IdProps>`
 `
 export const Title = styled.div``
 
-export const Container = styled.div`
+export const Container = styled.div<ContainerProps>`
   cursor: pointer;
   background: white;
   display: flex;
   justify-content: space-between;
   user-select: none;
+
+  ${({ panel }) => css`
+    ${!!panel && wrapperModifiers.panelContainer()};
+  `}
 `
 
 export const Left = styled.div`
   display: flex;
 `
 
-export const Right = styled.div`
+export const Right = styled.div<ContainerProps>`
   margin-left: auto;
   display: flex;
+
+  ${({ panel }) => css`
+    ${!!panel && wrapperModifiers.panelRight()};
+  `}
 `
 
 export const TimeEstimated = styled.div`

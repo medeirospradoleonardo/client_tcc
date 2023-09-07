@@ -14,6 +14,7 @@ interface ItemProps {
   status: string | null
   responsible: string
   deleteBoard: (id: string) => void
+  onPanel?: boolean
 }
 
 const colors = [
@@ -37,26 +38,29 @@ const Item: React.FC<ItemProps> = ({
   timeEstimated,
   status,
   responsible,
-  deleteBoard
+  deleteBoard,
+  onPanel = false
 }) => {
   title = title.trim()
   return (
-    <S.Container>
+    <S.Container panel={!status}>
       <S.Id concluded={status == 'concluded' ? true : false}>{id}</S.Id>
       <S.Title>
         {title.length > 60 ? `${title.slice(0, 60)}...` : title}
       </S.Title>
-      <S.Right>
+      <S.Right panel={onPanel}>
         <S.TimeEstimated>
           <div className="timeEstimated">
             <span className="title">Tempo estimado (em horas)</span>
             <span className="timeEstimatedSpan">{timeEstimated}</span>
           </div>
         </S.TimeEstimated>
-        <S.Status color={getBoardStatus(status)?.color}>
-          <span className="title">Status</span>
-          {getBoardStatus(status)?.title}
-        </S.Status>
+        {!onPanel && (
+          <S.Status color={getBoardStatus(status)?.color}>
+            <span className="title">Status</span>
+            {getBoardStatus(status)?.title}
+          </S.Status>
+        )}
 
         <S.AvatarContainer>
           <S.Avatar color={getColorFromName(responsible)}>

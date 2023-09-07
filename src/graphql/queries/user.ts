@@ -17,6 +17,26 @@ export const QUERY_PROFILE_ME = gql`
               }
             }
           }
+          activeSprints {
+            data {
+              id
+              attributes {
+                sprint {
+                  data {
+                    id
+                    attributes {
+                      name
+                    }
+                  }
+                }
+                project {
+                  data {
+                    id
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

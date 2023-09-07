@@ -30,6 +30,7 @@ type SelectComponentProps = {
   maxMenuHeight?: number
   setData: (e: MultiValue<OptionType> | SingleValue<OptionType>) => void
   isDisabled?: boolean
+  noOptionsMessage?: string
 }
 
 const SelectComponent = ({
@@ -43,7 +44,8 @@ const SelectComponent = ({
   isSearchable = false,
   maxMenuHeight = 200,
   setData,
-  isDisabled = false
+  isDisabled = false,
+  noOptionsMessage = 'Sem dados'
 }: SelectComponentProps) => {
   const components: Partial<
     SelectComponents<OptionType, boolean, GroupBase<OptionType>>
@@ -64,13 +66,14 @@ const SelectComponent = ({
         isDisabled={isDisabled}
         placeholder={placeholder}
         components={components}
-        isSearchable={isSearchable}
+        isSearchable={false}
         inputId={`indicators-dropdown${label}`}
         maxMenuHeight={maxMenuHeight}
         defaultValue={defaultOption}
         options={options}
         styles={customStyle}
         onChange={(e) => setData(e)}
+        noOptionsMessage={() => noOptionsMessage}
       />
     </>
   )

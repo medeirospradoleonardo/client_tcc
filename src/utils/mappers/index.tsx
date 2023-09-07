@@ -10,6 +10,7 @@ import { Sprint } from 'templates/ProductBacklog'
 import { QuerySprintsInProject_sprints_data } from 'graphql/generated/QuerySprintsInProject'
 import { User } from 'components/Table'
 import { QueryProjectUserRolesLight_projectUserRoles_data } from 'graphql/generated/QueryProjectUserRolesLight'
+import { QueryProfileMe_usersPermissionsUser_data_attributes_activeSprints_data } from 'graphql/generated/QueryProfileMe'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -208,4 +209,22 @@ export const getBoardStatus = (status: string | null) => {
     title: 'NÃO INICIADO',
     color: '#DA5757'
   }
+}
+
+export const getActiveSprint = (
+  activeSprints: QueryProfileMe_usersPermissionsUser_data_attributes_activeSprints_data[],
+  projectId: string
+) => {
+  const activeSprint = activeSprints.find(
+    (s) => s.attributes?.project?.data?.id == projectId
+  )
+  return activeSprint
+    ? {
+        id: activeSprint.id,
+        sprint: {
+          id: activeSprint.attributes?.sprint?.data?.id,
+          name: activeSprint.attributes?.sprint?.data?.attributes?.name
+        }
+      }
+    : null
 }

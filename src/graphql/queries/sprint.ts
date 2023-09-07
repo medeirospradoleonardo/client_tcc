@@ -75,3 +75,47 @@ export const QUERY_SPRINTS_IN_PROJECT = gql`
     }
   }
 `
+
+export const QUERY_SPRINT_BOARDS = gql`
+  query QuerySprintBoards($id: ID!) {
+    sprint(id: $id) {
+      data {
+        id
+        attributes {
+          boards {
+            data {
+              id
+              attributes {
+                title
+                timeEstimated
+                description
+                author {
+                  data {
+                    id
+                    attributes {
+                      username
+                    }
+                  }
+                }
+                responsible {
+                  data {
+                    id
+                    attributes {
+                      username
+                    }
+                  }
+                }
+                sprint {
+                  data {
+                    id
+                  }
+                }
+                status
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`

@@ -22,3 +22,17 @@ export const Content = styled.div`
     padding: ${theme.spacings.xsmall};
   `}
 `
+
+export const StatusContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+  `}
+`
+export const Select = styled.div`
+  ${({ theme }) => css`
+    width: 215px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border-bottom: 1px solid rgb(178, 185, 197);
+  `}
+`

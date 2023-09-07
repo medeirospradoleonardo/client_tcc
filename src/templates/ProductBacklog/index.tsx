@@ -3,7 +3,6 @@ import { Container } from 'components/Container'
 import * as S from './styles'
 import Base from 'templates/Base'
 import { Project, ProjectUserRoleType } from 'templates/Projects'
-import Logo from 'components/Logo'
 import Sprint from 'components/Sprint'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import AddIcon from '@mui/icons-material/Add'
@@ -31,6 +30,7 @@ import { QueryAllUsersInProject } from 'graphql/generated/QueryAllUsersInProject
 import { QuerySprintsInProject } from 'graphql/generated/QuerySprintsInProject'
 import { QUERY_BOARD } from 'graphql/queries/board'
 import { QueryBoard } from 'graphql/generated/QueryBoard'
+import WithoutProject from 'components/WithoutProject'
 
 export type User = {
   id: string
@@ -134,7 +134,7 @@ const ProductBacklog = ({
     modalSprintPropsDefault
   )
 
-  const refreshBoardForm = (board: Board) => {
+  const refreshBoardForm = async (board: Board) => {
     const sprintsNew = [] as Sprint[]
     const projectNew = {
       id: project.id,
@@ -153,12 +153,73 @@ const ProductBacklog = ({
       })
     })
 
-    const oldBoardProject = projectNew.boards?.find((b) => b.id == board.id)
-    const oldBoardSprint = sprintsNew
-      .find((s) => s.boards?.find((b) => b.id == board.id))
-      ?.boards.find((b) => b.id == board.id)
+    const oldBoardProject: Board = {
+      id: '',
+      title: '',
+      timeEstimated: 1,
+      description: '',
+      author: {
+        id: '',
+        name: ''
+      },
+      responsible: {
+        id: '',
+        name: ''
+      },
+      sprint: '',
+      status: ''
+    }
 
-    if (oldBoardProject == null) {
+    project.boards?.map((b) => {
+      if (b.id == board.id) {
+        oldBoardProject.id = b.title
+        oldBoardProject.title = b.title
+        oldBoardProject.timeEstimated = b.timeEstimated
+        oldBoardProject.description = b.description
+        oldBoardProject.author = b.author
+        oldBoardProject.responsible = b.responsible
+        oldBoardProject.sprint = b.sprint
+        oldBoardProject.status = b.status
+      }
+    })
+    // const oldBoardProject = project.boards?.find((b) => b.id == board.id)
+
+    // const oldBoardSprint = sprints
+    //   .find((s) => s.boards?.find((b) => b.id == board.id))
+    //   ?.boards.find((b) => b.id == board.id)
+    const oldBoardSprint: Board = {
+      id: '',
+      title: '',
+      timeEstimated: 1,
+      description: '',
+      author: {
+        id: '',
+        name: ''
+      },
+      responsible: {
+        id: '',
+        name: ''
+      },
+      sprint: '',
+      status: ''
+    }
+    sprints.map((s) =>
+      s.boards.map((b) => {
+        if (b.id == board.id) {
+          oldBoardSprint.id = b.title
+          oldBoardSprint.title = b.title
+          oldBoardSprint.timeEstimated = b.timeEstimated
+          oldBoardSprint.description = b.description
+          oldBoardSprint.author = b.author
+          oldBoardSprint.responsible = b.responsible
+          oldBoardSprint.sprint = b.sprint
+          oldBoardSprint.status = b.status
+        }
+      })
+    )
+
+    // board novo
+    if (oldBoardProject.id == null) {
       projectNew.boards?.push(board)
       if (board.sprint != null) {
         sprintsNew.map((s) => {
@@ -232,18 +293,24 @@ const ProductBacklog = ({
               }
             })
 
-            const sprint = sprintsNew.find((s) => s.id == board.sprint)
-            sprint && sprint.boards.push(board)
+            sprintsNew.map((s) => {
+              if (s.id == board.sprint) {
+                s.boards.push(board)
+              }
+            })
           }
         } else {
           // edit do backlog pro sprint
-          const sprint = sprintsNew.find((s) => s.id == board.sprint)
-          sprint && sprint.boards.push(board)
+          sprintsNew.map((s) => {
+            if (s.id == board.sprint) {
+              s.boards.push(board)
+            }
+          })
         }
-        setProject(projectNew)
-        setSprints(sprintsNew)
-        setOpenModalBoard(false)
       }
+      setProject(projectNew)
+      setSprints(sprintsNew)
+      setOpenModalBoard(false)
     }
   }
 
@@ -384,10 +451,7 @@ const ProductBacklog = ({
   }
 
   const [UpdateSprintBoardsGraphQL] = useMutation(MUTATION_UPDATE_BOARDS, {
-    context: { session },
-    onCompleted: () => {
-      //
-    }
+    context: { session }
   })
 
   const [UpdateProjectBoardsGraphQL] = useMutation(
@@ -509,6 +573,7 @@ const ProductBacklog = ({
     }
 
     setSprints(sprintsNew)
+
     setProject(projectNew)
 
     if (idSprintDestination) {
@@ -856,11 +921,7 @@ const ProductBacklog = ({
 
             <S.Main>
               <S.Content>
-                <Logo color="black" />
-                <h1 style={{ marginLeft: '20px' }}>
-                  Você precisa ter um projeto selecionado para acessar essa
-                  seção
-                </h1>
+                <WithoutProject />
               </S.Content>
             </S.Main>
           </Container>

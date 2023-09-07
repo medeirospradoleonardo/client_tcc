@@ -518,6 +518,7 @@ input UsersPermissionsUserFiltersInput {
   knowledges: KnowledgeFiltersInput
   projectUserRoles: ProjectUserRoleFiltersInput
   activeProject: ProjectFiltersInput
+  activeSprints: ActiveSprintFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [UsersPermissionsUserFiltersInput]
@@ -543,6 +544,7 @@ input UsersPermissionsUserInput {
   knowledges: [ID]
   projectUserRoles: [ID]
   activeProject: ID
+  activeSprints: [ID]
 }
 
 type UsersPermissionsUser {
@@ -560,6 +562,7 @@ type UsersPermissionsUser {
   knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeRelationResponseCollection
   projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleRelationResponseCollection
   activeProject: ProjectEntityResponse
+  activeSprints(filters: ActiveSprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ActiveSprintRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -580,6 +583,50 @@ type UsersPermissionsUserEntityResponseCollection {
 
 type UsersPermissionsUserRelationResponseCollection {
   data: [UsersPermissionsUserEntity!]!
+}
+
+input ActiveSprintFiltersInput {
+  id: IDFilterInput
+  project: ProjectFiltersInput
+  sprint: SprintFiltersInput
+  user: UsersPermissionsUserFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  and: [ActiveSprintFiltersInput]
+  or: [ActiveSprintFiltersInput]
+  not: ActiveSprintFiltersInput
+}
+
+input ActiveSprintInput {
+  project: ID
+  sprint: ID
+  user: ID
+}
+
+type ActiveSprint {
+  project: ProjectEntityResponse
+  sprint: SprintEntityResponse
+  user: UsersPermissionsUserEntityResponse
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type ActiveSprintEntity {
+  id: ID
+  attributes: ActiveSprint
+}
+
+type ActiveSprintEntityResponse {
+  data: ActiveSprintEntity
+}
+
+type ActiveSprintEntityResponseCollection {
+  data: [ActiveSprintEntity!]!
+  meta: ResponseCollectionMeta!
+}
+
+type ActiveSprintRelationResponseCollection {
+  data: [ActiveSprintEntity!]!
 }
 
 enum ENUM_BOARD_TYPE {
@@ -943,7 +990,7 @@ type SprintRelationResponseCollection {
   data: [SprintEntity!]!
 }
 
-union GenericMorph = UploadFile | UploadFolder | I18NLocale | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Board | Category | Comentary | Knowledge | Project | ProjectUserRole | Sprint
+union GenericMorph = UploadFile | UploadFolder | I18NLocale | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | ActiveSprint | Board | Category | Comentary | Knowledge | Project | ProjectUserRole | Sprint
 
 input FileInfoInput {
   name: String
@@ -1018,6 +1065,8 @@ type Query {
   usersPermissionsRoles(filters: UsersPermissionsRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsRoleEntityResponseCollection
   usersPermissionsUser(id: ID): UsersPermissionsUserEntityResponse
   usersPermissionsUsers(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserEntityResponseCollection
+  activeSprint(id: ID): ActiveSprintEntityResponse
+  activeSprints(filters: ActiveSprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ActiveSprintEntityResponseCollection
   board(id: ID): BoardEntityResponse
   boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardEntityResponseCollection
   category(id: ID): CategoryEntityResponse
@@ -1042,6 +1091,9 @@ type Mutation {
   createUploadFolder(data: UploadFolderInput!): UploadFolderEntityResponse
   updateUploadFolder(id: ID!, data: UploadFolderInput!): UploadFolderEntityResponse
   deleteUploadFolder(id: ID!): UploadFolderEntityResponse
+  createActiveSprint(data: ActiveSprintInput!): ActiveSprintEntityResponse
+  updateActiveSprint(id: ID!, data: ActiveSprintInput!): ActiveSprintEntityResponse
+  deleteActiveSprint(id: ID!): ActiveSprintEntityResponse
   createBoard(data: BoardInput!): BoardEntityResponse
   updateBoard(id: ID!, data: BoardInput!): BoardEntityResponse
   deleteBoard(id: ID!): BoardEntityResponse
