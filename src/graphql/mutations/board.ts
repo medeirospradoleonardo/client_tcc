@@ -72,14 +72,14 @@ export const MUTATION_CREATE_BOARD = gql`
 export const MUTATION_UPDATE_BOARD = gql`
   mutation MutationUpdateBoard(
     $boardId: ID!
-    $title: String!
-    $description: String!
-    $timeEstimated: Int!
-    $status: ENUM_BOARD_STATUS!
+    $title: String
+    $description: String
+    $timeEstimated: Int
+    $status: ENUM_BOARD_STATUS
     $sprintId: ID
-    $authorId: ID!
-    $responsibleId: ID!
-    $projectId: ID!
+    $authorId: ID
+    $responsibleId: ID
+    $projectId: ID
   ) {
     updateBoard(
       id: $boardId

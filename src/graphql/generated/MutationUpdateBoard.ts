@@ -81,12 +81,12 @@ export interface MutationUpdateBoard {
 
 export interface MutationUpdateBoardVariables {
   boardId: string;
-  title: string;
-  description: string;
-  timeEstimated: number;
-  status: ENUM_BOARD_STATUS;
+  title?: string | null;
+  description?: string | null;
+  timeEstimated?: number | null;
+  status?: ENUM_BOARD_STATUS | null;
   sprintId?: string | null;
-  authorId: string;
-  responsibleId: string;
-  projectId: string;
+  authorId?: string | null;
+  responsibleId?: string | null;
+  projectId?: string | null;
 }

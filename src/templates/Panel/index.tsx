@@ -22,7 +22,10 @@ import {
   MUTATION_CREATE_ACTIVE_SPRINT,
   MUTATION_UPDATE_ACTIVE_SPRINT
 } from 'graphql/mutations/activeSprint'
-import { MUTATION_DELETE_BOARD } from 'graphql/mutations/board'
+import {
+  MUTATION_DELETE_BOARD,
+  MUTATION_UPDATE_BOARD
+} from 'graphql/mutations/board'
 import Confirm from 'components/Confirm'
 import { Dialog } from '@mui/material'
 import FormBoard, { FormBoardProps } from 'components/FormBoard'
@@ -32,6 +35,7 @@ import { pathToSelectMapper, usersToSelectMapper } from 'utils/mappers'
 import { QuerySprintsInProject } from 'graphql/generated/QuerySprintsInProject'
 import { QUERY_BOARD } from 'graphql/queries/board'
 import { QueryBoard } from 'graphql/generated/QueryBoard'
+import { MUTATION_UPDATE_BOARDS } from 'graphql/mutations/sprint'
 
 type ActiveSprintType = {
   id: string
@@ -85,6 +89,8 @@ const Panel = ({
     setOpenModalDeleteBoard(true)
     setBoardToRemoveId(id)
   }
+
+  // Entender que quando voce altera o status na edicao, ele entra como primeiro item na coluna nova
   const refreshBoardForm = async (board: Board) => {
     let boardsDataNew = boardsData?.slice()
 
@@ -303,8 +309,127 @@ const Panel = ({
   const boardsInProgress = boardsData?.filter((b) => b.status == 'inProgress')
   const boardsConcluded = boardsData?.filter((b) => b.status == 'concluded')
 
+  const [updateBoardGraphQL] = useMutation(MUTATION_UPDATE_BOARD, {
+    context: { session },
+    onCompleted: (data) => {
+      //
+    }
+  })
+
+  const [updateSprintGraphQL] = useMutation(MUTATION_UPDATE_BOARDS, {
+    context: { session },
+    onCompleted: (data) => {
+      //
+    }
+  })
+
   const onDragEnd = async (result: DropResult) => {
     //
+    // moveu e deixou em um lugar nao valido
+    if (!result.destination) {
+      return
+    }
+
+    const source = result.source
+    const destination = result.destination
+
+    // moveu e deixou no mesmo lugar
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
+      return
+    }
+
+    const sourceStatus = result.source?.droppableId.replace('status-', '')
+
+    const destinationStatus = result.destination?.droppableId.replace(
+      'status-',
+      ''
+    )
+
+    const boardId = result.draggableId.replace('draggable-', '')
+
+    const boardsDataOld = boardsData?.slice()
+    let boardsDataNew = boardsData?.slice()
+
+    const boardsDestination = boardsDataNew?.filter(
+      (b) => b.status == destinationStatus
+    )
+
+    if (!boardsDestination?.length) {
+      boardsDataNew?.map((b) => {
+        if (b.id == boardId) {
+          b.status = destinationStatus
+        }
+      })
+    } else {
+      const board: Board = {
+        id: '',
+        title: '',
+        timeEstimated: 1,
+        description: '',
+        author: {
+          id: '',
+          name: ''
+        },
+        responsible: {
+          id: '',
+          name: ''
+        },
+        sprint: '',
+        status: ''
+      }
+
+      boardsDataNew = boardsDataNew?.filter((b) => {
+        if (b.id != boardId) {
+          return b
+        } else {
+          board.id = b.id
+          board.title = b.title
+          board.timeEstimated = b.timeEstimated
+          board.description = b.description
+          board.author = b.author
+          board.responsible = b.responsible
+          board.sprint = b.sprint
+          board.status = destinationStatus
+        }
+      })
+      if (destination.index != boardsDestination?.length) {
+        const indexBoardDestination = boardsDataNew?.findIndex(
+          (b) => b.id == boardsDestination[destination.index].id
+        )
+
+        if (indexBoardDestination == 0) {
+          boardsDataNew = boardsDataNew && [board].concat(boardsDataNew)
+        } else {
+          indexBoardDestination &&
+            boardsDataNew?.splice(indexBoardDestination, 0, board)
+        }
+      } else {
+        boardsDataNew?.push(board)
+      }
+    }
+
+    setBoardsData(boardsDataNew)
+    const boardsIds = boardsDataNew?.map((b) => b.id)
+    const { errors } = await updateBoardGraphQL({
+      variables: {
+        boardId: boardId,
+        status: destinationStatus
+      }
+    })
+
+    const { errors: errorsBoardsIdUpdate } = await updateSprintGraphQL({
+      variables: {
+        id: activeSprintData.sprint.id,
+        boardsIds: boardsIds
+      }
+    })
+
+    if (errors || errorsBoardsIdUpdate) {
+      setBoardsData(boardsDataOld)
+    }
   }
 
   const [createActiveSprint] = useMutation(MUTATION_CREATE_ACTIVE_SPRINT, {
@@ -353,7 +478,8 @@ const Panel = ({
     getSprint({
       variables: {
         id: option.value
-      }
+      },
+      fetchPolicy: 'no-cache'
     })
   }
 
