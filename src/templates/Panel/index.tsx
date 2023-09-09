@@ -92,6 +92,7 @@ const Panel = ({
 
   // Entender que quando voce altera o status na edicao, ele entra como primeiro item na coluna nova
   const refreshBoardForm = async (board: Board) => {
+    const boardsDataOld = boardsData?.slice()
     let boardsDataNew = boardsData?.slice()
 
     // se mudar de destino
@@ -132,18 +133,90 @@ const Panel = ({
       }
     })
 
-    boardsDataNew?.map((b) => {
-      if (b.id == board.id) {
-        b.id = board.id
-        b.title = board.title
-        b.timeEstimated = board.timeEstimated
-        b.description = board.description
-        b.author = board.author
-        b.responsible = board.responsible
-        b.sprint = board.sprint
-        b.status = board.status
+    if (board.status == oldBoard.status) {
+      boardsDataNew?.map((b) => {
+        if (b.id == board.id) {
+          b.title = board.title
+          b.timeEstimated = board.timeEstimated
+          b.description = board.description
+          b.author = board.author
+          b.responsible = board.responsible
+          b.sprint = board.sprint
+          b.status = board.status
+        }
+      })
+      setBoardsData(boardsDataNew)
+      setOpenModalBoard(false)
+      return
+    }
+    // ver se tem board na coluna de destino
+    const boardsDestination = boardsDataNew?.filter(
+      (b) => b.status == board.status
+    )
+
+    // se nao tiver, so atualiza
+    if (!boardsDestination?.length) {
+      boardsDataNew?.map((b) => {
+        if (b.id == board.id) {
+          b.status = board.status
+        }
+      })
+    } else {
+      const boardData: Board = {
+        id: '',
+        title: '',
+        timeEstimated: 1,
+        description: '',
+        author: {
+          id: '',
+          name: ''
+        },
+        responsible: {
+          id: '',
+          name: ''
+        },
+        sprint: '',
+        status: ''
+      }
+
+      boardsDataNew = boardsDataNew?.filter((b) => {
+        if (b.id != board.id) {
+          return b
+        } else {
+          boardData.id = b.id
+          boardData.title = b.title
+          boardData.timeEstimated = b.timeEstimated
+          boardData.description = b.description
+          boardData.author = b.author
+          boardData.responsible = b.responsible
+          boardData.sprint = b.sprint
+          boardData.status = board.status
+        }
+      })
+
+      const indexBoardDestination = boardsDataNew?.findIndex(
+        (b) => b.id == boardsDestination[0].id
+      )
+
+      if (indexBoardDestination == 0) {
+        boardsDataNew = boardsDataNew && [board].concat(boardsDataNew)
+      } else {
+        indexBoardDestination &&
+          boardsDataNew?.splice(indexBoardDestination, 0, board)
+      }
+    }
+
+    const boardsIds = boardsDataNew?.map((b) => b.id)
+    const { errors } = await updateSprintGraphQL({
+      variables: {
+        id: activeSprintData.sprint.id,
+        boardsIds: boardsIds
       }
     })
+
+    if (errors) {
+      setBoardsData(boardsDataOld)
+    }
     setBoardsData(boardsDataNew)
     setOpenModalBoard(false)
   }
@@ -353,10 +426,12 @@ const Panel = ({
     const boardsDataOld = boardsData?.slice()
     let boardsDataNew = boardsData?.slice()
 
+    // ver se tem board na coluna de destino
     const boardsDestination = boardsDataNew?.filter(
-      (b) => b.status == destinationStatus
+      (b) => b.status == destinationStatus && b.id != boardId
     )
 
+    // se nao tiver, so atualiza
     if (!boardsDestination?.length) {
       boardsDataNew?.map((b) => {
         if (b.id == boardId) {
@@ -395,6 +470,7 @@ const Panel = ({
           board.status = destinationStatus
         }
       })
+
       if (destination.index != boardsDestination?.length) {
         const indexBoardDestination = boardsDataNew?.findIndex(
           (b) => b.id == boardsDestination[destination.index].id
