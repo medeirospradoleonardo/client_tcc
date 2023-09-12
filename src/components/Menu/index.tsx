@@ -30,7 +30,7 @@ const Menu = ({ username, loading }: MenuProps) => {
         <S.LogoWrapper
           onClick={() =>
             router.push({
-              pathname: '',
+              pathname: '/',
               query: { confirm: true }
             })
           }

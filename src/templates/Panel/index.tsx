@@ -643,7 +643,7 @@ const Panel = ({
                         deleteBoard={removeBoardSelect}
                         statusType="notInitiated"
                         boards={boardsNotInitiated}
-                        permited={true}
+                        permited={userRole != 'member'}
                         editBoard={editBoard}
                         user={user}
                       />
@@ -651,7 +651,7 @@ const Panel = ({
                         deleteBoard={removeBoardSelect}
                         statusType="inProgress"
                         boards={boardsInProgress}
-                        permited={true}
+                        permited={userRole != 'member'}
                         editBoard={editBoard}
                         user={user}
                       />
@@ -659,7 +659,7 @@ const Panel = ({
                         deleteBoard={removeBoardSelect}
                         statusType="concluded"
                         boards={boardsConcluded}
-                        permited={true}
+                        permited={userRole != 'member'}
                         editBoard={editBoard}
                         user={user}
                       />
