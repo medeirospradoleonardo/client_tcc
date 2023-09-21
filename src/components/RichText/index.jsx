@@ -26,7 +26,7 @@ const htmlToDraft =
 //   setData: (field: string, value: string | null | User | number) => void
 // }
 
-const TextEditor = ({ label, content, setData }) => {
+const TextEditor = ({ label, content, setData, style, input }) => {
   let editorState
   const contentBlock = htmlToDraft(content)
   if (contentBlock) {
@@ -39,10 +39,7 @@ const TextEditor = ({ label, content, setData }) => {
 
   const editorStateChange = (editorState) => {
     setEditorStateData(editorState)
-    setData(
-      'description',
-      draftToHtml(convertToRaw(editorState.getCurrentContent()))
-    )
+    setData(input, draftToHtml(convertToRaw(editorState.getCurrentContent())))
   }
 
   return (
@@ -54,11 +51,7 @@ const TextEditor = ({ label, content, setData }) => {
         wrapperClassName="wrapperClassName"
         editorClassName="editorClassName"
         onEditorStateChange={editorStateChange}
-        editorStyle={{
-          border: '1px solid rgb(227, 232, 241)',
-          width: '491px',
-          height: '170px'
-        }}
+        editorStyle={style}
       />
     </>
   )

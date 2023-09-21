@@ -258,9 +258,15 @@ const FormBoard = ({
           </div>
           <S.Description>
             <RichText
+              input="description"
               content={values.description}
               label="Descrição"
               setData={handleInput}
+              style={{
+                border: '1px solid rgb(227, 232, 241)',
+                width: '491px',
+                height: '170px'
+              }}
             />
           </S.Description>
         </S.Left>

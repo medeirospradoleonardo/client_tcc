@@ -1,4 +1,5 @@
 import { FormBoardValues } from 'components/FormBoard'
+import { FormKnowledgeValues } from 'components/FormKnowledge'
 import { SprintValues } from 'components/FormSprint'
 import { UsersPermissionsRegisterInput } from 'graphql/generated/globalTypes'
 import Joi from 'joi'
@@ -120,6 +121,18 @@ const fieldsValidationsBoard = {
 
 export function createBoardValidate(values: FormBoardValues) {
   const schema = Joi.object(fieldsValidationsBoard)
+
+  return getFieldErrors(schema.validate(values, { abortEarly: false }))
+}
+
+const fieldsValidationsKnowledge = {
+  title: Joi.string().required().messages({
+    'string.empty': `O campo título não pode ficar vazio.`
+  })
+}
+
+export function createKnowledgeValidate(values: FormKnowledgeValues) {
+  const schema = Joi.object(fieldsValidationsKnowledge)
 
   return getFieldErrors(schema.validate(values, { abortEarly: false }))
 }

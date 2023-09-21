@@ -22,3 +22,8 @@ export const Content = styled.div`
     padding: ${theme.spacings.xsmall};
   `}
 `
+export const Knowledges = styled.div`
+  ${({ theme }) => css`
+    margin-top: 20px;
+  `}
+`

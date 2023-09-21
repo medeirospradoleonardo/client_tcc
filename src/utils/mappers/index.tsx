@@ -11,6 +11,7 @@ import { QuerySprintsInProject_sprints_data } from 'graphql/generated/QuerySprin
 import { User } from 'components/Table'
 import { QueryProjectUserRolesLight_projectUserRoles_data } from 'graphql/generated/QueryProjectUserRolesLight'
 import { QueryProfileMe_usersPermissionsUser_data_attributes_activeSprints_data } from 'graphql/generated/QueryProfileMe'
+import { QueryKnowledges_knowledges } from 'graphql/generated/QueryKnowledges'
 
 export const projectsMapper = (projectUserRoles: QueryProjectUserRolesFull) => {
   return projectUserRoles.projectUserRoles?.data.map((projectUserRole) => ({
@@ -227,4 +228,21 @@ export const getActiveSprint = (
         }
       }
     : null
+}
+
+export const knowledgesMapper = (
+  knowledgesData: QueryKnowledges_knowledges | null
+) => {
+  return knowledgesData?.data.map((knowledge) => ({
+    id: knowledge.id,
+    title: knowledge.attributes?.title,
+    categories: knowledge.attributes?.categories?.data.map((category) => ({
+      id: category.id,
+      name: category.attributes?.name
+    })),
+    author: {
+      id: knowledge.attributes?.author?.data?.id,
+      name: knowledge.attributes?.author?.data?.attributes?.username
+    }
+  }))
 }

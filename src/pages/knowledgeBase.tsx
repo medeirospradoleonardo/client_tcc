@@ -16,14 +16,19 @@ import KnowledgeBase, {
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
 
+import { QUERY_GET_KNOWLEDGES } from 'graphql/queries/knowledge'
+import { knowledgesMapper } from 'utils/mappers'
+import { QueryGetKnowledges } from 'graphql/generated/QueryGetKnowledges'
+
 export default function KnowledgeBasePage(props: KnowledgeBaseTemplateProps) {
   return (
     <KnowledgeBase
+      user={props?.user}
+      session={props?.session}
+      knowledges={props?.knowledges}
       projectUserRoles={props?.projectUserRoles}
       activeProject={props?.activeProject}
-    >
-      <h1>Base de conhecimento</h1>
-    </KnowledgeBase>
+    />
   )
 }
 
@@ -64,8 +69,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     fetchPolicy: 'no-cache'
   })
 
+  const {
+    data: { knowledges }
+  } = await apolloClient.query<QueryGetKnowledges>({
+    query: QUERY_GET_KNOWLEDGES,
+    fetchPolicy: 'no-cache'
+  })
+
   return {
     props: {
+      session,
+      user: {
+        id: usersPermissionsUser?.data?.id,
+        name: usersPermissionsUser?.data?.attributes?.username
+      },
       projectUserRoles: projectUserRoles?.data,
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {
@@ -76,7 +93,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
               usersPermissionsUser?.data?.attributes?.activeProject?.data
                 ?.attributes?.name || ''
           }
-        : null
+        : null,
+      knowledges: knowledgesMapper(knowledges)
     }
   }
 }

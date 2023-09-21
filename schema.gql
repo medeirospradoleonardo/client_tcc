@@ -559,7 +559,7 @@ type UsersPermissionsUser {
   ownerBoards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryRelationResponseCollection
   responsibleboards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardRelationResponseCollection
-  knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeRelationResponseCollection
+  knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): KnowledgeRelationResponseCollection
   projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleRelationResponseCollection
   activeProject: ProjectEntityResponse
   activeSprints(filters: ActiveSprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ActiveSprintRelationResponseCollection
@@ -709,10 +709,8 @@ type BoardRelationResponseCollection {
 input CategoryFiltersInput {
   id: IDFilterInput
   name: StringFilterInput
-  knowledge: KnowledgeFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
   and: [CategoryFiltersInput]
   or: [CategoryFiltersInput]
   not: CategoryFiltersInput
@@ -720,16 +718,12 @@ input CategoryFiltersInput {
 
 input CategoryInput {
   name: String
-  knowledge: ID
-  publishedAt: DateTime
 }
 
 type Category {
   name: String!
-  knowledge: KnowledgeEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 type CategoryEntity {
@@ -802,7 +796,6 @@ input KnowledgeFiltersInput {
   author: UsersPermissionsUserFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
-  publishedAt: DateTimeFilterInput
   and: [KnowledgeFiltersInput]
   or: [KnowledgeFiltersInput]
   not: KnowledgeFiltersInput
@@ -813,17 +806,15 @@ input KnowledgeInput {
   categories: [ID]
   content: String
   author: ID
-  publishedAt: DateTime
 }
 
 type Knowledge {
   title: String!
-  categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): CategoryRelationResponseCollection
+  categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): CategoryRelationResponseCollection
   content: String!
   author: UsersPermissionsUserEntityResponse
   createdAt: DateTime
   updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 type KnowledgeEntity {
@@ -1070,11 +1061,11 @@ type Query {
   board(id: ID): BoardEntityResponse
   boards(filters: BoardFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): BoardEntityResponseCollection
   category(id: ID): CategoryEntityResponse
-  categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): CategoryEntityResponseCollection
+  categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): CategoryEntityResponseCollection
   comentary(id: ID): ComentaryEntityResponse
   comentaries(filters: ComentaryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): ComentaryEntityResponseCollection
   knowledge(id: ID): KnowledgeEntityResponse
-  knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], publicationState: PublicationState = LIVE): KnowledgeEntityResponseCollection
+  knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): KnowledgeEntityResponseCollection
   project(id: ID): ProjectEntityResponse
   projects(filters: ProjectFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectEntityResponseCollection
   projectUserRole(id: ID): ProjectUserRoleEntityResponse

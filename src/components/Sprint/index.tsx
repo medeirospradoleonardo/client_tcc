@@ -182,7 +182,7 @@ export default function SprintComponent({
 
                   {provided.placeholder}
                 </div>
-                {permited && (
+                {/* {permited && (
                   <Button
                     style={{ color: '#000' }}
                     icon={<AddIcon />}
@@ -192,7 +192,7 @@ export default function SprintComponent({
                   >
                     Criar item
                   </Button>
-                )}
+                )} */}
               </S.Content>
             )}
           </Droppable>
