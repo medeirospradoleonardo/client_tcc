@@ -10,6 +10,7 @@ interface KnowledgeProps {
   title: string
   author: string
   editKnowledge: (id: string) => void
+  deleteKnowledge: (id: string) => void
 }
 
 const Knowledge = ({
@@ -17,7 +18,8 @@ const Knowledge = ({
   permited,
   title,
   author,
-  editKnowledge
+  editKnowledge,
+  deleteKnowledge
 }: KnowledgeProps) => {
   title = title.trim()
   return (
@@ -40,7 +42,7 @@ const Knowledge = ({
             <IconButton
               onClick={(e) => {
                 e.stopPropagation()
-                // deleteBoard(id)
+                deleteKnowledge(id)
               }}
             >
               <DeleteIcon style={{ color: '#030517' }} fontSize="large" />

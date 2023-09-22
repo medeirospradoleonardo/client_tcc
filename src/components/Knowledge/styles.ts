@@ -1,6 +1,9 @@
 import styled, { css } from 'styled-components'
 
-export const Title = styled.div``
+export const Title = styled.div`
+  margin-top: 10px;
+  margin-left: 10px;
+`
 
 export const Container = styled.div`
   ${({ theme }) => css`
@@ -21,6 +24,7 @@ export const Right = styled.div`
   margin-left: auto;
   display: flex;
   margin-top: 20px;
+  margin-bottom: 5px;
 `
 export const Icon = styled.div`
   margin-top: -6px;

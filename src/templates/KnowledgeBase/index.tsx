@@ -4,16 +4,20 @@ import * as S from './styles'
 import Base from 'templates/Base'
 import { Project, ProjectsTemplateProps } from 'templates/Projects'
 import TextField from 'components/TextField'
+import Confirm from 'components/Confirm'
 import { Search } from '@styled-icons/material-outlined/Search'
 import { User } from 'templates/ProductBacklog'
 import Knowledge from 'components/Knowledge'
 import Button from 'components/Button'
 import { useState } from 'react'
 import FormKnowledge, { FormKnowledgeProps } from 'components/FormKnowledge'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { QueryGetKnowledge } from 'graphql/generated/QueryGetKnowledge'
 import { QUERY_GET_KNOWLEDGE } from 'graphql/queries/knowledge'
 import { Session } from 'next-auth'
+import { Grid } from 'components/Grid'
+import { Dialog } from '@mui/material'
+import { MUTATION_DELETE_KNOWLEDGE } from 'graphql/mutations/knowledge'
 
 export type Category = {
   id: string
@@ -44,7 +48,20 @@ const KnowledgeBase = ({
   knowledges
 }: KnowledgeBaseTemplateProps) => {
   const [openForm, setOpenForm] = useState(false)
+  const [openModalDeleteKnowledge, setOpenModalDeleteKnowledge] =
+    useState(false)
   const [knowledgesData, setKnowledgesData] = useState(knowledges)
+  const [knowledgeToRemoveId, setKnowledgeToRemoveId] = useState<string>()
+
+  const handleClose = (event: React.MouseEventHandler, reason: string) => {
+    if (reason && reason == 'backdropClick') return
+    setOpenModalDeleteKnowledge(false)
+  }
+
+  const removeKnowledgeSelect = (id: string) => {
+    setOpenModalDeleteKnowledge(true)
+    setKnowledgeToRemoveId(id)
+  }
 
   const refreshKnowledges = (knowledge: Knowledge) => {
     const knowledgesNew = knowledgesData.slice()
@@ -131,11 +148,44 @@ const KnowledgeBase = ({
     })
   }
 
+  const [deleteKnowledgeGraphQL] = useMutation(MUTATION_DELETE_KNOWLEDGE, {
+    context: { session },
+    onCompleted: (data) => {
+      let knowledgesDataNew = knowledgesData?.slice()
+      knowledgesDataNew = knowledgesDataNew?.filter(
+        (k) => k.id != data.deleteKnowledge.data.id
+      )
+      setKnowledgesData(knowledgesDataNew)
+      setOpenModalDeleteKnowledge(false)
+    }
+  })
+
+  const deleteKnowledge = (id: string) => {
+    deleteKnowledgeGraphQL({
+      variables: {
+        id: id
+      }
+    })
+  }
+
   return (
     <Base
       projectsQuantity={projectUserRoles?.length}
       activeProject={activeProject}
     >
+      <Dialog
+        fullWidth={true}
+        maxWidth="xs"
+        open={openModalDeleteKnowledge}
+        onClose={handleClose}
+      >
+        <Confirm
+          closeModal={() => setOpenModalDeleteKnowledge(false)}
+          buttonLabel="Deletar"
+          message="Você tem certeza que deseja deletar esse documento?"
+          actionFunction={() => deleteKnowledge(knowledgeToRemoveId || '')}
+        />
+      </Dialog>
       <Container>
         <Heading lineLeft lineColor="secondary" color="black">
           Base de conhecimento
@@ -146,10 +196,14 @@ const KnowledgeBase = ({
             {!openForm ? (
               <>
                 <TextField icon={<Search />} />
-                <Button size="small" onClick={createKnowledge}>
+                <Button
+                  style={{ marginTop: '10px' }}
+                  size="small"
+                  onClick={createKnowledge}
+                >
                   Criar documento
                 </Button>
-                <S.Knowledges>
+                <Grid>
                   {knowledgesData.map((knowledge) => (
                     <Knowledge
                       permited={true}
@@ -158,9 +212,10 @@ const KnowledgeBase = ({
                       title={knowledge.title}
                       author={knowledge.author.name}
                       editKnowledge={editKnowledge}
+                      deleteKnowledge={removeKnowledgeSelect}
                     />
                   ))}
-                </S.Knowledges>
+                </Grid>
               </>
             ) : (
               <FormKnowledge {...propsFormKnowledge} />
