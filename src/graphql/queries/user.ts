@@ -103,8 +103,10 @@ export const QUERY_PROFILE_ME_BOARDS = gql`
 `
 
 export const QUERY_ALL_USERS = gql`
-  query QueryAllUsers {
-    usersPermissionsUsers(filters: { type: { eqi: "default" } }) {
+  query QueryAllUsers($IdUser: ID) {
+    usersPermissionsUsers(
+      filters: { type: { eqi: "default" }, id: { not: { eq: $IdUser } } }
+    ) {
       data {
         id
         attributes {

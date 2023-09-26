@@ -19,6 +19,11 @@ import { Grid } from 'components/Grid'
 import { Dialog } from '@mui/material'
 import { MUTATION_DELETE_KNOWLEDGE } from 'graphql/mutations/knowledge'
 
+export type Story = {
+  author: string
+  date: string
+}
+
 export type Category = {
   id: string
   name: string
@@ -28,11 +33,14 @@ export type Knowledge = {
   id: string
   title: string
   content?: string
-  categories: Category[] | null
   author: User
+  usersCanEdit: User[] | null
+  categories: Category[] | null
+  stories: Story[] | null
 }
 
 export type KnowledgeBaseTemplateProps = {
+  isAdmin: boolean
   user: User
   session: Session
   projectUserRoles: ProjectsTemplateProps[]
@@ -41,6 +49,7 @@ export type KnowledgeBaseTemplateProps = {
 }
 
 const KnowledgeBase = ({
+  isAdmin,
   user,
   session,
   projectUserRoles,
@@ -79,6 +88,8 @@ const KnowledgeBase = ({
   }
 
   const formKnowledgePropsDefault = {
+    permited: true,
+    isAdmin: isAdmin,
     user,
     refreshKnowledges,
     session: session,
@@ -89,10 +100,12 @@ const KnowledgeBase = ({
       title: '',
       content: '',
       author: {
-        id: '',
-        name: ''
+        id: user.id,
+        name: user.name
       },
-      categories: [] as Category[]
+      usersCanEdit: [] as User[],
+      categories: [] as Category[],
+      stories: [] as Story[]
     }
   }
 
@@ -111,6 +124,30 @@ const KnowledgeBase = ({
       onCompleted: () => {
         const propsFormKnowledgeNew = formKnowledgePropsDefault
         propsFormKnowledgeNew.option = 'edit'
+        const getPermited = () => {
+          if (isAdmin) {
+            return true
+          } else {
+            if (
+              user.id ==
+              dataQueryKnowledge?.knowledge?.data?.attributes?.author?.data?.id
+            ) {
+              return true
+            } else {
+              if (
+                dataQueryKnowledge?.knowledge?.data?.attributes?.usersCanEdit?.data?.find(
+                  (u) => user.id == u.id
+                )
+              ) {
+                return true
+              } else {
+                return false
+              }
+            }
+          }
+        }
+        propsFormKnowledgeNew.permited = getPermited()
+
         propsFormKnowledgeNew.initialKnowledge = {
           id: dataQueryKnowledge?.knowledge?.data?.id || '',
           title: dataQueryKnowledge?.knowledge?.data?.attributes?.title || '',
@@ -124,6 +161,15 @@ const KnowledgeBase = ({
               dataQueryKnowledge?.knowledge?.data?.attributes?.author?.data
                 ?.attributes?.username || ''
           },
+          usersCanEdit: dataQueryKnowledge?.knowledge?.data?.attributes
+            ?.usersCanEdit?.data
+            ? dataQueryKnowledge?.knowledge?.data?.attributes?.usersCanEdit?.data?.map(
+                (u) => ({
+                  id: u?.id || '',
+                  name: u?.attributes?.username || ''
+                })
+              )
+            : [],
           categories: dataQueryKnowledge?.knowledge?.data?.attributes
             ?.categories?.data
             ? dataQueryKnowledge?.knowledge?.data?.attributes?.categories?.data?.map(
@@ -132,8 +178,18 @@ const KnowledgeBase = ({
                   name: category.attributes?.name || ''
                 })
               )
+            : [],
+          stories: dataQueryKnowledge?.knowledge?.data?.attributes?.stories
+            ?.data
+            ? dataQueryKnowledge?.knowledge?.data?.attributes?.stories?.data?.map(
+                (story) => ({
+                  author: story.attributes?.author || '',
+                  date: story.attributes?.date || ''
+                })
+              )
             : []
         }
+
         setPropsFormKnowledge(propsFormKnowledgeNew)
         setOpenForm(true)
       }
@@ -166,6 +222,21 @@ const KnowledgeBase = ({
         id: id
       }
     })
+  }
+
+  const [itemOffset, setItemOffset] = useState(0)
+
+  const itemsPerPage = 2
+  const endOffset = itemOffset + itemsPerPage
+
+  const currentItems = knowledgesData.slice(itemOffset, endOffset)
+  const pageCount = Math.ceil(knowledgesData.length / itemsPerPage)
+
+  // Invoke when user click to request another page.
+  const handlePageClick = (event: any) => {
+    const newOffset = (event.selected * itemsPerPage) % knowledgesData.length
+
+    setItemOffset(newOffset)
   }
 
   return (
@@ -203,8 +274,16 @@ const KnowledgeBase = ({
                 >
                   Criar documento
                 </Button>
+                <Heading
+                  size="small"
+                  lineLeft
+                  lineColor="secondary"
+                  color="black"
+                >
+                  {knowledgesData.length} documentos
+                </Heading>
                 <Grid>
-                  {knowledgesData.map((knowledge) => (
+                  {currentItems.map((knowledge) => (
                     <Knowledge
                       permited={true}
                       key={knowledge.id}
@@ -216,6 +295,25 @@ const KnowledgeBase = ({
                     />
                   ))}
                 </Grid>
+                <S.StyledReactPaginate
+                  onPageChange={handlePageClick}
+                  pageRangeDisplayed={5}
+                  pageCount={pageCount}
+                  breakLabel="..."
+                  previousLabel="<<"
+                  nextLabel=">>"
+                  breakClassName="break-me"
+                  renderOnZeroPageCount={null}
+                  breakLinkClassName="page-link"
+                  containerClassName="pagination"
+                  pageClassName="page-item"
+                  pageLinkClassName="page-link"
+                  previousClassName="page-item"
+                  previousLinkClassName="page-link"
+                  nextClassName="page-item"
+                  nextLinkClassName="page-link"
+                  activeClassName="active"
+                />
               </>
             ) : (
               <FormKnowledge {...propsFormKnowledge} />

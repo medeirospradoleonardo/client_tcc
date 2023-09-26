@@ -5,14 +5,27 @@ export const Heading = styled.div`
   margin-top: 10px;
 `
 
-export const ButtonContainer = styled.div`
+export const Footer = styled.div`
   display: flex;
-  justify-content: flex-end;
   margin-top: 80px;
-
-  ${media.greaterThan('medium')`
-      grid-column: 2;
-  `}
 `
 
 export const Content = styled.div``
+
+export const ButtonsHeading = styled.div`
+  display: flex;
+`
+
+export const Left = styled.div`
+  margin-right: auto;
+`
+
+export const Right = styled.div`
+  margin-left: auto;
+`
+
+export const CreateBy = styled.span`
+  ${({ theme }) => css`
+    color: ${theme.colors.gray};
+  `}
+`

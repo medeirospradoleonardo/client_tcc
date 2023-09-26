@@ -26,7 +26,14 @@ const htmlToDraft =
 //   setData: (field: string, value: string | null | User | number) => void
 // }
 
-const TextEditor = ({ label, content, setData, style, input }) => {
+const TextEditor = ({
+  label,
+  content,
+  setData,
+  style,
+  input,
+  disabled = false
+}) => {
   let editorState
   const contentBlock = htmlToDraft(content)
   if (contentBlock) {
@@ -52,6 +59,7 @@ const TextEditor = ({ label, content, setData, style, input }) => {
         editorClassName="editorClassName"
         onEditorStateChange={editorStateChange}
         editorStyle={style}
+        readOnly={disabled}
       />
     </>
   )

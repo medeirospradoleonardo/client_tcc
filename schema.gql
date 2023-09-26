@@ -794,6 +794,8 @@ input KnowledgeFiltersInput {
   categories: CategoryFiltersInput
   content: StringFilterInput
   author: UsersPermissionsUserFiltersInput
+  usersCanEdit: UsersPermissionsUserFiltersInput
+  stories: StoryFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [KnowledgeFiltersInput]
@@ -806,13 +808,17 @@ input KnowledgeInput {
   categories: [ID]
   content: String
   author: ID
+  usersCanEdit: [ID]
+  stories: [ID]
 }
 
 type Knowledge {
   title: String!
   categories(filters: CategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): CategoryRelationResponseCollection
-  content: String!
+  content: String
   author: UsersPermissionsUserEntityResponse
+  usersCanEdit(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserRelationResponseCollection
+  stories(filters: StoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): StoryRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -981,7 +987,48 @@ type SprintRelationResponseCollection {
   data: [SprintEntity!]!
 }
 
-union GenericMorph = UploadFile | UploadFolder | I18NLocale | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | ActiveSprint | Board | Category | Comentary | Knowledge | Project | ProjectUserRole | Sprint
+input StoryFiltersInput {
+  id: IDFilterInput
+  author: StringFilterInput
+  date: DateTimeFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  and: [StoryFiltersInput]
+  or: [StoryFiltersInput]
+  not: StoryFiltersInput
+}
+
+input StoryInput {
+  author: String
+  date: DateTime
+}
+
+type Story {
+  author: String
+  date: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type StoryEntity {
+  id: ID
+  attributes: Story
+}
+
+type StoryEntityResponse {
+  data: StoryEntity
+}
+
+type StoryEntityResponseCollection {
+  data: [StoryEntity!]!
+  meta: ResponseCollectionMeta!
+}
+
+type StoryRelationResponseCollection {
+  data: [StoryEntity!]!
+}
+
+union GenericMorph = UploadFile | UploadFolder | I18NLocale | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | ActiveSprint | Board | Category | Comentary | Knowledge | Project | ProjectUserRole | Sprint | Story
 
 input FileInfoInput {
   name: String
@@ -1072,6 +1119,8 @@ type Query {
   projectUserRoles(filters: ProjectUserRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ProjectUserRoleEntityResponseCollection
   sprint(id: ID): SprintEntityResponse
   sprints(filters: SprintFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): SprintEntityResponseCollection
+  story(id: ID): StoryEntityResponse
+  stories(filters: StoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): StoryEntityResponseCollection
   me: UsersPermissionsMe
 }
 
@@ -1106,6 +1155,9 @@ type Mutation {
   createSprint(data: SprintInput!): SprintEntityResponse
   updateSprint(id: ID!, data: SprintInput!): SprintEntityResponse
   deleteSprint(id: ID!): SprintEntityResponse
+  createStory(data: StoryInput!): StoryEntityResponse
+  updateStory(id: ID!, data: StoryInput!): StoryEntityResponse
+  deleteStory(id: ID!): StoryEntityResponse
   upload(refId: ID, ref: String, field: String, info: FileInfoInput, file: Upload!): UploadFileEntityResponse!
   multipleUpload(refId: ID, ref: String, field: String, files: [Upload]!): [UploadFileEntityResponse]!
   updateFileInfo(id: ID!, info: FileInfoInput): UploadFileEntityResponse!

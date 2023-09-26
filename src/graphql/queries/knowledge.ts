@@ -45,11 +45,27 @@ export const QUERY_GET_KNOWLEDGE = gql`
               }
             }
           }
+          usersCanEdit(filters: { type: { eqi: "default" } }) {
+            data {
+              id
+              attributes {
+                username
+              }
+            }
+          }
           categories {
             data {
               id
               attributes {
                 name
+              }
+            }
+          }
+          stories {
+            data {
+              attributes {
+                author
+                date
               }
             }
           }

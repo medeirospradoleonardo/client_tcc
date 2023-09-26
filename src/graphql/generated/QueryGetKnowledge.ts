@@ -23,6 +23,22 @@ export interface QueryGetKnowledge_knowledge_data_attributes_author {
   data: QueryGetKnowledge_knowledge_data_attributes_author_data | null;
 }
 
+export interface QueryGetKnowledge_knowledge_data_attributes_usersCanEdit_data_attributes {
+  __typename: "UsersPermissionsUser";
+  username: string;
+}
+
+export interface QueryGetKnowledge_knowledge_data_attributes_usersCanEdit_data {
+  __typename: "UsersPermissionsUserEntity";
+  id: string | null;
+  attributes: QueryGetKnowledge_knowledge_data_attributes_usersCanEdit_data_attributes | null;
+}
+
+export interface QueryGetKnowledge_knowledge_data_attributes_usersCanEdit {
+  __typename: "UsersPermissionsUserRelationResponseCollection";
+  data: QueryGetKnowledge_knowledge_data_attributes_usersCanEdit_data[];
+}
+
 export interface QueryGetKnowledge_knowledge_data_attributes_categories_data_attributes {
   __typename: "Category";
   name: string;
@@ -39,12 +55,30 @@ export interface QueryGetKnowledge_knowledge_data_attributes_categories {
   data: QueryGetKnowledge_knowledge_data_attributes_categories_data[];
 }
 
+export interface QueryGetKnowledge_knowledge_data_attributes_stories_data_attributes {
+  __typename: "Story";
+  author: string | null;
+  date: any | null;
+}
+
+export interface QueryGetKnowledge_knowledge_data_attributes_stories_data {
+  __typename: "StoryEntity";
+  attributes: QueryGetKnowledge_knowledge_data_attributes_stories_data_attributes | null;
+}
+
+export interface QueryGetKnowledge_knowledge_data_attributes_stories {
+  __typename: "StoryRelationResponseCollection";
+  data: QueryGetKnowledge_knowledge_data_attributes_stories_data[];
+}
+
 export interface QueryGetKnowledge_knowledge_data_attributes {
   __typename: "Knowledge";
   title: string;
-  content: string;
+  content: string | null;
   author: QueryGetKnowledge_knowledge_data_attributes_author | null;
+  usersCanEdit: QueryGetKnowledge_knowledge_data_attributes_usersCanEdit | null;
   categories: QueryGetKnowledge_knowledge_data_attributes_categories | null;
+  stories: QueryGetKnowledge_knowledge_data_attributes_stories | null;
 }
 
 export interface QueryGetKnowledge_knowledge_data {

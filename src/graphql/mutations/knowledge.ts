@@ -13,15 +13,17 @@ export const MUTATION_CREATE_KNOWLEDGE = gql`
   mutation MutationCreateKnowledge(
     $title: String!
     $content: String
-    $categories: [ID]
     $authorId: ID!
+    $usersCanEdit: [ID]
+    $categories: [ID]
   ) {
     createKnowledge(
       data: {
         title: $title
         content: $content
-        categories: $categories
         author: $authorId
+        usersCanEdit: $usersCanEdit
+        categories: $categories
       }
     ) {
       data {
@@ -30,6 +32,14 @@ export const MUTATION_CREATE_KNOWLEDGE = gql`
           title
           content
           author {
+            data {
+              id
+              attributes {
+                username
+              }
+            }
+          }
+          usersCanEdit(filters: { type: { eqi: "default" } }) {
             data {
               id
               attributes {
@@ -56,11 +66,17 @@ export const MUTATION_UPDATE_KNOWLEDGE = gql`
     $knowledgeId: ID!
     $title: String!
     $content: String
+    $usersCanEdit: [ID]
     $categories: [ID]
   ) {
     updateKnowledge(
       id: $knowledgeId
-      data: { title: $title, content: $content, categories: $categories }
+      data: {
+        title: $title
+        content: $content
+        usersCanEdit: $usersCanEdit
+        categories: $categories
+      }
     ) {
       data {
         id
@@ -68,6 +84,14 @@ export const MUTATION_UPDATE_KNOWLEDGE = gql`
           title
           content
           author {
+            data {
+              id
+              attributes {
+                username
+              }
+            }
+          }
+          usersCanEdit(filters: { type: { eqi: "default" } }) {
             data {
               id
               attributes {

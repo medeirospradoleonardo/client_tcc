@@ -20,7 +20,7 @@ const DropdownIndicator = (props: DropdownIndicatorProps<OptionType, true>) => {
 }
 
 type SelectChipsProps = {
-  label: string
+  label?: string
   setData: (e: MultiValue<OptionType>) => void
   options: MultiValue<OptionType>
   defaultValues?: MultiValue<{
@@ -76,7 +76,9 @@ export default function SelectChips({
 }: SelectChipsProps) {
   return (
     <>
-      <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
+      {!!label && (
+        <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
+      )}
       <Select
         inputId={`indicators-dropdown${label}`}
         closeMenuOnSelect={false}

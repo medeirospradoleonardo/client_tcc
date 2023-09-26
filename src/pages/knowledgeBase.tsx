@@ -23,6 +23,7 @@ import { QueryGetKnowledges } from 'graphql/generated/QueryGetKnowledges'
 export default function KnowledgeBasePage(props: KnowledgeBaseTemplateProps) {
   return (
     <KnowledgeBase
+      isAdmin={props.isAdmin}
       user={props?.user}
       session={props?.session}
       knowledges={props?.knowledges}
@@ -84,6 +85,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         name: usersPermissionsUser?.data?.attributes?.username
       },
       projectUserRoles: projectUserRoles?.data,
+      isAdmin:
+        usersPermissionsUser?.data?.attributes?.type == 'admin' ? true : false,
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {
             id:

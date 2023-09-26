@@ -1,37 +1,7 @@
+import styled from 'styled-components'
 import ReactPaginate from 'react-paginate'
-import styled, { css } from 'styled-components'
-import media from 'styled-media-query'
-
-export const Main = styled.main`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacings.medium};
-
-    ${media.greaterThan('medium')`
-        /* display: grid; */
-        /* grid-template-columns: 32rem 1fr; */
-        /* gap: calc(${theme.grid.gutter} * 2); */
-    `}
-    box-shadow: 8px 12px 24px 12px rgba(0, 0, 0, 0.1);
-  `}
-`
-
-export const Content = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    background-color: ${theme.colors.white};
-    color: ${theme.colors.black};
-    padding: ${theme.spacings.xsmall};
-  `}
-`
-export const Knowledges = styled.div`
-  ${({ theme }) => css`
-    margin-top: 20px;
-  `}
-`
 
 export const StyledReactPaginate = styled(ReactPaginate)`
-  /* layout */
-
   body {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -201,15 +171,13 @@ export const StyledReactPaginate = styled(ReactPaginate)`
   }
 
   .pagination {
-    align-items: center;
-    background-color: #0fbcf9;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: row;
-    height: 60px;
-    justify-content: center;
-    list-style-type: none;
-    position: relative;
-    width: 1000px;
+    padding-left: 0;
+    list-style: none;
+    border-radius: 0.25rem;
+    padding-top: 20px;
+    justify-content: flex-end;
   }
 
   .page-link {

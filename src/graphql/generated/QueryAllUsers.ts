@@ -29,3 +29,7 @@ export interface QueryAllUsers_usersPermissionsUsers {
 export interface QueryAllUsers {
   usersPermissionsUsers: QueryAllUsers_usersPermissionsUsers | null;
 }
+
+export interface QueryAllUsersVariables {
+  IdUser?: string | null;
+}

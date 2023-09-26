@@ -35,9 +35,9 @@ export type FormProjectProps = {
   option?: 'create' | 'edit'
   user: User
   session: Session
-  scrumMastersReceived: selectValue
-  productOwnersReceived: selectValue
-  membersReceived: selectValue
+  scrumMastersReceived: SelectValue
+  productOwnersReceived: SelectValue
+  membersReceived: SelectValue
   projectUserRoleTables: ProjectUserRoleType[]
   setProjects: React.Dispatch<React.SetStateAction<ProjectUserRoleType[]>>
   setQuantityProjectsPage: (quantity: number) => void
@@ -46,7 +46,7 @@ export type FormProjectProps = {
   setActiveProjectSideBar: (project: Project | null) => void
 }
 
-type selectValue = MultiValue<{
+export type SelectValue = MultiValue<{
   label: string
   value: string
 }>
@@ -69,11 +69,11 @@ const FormProject = ({
   setActiveProjectSideBar
 }: FormProjectProps) => {
   const [scrumMasters, setScrumMasters] =
-    useState<selectValue>(scrumMastersReceived)
-  const [productOwners, setProductOwners] = useState<selectValue>(
+    useState<SelectValue>(scrumMastersReceived)
+  const [productOwners, setProductOwners] = useState<SelectValue>(
     productOwnersReceived
   )
-  const [members, setMembers] = useState<selectValue>(membersReceived)
+  const [members, setMembers] = useState<SelectValue>(membersReceived)
   const [users, setUsers] = useState<MultiValue<OptionType>>(usersOptions)
   const [name, setName] = useState<string>(nameProject ? nameProject : '')
 

@@ -4,7 +4,7 @@ import { ButtonProps } from '.'
 
 export type WrapperProps = {
   hasIcon: boolean
-} & Pick<ButtonProps, 'size' | 'fullWidth' | 'minimal'>
+} & Pick<ButtonProps, 'size' | 'padding' | 'fullWidth' | 'minimal'>
 
 const wrapperModifiers = {
   small: (theme: DefaultTheme) => css`
@@ -20,6 +20,9 @@ const wrapperModifiers = {
     height: 5rem;
     font-size: ${theme.font.sizes.medium};
     padding: ${theme.spacings.xxsmall} ${theme.spacings.xlarge};
+  `,
+  padding: (theme: DefaultTheme) => css`
+    padding: ${theme.spacings.xxsmall};
   `,
   fullWidth: () => css`
     width: 100%;
@@ -50,7 +53,7 @@ const wrapperModifiers = {
 }
 
 export const Wrapper = styled.button<WrapperProps>`
-  ${({ theme, size, fullWidth, hasIcon, minimal, disabled }) => css`
+  ${({ theme, size, fullWidth, hasIcon, minimal, disabled, padding }) => css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -59,7 +62,7 @@ export const Wrapper = styled.button<WrapperProps>`
     border: 0;
     cursor: pointer;
     border-radius: ${theme.border.radius};
-    padding: ${theme.spacings.xxsmall};
+
     text-decoration: none;
 
     &:focus {
@@ -72,6 +75,7 @@ export const Wrapper = styled.button<WrapperProps>`
         : `linear-gradient(180deg, #F99B6D 0%, #F88F62 50%)`};
     }
 
+    ${padding && wrapperModifiers.padding(theme)};
     ${!!size && wrapperModifiers[size](theme)};
     ${!!fullWidth && wrapperModifiers.fullWidth()};
     ${!!hasIcon && wrapperModifiers.withIcon(theme)};
