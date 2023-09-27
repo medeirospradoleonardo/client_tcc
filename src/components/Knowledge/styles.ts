@@ -13,6 +13,11 @@ export const Container = styled.div`
     justify-content: space-between;
     user-select: none;
     width: 250px;
+    padding: 5px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-bottom: 1px solid rgb(178, 185, 197);
   `}
 `
 

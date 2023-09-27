@@ -16,8 +16,12 @@ import KnowledgeBase, {
 import { initializeApollo } from 'utils/apollo'
 import protectedRoutes from 'utils/protected-routes'
 
-import { QUERY_GET_KNOWLEDGES } from 'graphql/queries/knowledge'
+import {
+  QUERY_GET_KNOWLEDGES,
+  QUERY_GET_KNOWLEDGES_TOTAL
+} from 'graphql/queries/knowledge'
 import { knowledgesMapper } from 'utils/mappers'
+import { QueryGetKnowledgesTotal } from 'graphql/generated/QueryGetKnowledgesTotal'
 import { QueryGetKnowledges } from 'graphql/generated/QueryGetKnowledges'
 
 export default function KnowledgeBasePage(props: KnowledgeBaseTemplateProps) {
@@ -26,9 +30,11 @@ export default function KnowledgeBasePage(props: KnowledgeBaseTemplateProps) {
       isAdmin={props.isAdmin}
       user={props?.user}
       session={props?.session}
-      knowledges={props?.knowledges}
       projectUserRoles={props?.projectUserRoles}
       activeProject={props?.activeProject}
+      knowledges={props?.knowledges}
+      knowledgesTotal={props?.knowledgesTotal}
+      itemsPerPage={9}
     />
   )
 }
@@ -74,6 +80,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     data: { knowledges }
   } = await apolloClient.query<QueryGetKnowledges>({
     query: QUERY_GET_KNOWLEDGES,
+    variables: {
+      pageSize: 9
+    },
+    fetchPolicy: 'no-cache'
+  })
+
+  const {
+    data: { knowledges: knowledgesTotal }
+  } = await apolloClient.query<QueryGetKnowledgesTotal>({
+    query: QUERY_GET_KNOWLEDGES_TOTAL,
+    variables: {
+      //
+    },
     fetchPolicy: 'no-cache'
   })
 
@@ -97,7 +116,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
                 ?.attributes?.name || ''
           }
         : null,
-      knowledges: knowledgesMapper(knowledges)
+      knowledges: knowledgesMapper(knowledges),
+      knowledgesTotal: knowledgesTotal?.meta.pagination.total
     }
   }
 }

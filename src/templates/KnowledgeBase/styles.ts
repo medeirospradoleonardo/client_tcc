@@ -29,8 +29,24 @@ export const Knowledges = styled.div`
   `}
 `
 
+export const Footer = styled.div`
+  display: flex;
+`
+
+export const Right = styled.div`
+  margin-left: auto;
+`
+
 export const StyledReactPaginate = styled(ReactPaginate)`
   /* layout */
+
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 60px;
+  justify-content: center;
+  list-style-type: none;
+  position: relative;
 
   body {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -200,27 +216,17 @@ export const StyledReactPaginate = styled(ReactPaginate)`
     line-height: 2;
   }
 
-  .pagination {
-    align-items: center;
-    background-color: #0fbcf9;
-    display: flex;
-    flex-direction: row;
-    height: 60px;
-    justify-content: center;
-    list-style-type: none;
-    position: relative;
-    width: 1000px;
-  }
-
   .page-link {
-    position: relative;
-    display: block;
-    padding: 0.5rem 0.75rem;
-    margin-left: -1px;
-    line-height: 1.25;
-    color: #007bff;
-    background-color: #fff;
-    border: 1px solid #dee2e6;
+    ${({ theme }) => css`
+      color: ${theme.colors.primary};
+      position: relative;
+      display: block;
+      padding: 0.5rem 0.75rem;
+      margin-left: -1px;
+      line-height: 1.25;
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+    `}
   }
 
   .page-link:hover {
@@ -229,8 +235,10 @@ export const StyledReactPaginate = styled(ReactPaginate)`
   }
 
   li.page-item.active > a {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
+    ${({ theme }) => css`
+      background: ${theme.colors.primary};
+      color: white;
+      border-color: ${theme.colors.primary};
+    `}
   }
 `

@@ -60,3 +60,9 @@ export interface QueryGetKnowledges_knowledges {
 export interface QueryGetKnowledges {
   knowledges: QueryGetKnowledges_knowledges | null;
 }
+
+export interface QueryGetKnowledgesVariables {
+  categories?: (string | null)[] | null;
+  page?: number | null;
+  pageSize: number;
+}

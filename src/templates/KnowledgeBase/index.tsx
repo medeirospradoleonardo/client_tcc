@@ -13,11 +13,16 @@ import { useState } from 'react'
 import FormKnowledge, { FormKnowledgeProps } from 'components/FormKnowledge'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { QueryGetKnowledge } from 'graphql/generated/QueryGetKnowledge'
-import { QUERY_GET_KNOWLEDGE } from 'graphql/queries/knowledge'
+import {
+  QUERY_GET_KNOWLEDGE,
+  QUERY_GET_KNOWLEDGES
+} from 'graphql/queries/knowledge'
 import { Session } from 'next-auth'
 import { Grid } from 'components/Grid'
 import { Dialog } from '@mui/material'
 import { MUTATION_DELETE_KNOWLEDGE } from 'graphql/mutations/knowledge'
+import { QueryGetKnowledges } from 'graphql/generated/QueryGetKnowledges'
+import { knowledgesMapper } from 'utils/mappers'
 
 export type Story = {
   author: string
@@ -46,6 +51,8 @@ export type KnowledgeBaseTemplateProps = {
   projectUserRoles: ProjectsTemplateProps[]
   activeProject: Project
   knowledges: Knowledge[]
+  knowledgesTotal: number
+  itemsPerPage: number
 }
 
 const KnowledgeBase = ({
@@ -54,7 +61,9 @@ const KnowledgeBase = ({
   session,
   projectUserRoles,
   activeProject,
-  knowledges
+  knowledges,
+  knowledgesTotal,
+  itemsPerPage
 }: KnowledgeBaseTemplateProps) => {
   const [openForm, setOpenForm] = useState(false)
   const [openModalDeleteKnowledge, setOpenModalDeleteKnowledge] =
@@ -224,19 +233,37 @@ const KnowledgeBase = ({
     })
   }
 
-  const [itemOffset, setItemOffset] = useState(0)
+  const [getKnowledgesGraphql, { data: dataQueryKnowledges }] =
+    useLazyQuery<QueryGetKnowledges>(QUERY_GET_KNOWLEDGES, {
+      context: { session },
+      onCompleted: () => {
+        setKnowledgesData(knowledgesMapper(dataQueryKnowledges?.knowledges))
+        // if (dataQueryKnowledges?.knowledges) {
+        //   if (knowledgesMapper(dataQueryKnowledges?.knowledges)) {
+        //     setKnowledgesData(knowledgesMapper(dataQueryKnowledges?.knowledges))
+        //   }
+        // }
+      }
+    })
 
-  const itemsPerPage = 2
-  const endOffset = itemOffset + itemsPerPage
-
-  const currentItems = knowledgesData.slice(itemOffset, endOffset)
-  const pageCount = Math.ceil(knowledgesData.length / itemsPerPage)
+  const [pageActive, setPageActive] = useState(0)
+  const [pageCount, setPageCount] = useState(
+    Math.ceil(knowledgesTotal / itemsPerPage)
+  )
 
   // Invoke when user click to request another page.
   const handlePageClick = (event: any) => {
-    const newOffset = (event.selected * itemsPerPage) % knowledgesData.length
-
-    setItemOffset(newOffset)
+    // const newOffset = (event.selected * itemsPerPage) % knowledgesTotal
+    // console.log(event.selected)
+    // setItemOffset(newOffset)
+    setPageActive(event.selected)
+    getKnowledgesGraphql({
+      variables: {
+        page: event.selected + 1,
+        pageSize: itemsPerPage
+      },
+      fetchPolicy: 'no-cache'
+    })
   }
 
   return (
@@ -283,9 +310,9 @@ const KnowledgeBase = ({
                   {knowledgesData.length} documentos
                 </Heading>
                 <Grid>
-                  {currentItems.map((knowledge) => (
+                  {knowledgesData.map((knowledge) => (
                     <Knowledge
-                      permited={true}
+                      permited={isAdmin || user.id == knowledge.author.id}
                       key={knowledge.id}
                       id={knowledge.id}
                       title={knowledge.title}
@@ -295,25 +322,28 @@ const KnowledgeBase = ({
                     />
                   ))}
                 </Grid>
-                <S.StyledReactPaginate
-                  onPageChange={handlePageClick}
-                  pageRangeDisplayed={5}
-                  pageCount={pageCount}
-                  breakLabel="..."
-                  previousLabel="<<"
-                  nextLabel=">>"
-                  breakClassName="break-me"
-                  renderOnZeroPageCount={null}
-                  breakLinkClassName="page-link"
-                  containerClassName="pagination"
-                  pageClassName="page-item"
-                  pageLinkClassName="page-link"
-                  previousClassName="page-item"
-                  previousLinkClassName="page-link"
-                  nextClassName="page-item"
-                  nextLinkClassName="page-link"
-                  activeClassName="active"
-                />
+                <S.Footer>
+                  <S.Right>
+                    <S.StyledReactPaginate
+                      onPageChange={handlePageClick}
+                      pageRangeDisplayed={5}
+                      pageCount={pageCount}
+                      breakLabel="..."
+                      previousLabel="<<"
+                      nextLabel=">>"
+                      breakClassName="break-me"
+                      breakLinkClassName="page-link"
+                      pageClassName="page-item"
+                      pageLinkClassName="page-link"
+                      previousClassName="page-item"
+                      previousLinkClassName="page-link"
+                      nextClassName="page-item"
+                      nextLinkClassName="page-link"
+                      activeClassName="active"
+                      initialPage={pageActive}
+                    />
+                  </S.Right>
+                </S.Footer>
               </>
             ) : (
               <FormKnowledge {...propsFormKnowledge} />

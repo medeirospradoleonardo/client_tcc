@@ -16,7 +16,6 @@ const HistoryKnowledge = ({ closeModal, stories }: HistoryKnowledgeProps) => {
   }
 
   function formatDate(date: Date) {
-    console.log(date.getHours())
     return [
       padTo2Digits(date.getDate() + 1),
       padTo2Digits(date.getMonth() + 1),
@@ -53,7 +52,7 @@ const HistoryKnowledge = ({ closeModal, stories }: HistoryKnowledgeProps) => {
       <S.Content>
         {stories.map((s, index) => (
           <>
-            <S.ContainerStory key={s.date}>
+            <S.ContainerStory key={`${s.date}-${index}`}>
               <S.Date>{formatDate(new Date(s.date))} </S.Date>
               <S.Author>
                 {index == 0 ? 'Criado por' : 'Editado por'} {s.author}
