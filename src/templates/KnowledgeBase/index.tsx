@@ -9,13 +9,14 @@ import { Search } from '@styled-icons/material-outlined/Search'
 import { User } from 'templates/ProductBacklog'
 import Knowledge from 'components/Knowledge'
 import Button from 'components/Button'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import FormKnowledge, { FormKnowledgeProps } from 'components/FormKnowledge'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { QueryGetKnowledge } from 'graphql/generated/QueryGetKnowledge'
 import {
   QUERY_GET_KNOWLEDGE,
-  QUERY_GET_KNOWLEDGES
+  QUERY_GET_KNOWLEDGES,
+  QUERY_GET_KNOWLEDGES_TOTAL
 } from 'graphql/queries/knowledge'
 import { Session } from 'next-auth'
 import { Grid } from 'components/Grid'
@@ -23,6 +24,12 @@ import { Dialog } from '@mui/material'
 import { MUTATION_DELETE_KNOWLEDGE } from 'graphql/mutations/knowledge'
 import { QueryGetKnowledges } from 'graphql/generated/QueryGetKnowledges'
 import { knowledgesMapper } from 'utils/mappers'
+import Radio from 'components/Radio'
+import SelectChips from 'components/SelectChips'
+import { QueryGetKnowledgesTotal } from 'graphql/generated/QueryGetKnowledgesTotal'
+import { MultiValue } from 'react-select'
+import { OptionType } from '@atlaskit/select'
+import { title } from 'process'
 
 export type Story = {
   author: string
@@ -32,6 +39,11 @@ export type Story = {
 export type Category = {
   id: string
   name: string
+}
+
+type KnowledgeBaseValues = {
+  title: string
+  categories: string[] | null
 }
 
 export type Knowledge = {
@@ -69,7 +81,21 @@ const KnowledgeBase = ({
   const [openModalDeleteKnowledge, setOpenModalDeleteKnowledge] =
     useState(false)
   const [knowledgesData, setKnowledgesData] = useState(knowledges)
+  const [total, setTotal] = useState(knowledgesTotal)
   const [knowledgeToRemoveId, setKnowledgeToRemoveId] = useState<string>()
+  const [sort, setSort] = useState<string>('asc')
+
+  const [pageActive, setPageActive] = useState(0)
+  const [pageCount, setPageCount] = useState(Math.ceil(total / itemsPerPage))
+
+  const [values, setValues] = useState<KnowledgeBaseValues>({
+    title: '',
+    categories: []
+  })
+
+  useEffect(() => {
+    setPageCount(Math.ceil(total / itemsPerPage))
+  }, [total, itemsPerPage])
 
   const handleClose = (event: React.MouseEventHandler, reason: string) => {
     if (reason && reason == 'backdropClick') return
@@ -81,29 +107,72 @@ const KnowledgeBase = ({
     setKnowledgeToRemoveId(id)
   }
 
-  const refreshKnowledges = (knowledge: Knowledge) => {
-    const knowledgesNew = knowledgesData.slice()
-    const isEdit = knowledgesNew.find((k) => k.id == knowledge.id)
+  const refreshKnowledges = async ({
+    page = pageActive + 1,
+    pageSize = itemsPerPage,
+    sortParam = sort,
+    title = values.title,
+    categories = values.categories
+  }) => {
+    if (sortParam != sort || title != values.title) {
+      setSort(sortParam)
+      setPageActive(0)
+      page = 1
+    }
 
-    isEdit
-      ? knowledgesNew.map((k) => {
-          if (k.id == knowledge.id) {
-            k.title = knowledge.title
-          }
-        })
-      : knowledgesNew.push(knowledge)
+    await getKnowledgesGraphql({
+      variables: {
+        page: page,
+        pageSize: pageSize,
+        sort: `title:${sortParam}`,
+        title: title,
+        categories: categories
+      },
+      fetchPolicy: 'no-cache'
+    })
+    await getKnowledgeTotalGraphQL({
+      variables: {
+        title: title,
+        categories: categories
+      },
+      fetchPolicy: 'no-cache'
+    })
+  }
 
-    setKnowledgesData(knowledgesNew)
+  const handleInput = (field: string, value: string) => {
+    setValues((s) => ({ ...s, [field]: value }))
+
+    field == 'title' &&
+      refreshKnowledges({
+        title: value
+      })
+
+    // field == 'categories' &&
+    // refreshKnowledges({
+    //   categories: value
+    // })
+  }
+
+  const setData = (value: MultiValue<OptionType>) => {
+    setValues((s) => ({
+      ...s,
+      ['categories']: value.map((category) => `${category.value}`)
+    }))
+
+    // refreshKnowledges({
+    //     categories: value.map((category) => `${category.value}`)
+    //   })
   }
 
   const formKnowledgePropsDefault = {
     permited: true,
     isAdmin: isAdmin,
     user,
-    refreshKnowledges,
+    refreshKnowledges: () => refreshKnowledges({}),
     session: session,
     option: 'create',
     closeForm: () => setOpenForm(false),
+    addTotal: () => setTotal(total + 1),
     initialKnowledge: {
       id: '',
       title: '',
@@ -213,20 +282,25 @@ const KnowledgeBase = ({
     })
   }
 
+  const [getKnowledgeTotalGraphQL, { data: dataQueryKnowledgeTotal }] =
+    useLazyQuery<QueryGetKnowledgesTotal>(QUERY_GET_KNOWLEDGES_TOTAL, {
+      context: { session },
+      onCompleted: () => {
+        dataQueryKnowledgeTotal?.knowledges?.meta.pagination.total &&
+          setTotal(dataQueryKnowledgeTotal?.knowledges?.meta.pagination.total)
+      }
+    })
+
   const [deleteKnowledgeGraphQL] = useMutation(MUTATION_DELETE_KNOWLEDGE, {
     context: { session },
-    onCompleted: (data) => {
-      let knowledgesDataNew = knowledgesData?.slice()
-      knowledgesDataNew = knowledgesDataNew?.filter(
-        (k) => k.id != data.deleteKnowledge.data.id
-      )
-      setKnowledgesData(knowledgesDataNew)
+    onCompleted: () => {
+      refreshKnowledges({})
       setOpenModalDeleteKnowledge(false)
     }
   })
 
-  const deleteKnowledge = (id: string) => {
-    deleteKnowledgeGraphQL({
+  const deleteKnowledge = async (id: string) => {
+    await deleteKnowledgeGraphQL({
       variables: {
         id: id
       }
@@ -237,32 +311,15 @@ const KnowledgeBase = ({
     useLazyQuery<QueryGetKnowledges>(QUERY_GET_KNOWLEDGES, {
       context: { session },
       onCompleted: () => {
-        setKnowledgesData(knowledgesMapper(dataQueryKnowledges?.knowledges))
-        // if (dataQueryKnowledges?.knowledges) {
-        //   if (knowledgesMapper(dataQueryKnowledges?.knowledges)) {
-        //     setKnowledgesData(knowledgesMapper(dataQueryKnowledges?.knowledges))
-        //   }
-        // }
+        dataQueryKnowledges?.knowledges &&
+          setKnowledgesData(knowledgesMapper(dataQueryKnowledges?.knowledges))
       }
     })
 
-  const [pageActive, setPageActive] = useState(0)
-  const [pageCount, setPageCount] = useState(
-    Math.ceil(knowledgesTotal / itemsPerPage)
-  )
-
-  // Invoke when user click to request another page.
   const handlePageClick = (event: any) => {
-    // const newOffset = (event.selected * itemsPerPage) % knowledgesTotal
-    // console.log(event.selected)
-    // setItemOffset(newOffset)
     setPageActive(event.selected)
-    getKnowledgesGraphql({
-      variables: {
-        page: event.selected + 1,
-        pageSize: itemsPerPage
-      },
-      fetchPolicy: 'no-cache'
+    refreshKnowledges({
+      page: event.selected + 1
     })
   }
 
@@ -293,57 +350,129 @@ const KnowledgeBase = ({
           <S.Content>
             {!openForm ? (
               <>
-                <TextField icon={<Search />} />
-                <Button
-                  style={{ marginTop: '10px' }}
-                  size="small"
-                  onClick={createKnowledge}
-                >
-                  Criar documento
-                </Button>
-                <Heading
-                  size="small"
-                  lineLeft
-                  lineColor="secondary"
-                  color="black"
-                >
-                  {knowledgesData.length} documentos
-                </Heading>
-                <Grid>
-                  {knowledgesData.map((knowledge) => (
-                    <Knowledge
-                      permited={isAdmin || user.id == knowledge.author.id}
-                      key={knowledge.id}
-                      id={knowledge.id}
-                      title={knowledge.title}
-                      author={knowledge.author.name}
-                      editKnowledge={editKnowledge}
-                      deleteKnowledge={removeKnowledgeSelect}
-                    />
-                  ))}
-                </Grid>
-                <S.Footer>
-                  <S.Right>
-                    <S.StyledReactPaginate
-                      onPageChange={handlePageClick}
-                      pageRangeDisplayed={5}
-                      pageCount={pageCount}
-                      breakLabel="..."
-                      previousLabel="<<"
-                      nextLabel=">>"
-                      breakClassName="break-me"
-                      breakLinkClassName="page-link"
-                      pageClassName="page-item"
-                      pageLinkClassName="page-link"
-                      previousClassName="page-item"
-                      previousLinkClassName="page-link"
-                      nextClassName="page-item"
-                      nextLinkClassName="page-link"
-                      activeClassName="active"
-                      initialPage={pageActive}
-                    />
-                  </S.Right>
-                </S.Footer>
+                <S.Body>
+                  <S.Heading>
+                    <S.Right>
+                      <Heading
+                        size="small"
+                        lineLeft
+                        lineColor="secondary"
+                        color="black"
+                      >
+                        {total} documentos encontrados
+                      </Heading>
+                    </S.Right>
+                  </S.Heading>
+                  <S.Container>
+                    <S.Filters>
+                      <Button
+                        // style={{ marginTop: '10px', marginBottom: '10px' }}
+                        style={{ marginTop: '5px', marginBottom: '50px' }}
+                        size="small"
+                        onClick={createKnowledge}
+                      >
+                        Criar documento
+                      </Button>
+                      <S.Items>
+                        <Heading
+                          lineBottom
+                          lineColor="secondary"
+                          size="small"
+                          color="black"
+                        >
+                          Ordenar por
+                        </Heading>
+                        <Radio
+                          id={'asc'}
+                          value={'asc'}
+                          name={'sort'}
+                          label="Ascendente"
+                          labelFor="asc"
+                          labelColor="black"
+                          // defaultChecked={
+                          //   String(field.name) === String(values[item.name])
+                          // }
+                          defaultChecked={sort == 'asc'}
+                          // onChange={() => handleRadio(item.name, field.name)}
+                          onChange={() => {
+                            refreshKnowledges({
+                              sortParam: 'asc'
+                            })
+                          }}
+                          style={{ marginBottom: '5px' }}
+                        />
+                        <Radio
+                          id={'desc'}
+                          value={'desc'}
+                          name={'sort'}
+                          label="Decrescente"
+                          labelFor="desc"
+                          labelColor="black"
+                          defaultChecked={sort == 'desc'}
+                          // defaultChecked={
+                          //   String(field.name) === String(values[item.name])
+                          // }
+                          // onChange={() => handleRadio(item.name, field.name)}
+                          onChange={() => {
+                            refreshKnowledges({
+                              sortParam: 'desc'
+                            })
+                          }}
+                        />
+                      </S.Items>
+                      <S.Items>
+                        <SelectChips
+                          placeholder="Selecione as categorias"
+                          isMulti={true}
+                          setData={setData}
+                        />
+                      </S.Items>
+                    </S.Filters>
+                    <S.Grid>
+                      <S.Search>
+                        <TextField
+                          icon={<Search />}
+                          onInputChange={(v) => handleInput('title', v)}
+                        />
+                      </S.Search>
+                      <Grid>
+                        {knowledgesData.map((knowledge) => (
+                          <Knowledge
+                            permited={isAdmin || user.id == knowledge.author.id}
+                            key={knowledge.id}
+                            id={knowledge.id}
+                            title={knowledge.title}
+                            author={knowledge.author.name}
+                            editKnowledge={editKnowledge}
+                            deleteKnowledge={removeKnowledgeSelect}
+                          />
+                        ))}
+                      </Grid>
+                    </S.Grid>
+                  </S.Container>
+                  <S.Footer>
+                    <S.Right>
+                      <S.StyledReactPaginate
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={5}
+                        pageCount={pageCount}
+                        breakLabel="..."
+                        previousLabel="<<"
+                        nextLabel=">>"
+                        breakClassName="break-me"
+                        breakLinkClassName="page-link"
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        activeClassName="active"
+                        forcePage={pageActive}
+                      />
+                    </S.Right>
+                  </S.Footer>
+                </S.Body>
               </>
             ) : (
               <FormKnowledge {...propsFormKnowledge} />

@@ -1,9 +1,19 @@
 import { gql } from '@apollo/client'
 
 export const QUERY_GET_KNOWLEDGES = gql`
-  query QueryGetKnowledges($categories: [String], $page: Int, $pageSize: Int!) {
+  query QueryGetKnowledges(
+    $categories: [ID]
+    $page: Int
+    $pageSize: Int!
+    $sort: [String]
+    $title: String
+  ) {
     knowledges(
-      filters: { categories: { name: { in: $categories } } }
+      sort: $sort
+      filters: {
+        categories: { id: { in: $categories } }
+        title: { containsi: $title }
+      }
       pagination: { page: $page, pageSize: $pageSize }
     ) {
       data {
@@ -32,8 +42,13 @@ export const QUERY_GET_KNOWLEDGES = gql`
   }
 `
 export const QUERY_GET_KNOWLEDGES_TOTAL = gql`
-  query QueryGetKnowledgesTotal($categories: [String]) {
-    knowledges(filters: { categories: { name: { in: $categories } } }) {
+  query QueryGetKnowledgesTotal($categories: [ID], $title: String) {
+    knowledges(
+      filters: {
+        categories: { id: { in: $categories } }
+        title: { containsi: $title }
+      }
+    ) {
       meta {
         pagination {
           total

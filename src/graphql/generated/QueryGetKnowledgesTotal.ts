@@ -28,4 +28,5 @@ export interface QueryGetKnowledgesTotal {
 
 export interface QueryGetKnowledgesTotalVariables {
   categories?: (string | null)[] | null;
+  title?: string | null;
 }

@@ -1,18 +1,49 @@
 import ReactPaginate from 'react-paginate'
 import styled, { css } from 'styled-components'
-import media from 'styled-media-query'
+import { rgba } from 'polished'
 
 export const Main = styled.main`
   ${({ theme }) => css`
     margin-top: ${theme.spacings.medium};
-
-    ${media.greaterThan('medium')`
-        /* display: grid; */
-        /* grid-template-columns: 32rem 1fr; */
-        /* gap: calc(${theme.grid.gutter} * 2); */
-    `}
     box-shadow: 8px 12px 24px 12px rgba(0, 0, 0, 0.1);
   `}
+`
+export const Heading = styled.div`
+  display: flex;
+  margin-bottom: 10px;
+`
+export const Body = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+export const Container = styled.div`
+  display: flex;
+  height: 600px;
+`
+export const Items = styled.div`
+  ${({ theme }) => css`
+    & > div:not(:last-of-type) {
+      margin-bottom: ${theme.spacings.xsmall};
+    }
+    & + div {
+      border-top: 0.1rem solid ${rgba(theme.colors.gray, 0.2)};
+      margin-top: ${theme.spacings.small};
+      padding-top: ${theme.spacings.xsmall};
+    }
+  `}
+`
+
+export const Filters = styled.div`
+  width: 20rem;
+  padding-right: 10px;
+`
+
+export const Grid = styled.div`
+  height: 100%;
+  width: 100%;
+`
+export const Search = styled.div`
+  width: 70rem;
 `
 
 export const Content = styled.div`
@@ -21,6 +52,7 @@ export const Content = styled.div`
     background-color: ${theme.colors.white};
     color: ${theme.colors.black};
     padding: ${theme.spacings.xsmall};
+    height: 734px;
   `}
 `
 export const Knowledges = styled.div`
@@ -30,6 +62,7 @@ export const Knowledges = styled.div`
 `
 
 export const Footer = styled.div`
+  margin-top: auto;
   display: flex;
 `
 

@@ -65,4 +65,6 @@ export interface QueryGetKnowledgesVariables {
   categories?: (string | null)[] | null;
   page?: number | null;
   pageSize: number;
+  sort?: (string | null)[] | null;
+  title?: string | null;
 }

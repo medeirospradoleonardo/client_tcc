@@ -38,10 +38,11 @@ export type FormKnowledgeProps = {
   permited: boolean
   isAdmin: boolean
   user: User
-  refreshKnowledges: (knowledge: Knowledge) => void
+  refreshKnowledges: () => void
   session: Session
   option?: string
   closeForm: () => void
+  addTotal: () => void
   initialKnowledge: Knowledge
 }
 
@@ -57,6 +58,7 @@ const FormKnowledge = ({
   session,
   option = 'create',
   closeForm,
+  addTotal,
   initialKnowledge
 }: FormKnowledgeProps) => {
   const [formError, setFormError] = useState('')
@@ -113,24 +115,8 @@ const FormKnowledge = ({
         name: data.createKnowledge.data.attributes.author.data.attributes
           .username
       })
-      refreshKnowledges({
-        id: data.createKnowledge.data.id,
-        title: data.createKnowledge.data.attributes.title,
-        author: {
-          id: data.createKnowledge.data.attributes.author.data.id,
-          name: data.createKnowledge.data.attributes.author.data.attributes
-            .username
-        },
-        usersCanEdit:
-          data.createKnowledge.data.attributes.usersCanEdit.data.map(
-            (u: any) => ({
-              id: u.id,
-              name: u.attributes.username
-            })
-          ),
-        categories: [],
-        stories: []
-      })
+      refreshKnowledges()
+      addTotal()
       handleInput('id', data.createKnowledge.data.id)
       setIsModified(false)
       setIsEdit(true)
@@ -165,24 +151,7 @@ const FormKnowledge = ({
   const [editKnowledgeGraphQL] = useMutation(MUTATION_UPDATE_KNOWLEDGE, {
     context: { session },
     onCompleted: (data) => {
-      refreshKnowledges({
-        id: data.updateKnowledge.data.id,
-        title: data.updateKnowledge.data.attributes.title,
-        author: {
-          id: data.updateKnowledge.data.attributes.author.data.id,
-          name: data.updateKnowledge.data.attributes.author.data.attributes
-            .username
-        },
-        usersCanEdit:
-          data.updateKnowledge.data.attributes.usersCanEdit.data.map(
-            (u: any) => ({
-              id: u.id,
-              name: u.attributes.username
-            })
-          ),
-        categories: [],
-        stories: []
-      })
+      refreshKnowledges()
 
       setIsModified(false)
     }
@@ -316,7 +285,10 @@ const FormKnowledge = ({
               minimal
               size="small"
               padding={false}
-              onClick={closeForm}
+              onClick={() => {
+                refreshKnowledges()
+                closeForm()
+              }}
               icon={<ArrowBack />}
             >
               Voltar

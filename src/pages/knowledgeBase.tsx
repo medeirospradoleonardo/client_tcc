@@ -81,7 +81,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   } = await apolloClient.query<QueryGetKnowledges>({
     query: QUERY_GET_KNOWLEDGES,
     variables: {
-      pageSize: 9
+      pageSize: 9,
+      sort: 'title:asc'
     },
     fetchPolicy: 'no-cache'
   })

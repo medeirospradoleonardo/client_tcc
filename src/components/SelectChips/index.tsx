@@ -43,7 +43,8 @@ const customStyles: any = {
   }),
   control: (styles: any, state: any) => ({
     ...styles,
-    backgroundColor: '#f4f5f7',
+    // backgroundColor: '#f4f5f7',
+    backgroundColor: '#EAEAEA',
     cursor: 'pointer',
     border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none',
     boxShadow: state.isFocused ? '0 0 0.5rem #F26122' : 'none',
@@ -62,6 +63,14 @@ const customStyles: any = {
   option: (styles: any, state: any) => ({
     ...styles,
     cursor: 'pointer'
+  }),
+  multiValueLabel: (styles: any) => ({
+    ...styles,
+    backgroundColor: '#d6d6d6'
+  }),
+  multiValueRemove: (styles: any) => ({
+    ...styles,
+    backgroundColor: '#d6d6d6'
   })
 }
 

@@ -25,7 +25,7 @@ const Knowledge = ({
   return (
     <S.Container onClick={() => editKnowledge(id)}>
       <S.Title>
-        {title.length > 60 ? `${title.slice(0, 60)}...` : title}
+        {title.length > 42 ? `${title.slice(0, 42)}...` : title}
       </S.Title>
       <S.Right>
         <S.AvatarContainer>
