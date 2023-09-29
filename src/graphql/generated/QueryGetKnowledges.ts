@@ -67,4 +67,5 @@ export interface QueryGetKnowledgesVariables {
   pageSize: number;
   sort?: (string | null)[] | null;
   title?: string | null;
+  authorId?: string | null;
 }

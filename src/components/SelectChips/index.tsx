@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import Select, {
   OptionType,
-  StylesConfig,
   components,
   DropdownIndicatorProps
 } from '@atlaskit/select'
@@ -30,6 +29,7 @@ type SelectChipsProps = {
   maxMenuHeight?: number
   isMulti?: any
   placeholder: string
+  getData?: () => Promise<MultiValue<OptionType>>
 }
 
 const customStyles: any = {
@@ -62,7 +62,8 @@ const customStyles: any = {
   }),
   option: (styles: any, state: any) => ({
     ...styles,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    border: state.isFocused ? '0.2rem solid #EAEAEA' : 'none'
   }),
   multiValueLabel: (styles: any) => ({
     ...styles,
@@ -81,8 +82,11 @@ export default function SelectChips({
   defaultValues = [],
   maxMenuHeight,
   isMulti = true,
-  placeholder
+  placeholder,
+  getData
 }: SelectChipsProps) {
+  const [optionsData, setOptionsData] = useState(options)
+
   return (
     <>
       {!!label && (
@@ -94,7 +98,7 @@ export default function SelectChips({
         components={{ DropdownIndicator }}
         defaultValue={defaultValues}
         isMulti={isMulti}
-        options={options}
+        options={optionsData}
         placeholder={placeholder}
         styles={customStyles}
         maxMenuHeight={maxMenuHeight || 100}
@@ -102,7 +106,9 @@ export default function SelectChips({
           !inputValue ? 'Sem resultados' : 'Sem resultados'
         }
         onChange={(e) => setData(e)}
-        // appearance="subtle"
+        onMenuOpen={
+          getData ? async () => setOptionsData(await getData()) : undefined
+        }
       />
     </>
   )

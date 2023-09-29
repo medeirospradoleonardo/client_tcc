@@ -4,38 +4,9 @@ import {
   StylesConfig,
   components
 } from 'react-select'
-import chroma from 'chroma-js'
 import { OptionType } from 'components/Select'
 import * as S from './styles'
 import { getColorFromName } from 'components/Item'
-
-export const options = [
-  {
-    value: 'notInitiated',
-    label: 'NÃO INICIADO',
-    color: '#DA5757'
-  },
-  {
-    value: 'inProgress',
-    label: 'EM PROGRESSO',
-    color: '#a6b805'
-  },
-  { value: 'concluded', label: 'CONCLUÍDO', color: '#11831a' }
-]
-
-export const defaultOption = {
-  value: 'notInitiated',
-  label: 'NÃO INICIADO',
-  color: '#DA5757'
-}
-
-const dot = (color = 'transparent') => ({
-  alignItems: 'center',
-  color: '#FFF',
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: color
-})
 
 export const colourStylesStatus: StylesConfig<OptionType> = {
   control: (styles, state) => ({
@@ -52,7 +23,7 @@ export const colourStylesStatus: StylesConfig<OptionType> = {
       backgroundColor: '#dddcdc'
     }
   }),
-  option: (styles, { data, isSelected }) => {
+  option: (styles, { isSelected }) => {
     return {
       ...styles,
       display: 'flex',
@@ -74,21 +45,7 @@ export const colourStylesStatus: StylesConfig<OptionType> = {
 export const Option = (props: OptionProps<OptionType>) => {
   return (
     <components.Option {...props}>
-      <div
-        style={
-          {
-            // backgroundColor: props.data.color,
-            // alignItems: 'center',
-            // color: '#FFF',
-            // display: 'flex',
-            // paddingLeft: 10,
-            // paddingRight: 10,
-            // justifyContent: 'center'
-          }
-        }
-      >
-        {props.label}
-      </div>
+      <div>{props.label}</div>
     </components.Option>
   )
 }

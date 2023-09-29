@@ -1,16 +1,19 @@
 import styled, { css } from 'styled-components'
-import media from 'styled-media-query'
 
 export const Heading = styled.div`
-  margin-top: 10px;
+  margin-top: auto;
 `
 
 export const Footer = styled.div`
   display: flex;
-  margin-top: 80px;
+  margin-top: auto;
 `
 
-export const Content = styled.div``
+export const Content = styled.div`
+  display: flex;
+  height: 88%;
+  flex-direction: column;
+`
 
 export const ButtonsHeading = styled.div`
   display: flex;

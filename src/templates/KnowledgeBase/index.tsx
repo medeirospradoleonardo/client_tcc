@@ -29,7 +29,8 @@ import SelectChips from 'components/SelectChips'
 import { QueryGetKnowledgesTotal } from 'graphql/generated/QueryGetKnowledgesTotal'
 import { MultiValue } from 'react-select'
 import { OptionType } from '@atlaskit/select'
-import { title } from 'process'
+import { QUERY_GET_CATEGORIES } from 'graphql/queries/category'
+import { QueryGetCategories } from 'graphql/generated/QueryGetCategories'
 
 export type Story = {
   author: string
@@ -84,6 +85,7 @@ const KnowledgeBase = ({
   const [total, setTotal] = useState(knowledgesTotal)
   const [knowledgeToRemoveId, setKnowledgeToRemoveId] = useState<string>()
   const [sort, setSort] = useState<string>('asc')
+  const [isAll, setIsAll] = useState(true)
 
   const [pageActive, setPageActive] = useState(0)
   const [pageCount, setPageCount] = useState(Math.ceil(total / itemsPerPage))
@@ -112,9 +114,11 @@ const KnowledgeBase = ({
     pageSize = itemsPerPage,
     sortParam = sort,
     title = values.title,
-    categories = values.categories
+    categories = values.categories,
+    isAllParam = isAll
   }) => {
-    if (sortParam != sort || title != values.title) {
+    if (sortParam != sort || title != values.title || isAllParam != isAll) {
+      setIsAll(isAllParam)
       setSort(sortParam)
       setPageActive(0)
       page = 1
@@ -126,14 +130,16 @@ const KnowledgeBase = ({
         pageSize: pageSize,
         sort: `title:${sortParam}`,
         title: title,
-        categories: categories
+        categories: categories,
+        ...(!isAllParam && { authorId: user.id })
       },
       fetchPolicy: 'no-cache'
     })
     await getKnowledgeTotalGraphQL({
       variables: {
         title: title,
-        categories: categories
+        categories: categories,
+        ...(!isAllParam && { authorId: user.id })
       },
       fetchPolicy: 'no-cache'
     })
@@ -146,11 +152,6 @@ const KnowledgeBase = ({
       refreshKnowledges({
         title: value
       })
-
-    // field == 'categories' &&
-    // refreshKnowledges({
-    //   categories: value
-    // })
   }
 
   const setData = (value: MultiValue<OptionType>) => {
@@ -159,9 +160,9 @@ const KnowledgeBase = ({
       ['categories']: value.map((category) => `${category.value}`)
     }))
 
-    // refreshKnowledges({
-    //     categories: value.map((category) => `${category.value}`)
-    //   })
+    refreshKnowledges({
+      categories: value.map((category) => `${category.value}`)
+    })
   }
 
   const formKnowledgePropsDefault = {
@@ -286,7 +287,7 @@ const KnowledgeBase = ({
     useLazyQuery<QueryGetKnowledgesTotal>(QUERY_GET_KNOWLEDGES_TOTAL, {
       context: { session },
       onCompleted: () => {
-        dataQueryKnowledgeTotal?.knowledges?.meta.pagination.total &&
+        dataQueryKnowledgeTotal?.knowledges?.meta.pagination &&
           setTotal(dataQueryKnowledgeTotal?.knowledges?.meta.pagination.total)
       }
     })
@@ -321,6 +322,24 @@ const KnowledgeBase = ({
     refreshKnowledges({
       page: event.selected + 1
     })
+  }
+
+  const [getCategoriesGraphQL] = useLazyQuery<QueryGetCategories>(
+    QUERY_GET_CATEGORIES,
+    {
+      context: { session }
+    }
+  )
+
+  const getCategoriesToSelect = async () => {
+    const { data: dataQueryCategories } = await getCategoriesGraphQL({
+      fetchPolicy: 'no-cache'
+    })
+
+    return dataQueryCategories?.categories?.data.map((c) => ({
+      label: c.attributes?.name,
+      value: c.id
+    })) as MultiValue<OptionType>
   }
 
   return (
@@ -367,7 +386,7 @@ const KnowledgeBase = ({
                     <S.Filters>
                       <Button
                         // style={{ marginTop: '10px', marginBottom: '10px' }}
-                        style={{ marginTop: '5px', marginBottom: '50px' }}
+                        style={{ marginTop: '5px', marginBottom: '40px' }}
                         size="small"
                         onClick={createKnowledge}
                       >
@@ -389,11 +408,7 @@ const KnowledgeBase = ({
                           label="Ascendente"
                           labelFor="asc"
                           labelColor="black"
-                          // defaultChecked={
-                          //   String(field.name) === String(values[item.name])
-                          // }
                           defaultChecked={sort == 'asc'}
-                          // onChange={() => handleRadio(item.name, field.name)}
                           onChange={() => {
                             refreshKnowledges({
                               sortParam: 'asc'
@@ -409,10 +424,6 @@ const KnowledgeBase = ({
                           labelFor="desc"
                           labelColor="black"
                           defaultChecked={sort == 'desc'}
-                          // defaultChecked={
-                          //   String(field.name) === String(values[item.name])
-                          // }
-                          // onChange={() => handleRadio(item.name, field.name)}
                           onChange={() => {
                             refreshKnowledges({
                               sortParam: 'desc'
@@ -421,10 +432,59 @@ const KnowledgeBase = ({
                         />
                       </S.Items>
                       <S.Items>
+                        <Heading
+                          lineBottom
+                          lineColor="secondary"
+                          size="small"
+                          color="black"
+                        >
+                          Autor
+                        </Heading>
+                        <Radio
+                          id={'all'}
+                          value={'all'}
+                          name={'isAll'}
+                          label="Todos"
+                          labelFor="all"
+                          labelColor="black"
+                          defaultChecked={isAll}
+                          onChange={() => {
+                            refreshKnowledges({
+                              isAllParam: true
+                            })
+                          }}
+                          style={{ marginBottom: '5px' }}
+                        />
+                        <Radio
+                          id={'notAll'}
+                          value={'notAll'}
+                          name={'isAll'}
+                          label="Somente eu"
+                          labelFor="notAll"
+                          labelColor="black"
+                          defaultChecked={!isAll}
+                          onChange={() => {
+                            refreshKnowledges({
+                              isAllParam: false
+                            })
+                          }}
+                        />
+                      </S.Items>
+                      <S.Items>
+                        <Heading
+                          lineBottom
+                          lineColor="secondary"
+                          size="small"
+                          color="black"
+                        >
+                          Categorias
+                        </Heading>
                         <SelectChips
                           placeholder="Selecione as categorias"
                           isMulti={true}
                           setData={setData}
+                          options={[]}
+                          getData={getCategoriesToSelect}
                         />
                       </S.Items>
                     </S.Filters>
@@ -433,6 +493,8 @@ const KnowledgeBase = ({
                         <TextField
                           icon={<Search />}
                           onInputChange={(v) => handleInput('title', v)}
+                          initialValue={values.title}
+                          value={values.title}
                         />
                       </S.Search>
                       <Grid>
@@ -452,24 +514,26 @@ const KnowledgeBase = ({
                   </S.Container>
                   <S.Footer>
                     <S.Right>
-                      <S.StyledReactPaginate
-                        onPageChange={handlePageClick}
-                        pageRangeDisplayed={5}
-                        pageCount={pageCount}
-                        breakLabel="..."
-                        previousLabel="<<"
-                        nextLabel=">>"
-                        breakClassName="break-me"
-                        breakLinkClassName="page-link"
-                        pageClassName="page-item"
-                        pageLinkClassName="page-link"
-                        previousClassName="page-item"
-                        previousLinkClassName="page-link"
-                        nextClassName="page-item"
-                        nextLinkClassName="page-link"
-                        activeClassName="active"
-                        forcePage={pageActive}
-                      />
+                      {total > itemsPerPage && (
+                        <S.StyledReactPaginate
+                          onPageChange={handlePageClick}
+                          pageRangeDisplayed={5}
+                          pageCount={pageCount}
+                          breakLabel="..."
+                          previousLabel="<<"
+                          nextLabel=">>"
+                          breakClassName="break-me"
+                          breakLinkClassName="page-link"
+                          pageClassName="page-item"
+                          pageLinkClassName="page-link"
+                          previousClassName="page-item"
+                          previousLinkClassName="page-link"
+                          nextClassName="page-item"
+                          nextLinkClassName="page-link"
+                          activeClassName="active"
+                          forcePage={pageActive}
+                        />
+                      )}
                     </S.Right>
                   </S.Footer>
                 </S.Body>

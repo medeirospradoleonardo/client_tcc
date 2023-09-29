@@ -27,14 +27,6 @@ export const defaultOption = {
   color: '#DA5757'
 }
 
-const dot = (color = 'transparent') => ({
-  alignItems: 'center',
-  color: '#FFF',
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: color
-})
-
 export const colourStylesStatus: StylesConfig<OptionType> = {
   control: (styles, state) => ({
     ...styles,

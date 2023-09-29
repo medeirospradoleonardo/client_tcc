@@ -278,7 +278,7 @@ const FormKnowledge = ({
       >
         <HistoryKnowledge {...propsHistoryKnowledge} />
       </Dialog>
-      <Container>
+      <Container style={{ height: '100%' }}>
         <S.ButtonsHeading>
           <S.Left>
             <Button
@@ -347,7 +347,7 @@ const FormKnowledge = ({
             <RichText
               input="content"
               content={values.content}
-              label="Conteudo"
+              label="Conteúdo"
               setData={handleInput}
               style={{
                 border: '1px solid rgb(227, 232, 241)',

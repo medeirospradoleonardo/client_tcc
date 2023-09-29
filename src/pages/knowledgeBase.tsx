@@ -24,6 +24,8 @@ import { knowledgesMapper } from 'utils/mappers'
 import { QueryGetKnowledgesTotal } from 'graphql/generated/QueryGetKnowledgesTotal'
 import { QueryGetKnowledges } from 'graphql/generated/QueryGetKnowledges'
 
+const itemsPerPage = 15
+
 export default function KnowledgeBasePage(props: KnowledgeBaseTemplateProps) {
   return (
     <KnowledgeBase
@@ -34,7 +36,7 @@ export default function KnowledgeBasePage(props: KnowledgeBaseTemplateProps) {
       activeProject={props?.activeProject}
       knowledges={props?.knowledges}
       knowledgesTotal={props?.knowledgesTotal}
-      itemsPerPage={9}
+      itemsPerPage={itemsPerPage}
     />
   )
 }
@@ -81,7 +83,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   } = await apolloClient.query<QueryGetKnowledges>({
     query: QUERY_GET_KNOWLEDGES,
     variables: {
-      pageSize: 9,
+      pageSize: itemsPerPage,
       sort: 'title:asc'
     },
     fetchPolicy: 'no-cache'

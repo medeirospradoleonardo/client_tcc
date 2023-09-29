@@ -7,12 +7,14 @@ export const QUERY_GET_KNOWLEDGES = gql`
     $pageSize: Int!
     $sort: [String]
     $title: String
+    $authorId: ID
   ) {
     knowledges(
       sort: $sort
       filters: {
         categories: { id: { in: $categories } }
         title: { containsi: $title }
+        author: { id: { eq: $authorId } }
       }
       pagination: { page: $page, pageSize: $pageSize }
     ) {
@@ -42,11 +44,16 @@ export const QUERY_GET_KNOWLEDGES = gql`
   }
 `
 export const QUERY_GET_KNOWLEDGES_TOTAL = gql`
-  query QueryGetKnowledgesTotal($categories: [ID], $title: String) {
+  query QueryGetKnowledgesTotal(
+    $categories: [ID]
+    $title: String
+    $authorId: ID
+  ) {
     knowledges(
       filters: {
         categories: { id: { in: $categories } }
         title: { containsi: $title }
+        author: { id: { eq: $authorId } }
       }
     ) {
       meta {
