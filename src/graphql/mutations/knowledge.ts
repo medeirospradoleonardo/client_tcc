@@ -64,7 +64,7 @@ export const MUTATION_CREATE_KNOWLEDGE = gql`
 export const MUTATION_UPDATE_KNOWLEDGE = gql`
   mutation MutationUpdateKnowledge(
     $knowledgeId: ID!
-    $title: String!
+    $title: String
     $content: String
     $usersCanEdit: [ID]
     $categories: [ID]

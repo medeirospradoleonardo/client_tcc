@@ -117,10 +117,20 @@ const KnowledgeBase = ({
     categories = values.categories,
     isAllParam = isAll
   }) => {
-    if (sortParam != sort || title != values.title || isAllParam != isAll) {
+    if (
+      sortParam != sort ||
+      title != values.title ||
+      isAllParam != isAll ||
+      categories != values.categories
+    ) {
       setIsAll(isAllParam)
       setSort(sortParam)
       setPageActive(0)
+      categories &&
+        setValues((s) => ({
+          ...s,
+          ['categories']: categories
+        }))
       page = 1
     }
 
@@ -155,10 +165,10 @@ const KnowledgeBase = ({
   }
 
   const setData = (value: MultiValue<OptionType>) => {
-    setValues((s) => ({
-      ...s,
-      ['categories']: value.map((category) => `${category.value}`)
-    }))
+    // setValues((s) => ({
+    //   ...s,
+    //   ['categories']: value.map((category) => `${category.value}`)
+    // }))
 
     refreshKnowledges({
       categories: value.map((category) => `${category.value}`)

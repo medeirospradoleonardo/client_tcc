@@ -81,7 +81,7 @@ export interface MutationUpdateKnowledge {
 
 export interface MutationUpdateKnowledgeVariables {
   knowledgeId: string;
-  title: string;
+  title?: string | null;
   content?: string | null;
   usersCanEdit?: (string | null)[] | null;
   categories?: (string | null)[] | null;

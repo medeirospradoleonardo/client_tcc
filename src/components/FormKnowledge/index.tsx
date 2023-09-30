@@ -8,10 +8,11 @@ import { Container } from 'components/Container'
 import { FormError } from 'components/Form'
 import { ErrorOutline, NewLabel } from '@styled-icons/material-outlined'
 import { useState } from 'react'
-import { Knowledge, Story } from 'templates/KnowledgeBase'
+import { Category, Knowledge, Story } from 'templates/KnowledgeBase'
 import { User } from 'templates/ProductBacklog'
 import { ArrowBack } from '@styled-icons/material-outlined/ArrowBack'
 import { PersonOutline } from '@styled-icons/material-outlined/PersonOutline'
+import { Category as CategoryIcon } from '@styled-icons/material-outlined/Category'
 import { History } from '@styled-icons/material-outlined/History'
 import RichText from 'components/RichText'
 import { FieldErrors, createKnowledgeValidate } from 'utils/validations'
@@ -33,6 +34,10 @@ import { usersToSelectMapper } from 'utils/mappers'
 import { SelectValue } from 'components/FormProject'
 import { QueryGetKnowledge } from 'graphql/generated/QueryGetKnowledge'
 import { QUERY_GET_KNOWLEDGE } from 'graphql/queries/knowledge'
+import FormCategories, { FormCategoriesProps } from 'components/FormCategories'
+import { QueryGetCategories } from 'graphql/generated/QueryGetCategories'
+import { QUERY_GET_CATEGORIES } from 'graphql/queries/category'
+import { MUTATION_CREATE_CATEGORY } from 'graphql/mutations/category'
 
 export type FormKnowledgeProps = {
   permited: boolean
@@ -65,12 +70,15 @@ const FormKnowledge = ({
   const [isEdit, setIsEdit] = useState(option == 'edit')
   const [isModified, setIsModified] = useState(false)
   const [isOpenFormUsers, setIsOpenFormUsers] = useState(false)
+  const [isOpenFormCategories, setIsOpenFormCategories] = useState(false)
   const [isOpenHistoryKnowledge, setIsOpenHistoryKnowledge] = useState(false)
   const [fieldError, setFieldError] = useState<FieldErrors>({})
+  const [categoriesToVerify, setCategoriesToVerify] = useState<Category[]>([])
 
   const handleClose = (event: React.MouseEventHandler, reason: string) => {
     if (reason && reason == 'backdropClick') return
 
+    setIsOpenFormCategories(false)
     setIsOpenFormUsers(false)
     setIsOpenHistoryKnowledge(false)
   }
@@ -123,7 +131,33 @@ const FormKnowledge = ({
     }
   })
 
-  const createKnowledge = () => {
+  const [createCategoryGraphQL] = useMutation(MUTATION_CREATE_CATEGORY, {
+    context: { session }
+  })
+
+  const createCategoriesIfNotExist = async () => {
+    let ids
+    if (values.categories) {
+      ids = await Promise.all(
+        values.categories.map(async (c) => {
+          // se a categoria nao existir
+          if (!categoriesToVerify.find((cat) => cat.name == c.name)) {
+            const { data } = await createCategoryGraphQL({
+              variables: {
+                name: c.name
+              }
+            })
+            return data.createCategory.data.id
+          } else {
+            return c.id
+          }
+        })
+      )
+    }
+    console.log(ids)
+    return ids
+  }
+  const createKnowledge = async () => {
     const errors = createKnowledgeValidate({
       title: values.title
     })
@@ -132,6 +166,9 @@ const FormKnowledge = ({
       setFieldError(errors)
       return
     }
+
+    // teste para criar categoria que nao existir
+    const ids = await createCategoriesIfNotExist()
 
     createKnowledgeGraphQL({
       variables: {
@@ -141,23 +178,21 @@ const FormKnowledge = ({
         usersCanEdit: values.usersCanEdit
           ? values.usersCanEdit.map((u) => u.id)
           : null,
-        categories: values.categories
-          ? values.categories.map((category) => category.id)
-          : null
+        categories: ids
       }
     })
   }
 
   const [editKnowledgeGraphQL] = useMutation(MUTATION_UPDATE_KNOWLEDGE, {
     context: { session },
-    onCompleted: (data) => {
+    onCompleted: () => {
       refreshKnowledges()
 
       setIsModified(false)
     }
   })
 
-  const editKnowledge = () => {
+  const editKnowledge = async () => {
     const errors = createKnowledgeValidate({
       title: values.title
     })
@@ -167,6 +202,9 @@ const FormKnowledge = ({
       return
     }
 
+    // teste para criar categoria que nao existir
+    const ids = await createCategoriesIfNotExist()
+
     editKnowledgeGraphQL({
       variables: {
         knowledgeId: values.id,
@@ -175,14 +213,12 @@ const FormKnowledge = ({
         usersCanEdit: values.usersCanEdit
           ? values.usersCanEdit.map((u) => u.id)
           : null,
-        categories: values.categories
-          ? values.categories.map((category) => category.id)
-          : null
+        categories: ids
       }
     })
   }
 
-  const FormUsersPropsDefault = {
+  const formUsersPropsDefault = {
     closeModal: () => setIsOpenFormUsers(false),
     usersOptions: [{ label: '', value: '' }],
     usersCanEdit: [] as SelectValue,
@@ -190,15 +226,25 @@ const FormKnowledge = ({
   }
 
   const [propsFormUsers, setPropsFormUsers] = useState<FormUsersProps>(
-    FormUsersPropsDefault
+    formUsersPropsDefault
   )
+
+  const formCategoriesPropsDefault = {
+    closeModal: () => setIsOpenFormCategories(false),
+    categoriesOptions: [{ label: '', value: '' }],
+    categoriesOfKnowledge: [] as SelectValue,
+    handleInput: handleInput
+  }
+
+  const [propsFormCategories, setPropsFormCategories] =
+    useState<FormCategoriesProps>(formCategoriesPropsDefault)
 
   const [getAllUsers, { data: QueryAllUsers }] = useLazyQuery<QueryAllUsers>(
     QUERY_ALL_USERS,
     {
       context: { session },
       onCompleted: () => {
-        const propsFormUsersNew = FormUsersPropsDefault
+        const propsFormUsersNew = formUsersPropsDefault
         propsFormUsersNew.usersOptions = usersToSelectMapper(
           QueryAllUsers?.usersPermissionsUsers?.data || []
         )
@@ -236,32 +282,95 @@ const FormKnowledge = ({
     useLazyQuery<QueryGetKnowledge>(QUERY_GET_KNOWLEDGE, {
       context: { session },
       onCompleted: () => {
-        const propsHistoryKnowledgeNew = historyKnowledgePropsDefault
-        propsHistoryKnowledgeNew.stories = dataQueryKnowledge?.knowledge?.data
-          ?.attributes?.stories?.data
-          ? dataQueryKnowledge?.knowledge?.data?.attributes?.stories?.data?.map(
-              (story) => ({
-                author: story.attributes?.author || '',
-                date: story.attributes?.date || ''
-              })
-            )
-          : []
-        setPropsHistoryKnowledge(propsHistoryKnowledgeNew)
-        setIsOpenHistoryKnowledge(true)
+        dataQueryKnowledge?.knowledge?.data?.attributes?.categories &&
+          setValues((s) => ({
+            ...s,
+            categories:
+              dataQueryKnowledge?.knowledge?.data?.attributes?.categories?.data?.map(
+                (c) => ({
+                  id: c.id || '',
+                  name: c.attributes?.name || ''
+                })
+              ) as Category[]
+          }))
       }
     })
 
   const openHistoryKnowledge = async () => {
+    const { data: dataQueryKnowledge } = await getKnowledgeGraphql({
+      variables: {
+        id: values.id
+      },
+      fetchPolicy: 'no-cache'
+    })
+
+    const propsHistoryKnowledgeNew = historyKnowledgePropsDefault
+    propsHistoryKnowledgeNew.stories = dataQueryKnowledge?.knowledge?.data
+      ?.attributes?.stories?.data
+      ? dataQueryKnowledge?.knowledge?.data?.attributes?.stories?.data?.map(
+          (story) => ({
+            author: story.attributes?.author || '',
+            date: story.attributes?.date || ''
+          })
+        )
+      : []
+    setPropsHistoryKnowledge(propsHistoryKnowledgeNew)
+    setIsOpenHistoryKnowledge(true)
+  }
+
+  const [getCategoriesGraphQL, { data: QueryCategories }] =
+    useLazyQuery<QueryGetCategories>(QUERY_GET_CATEGORIES, {
+      context: { session },
+      onCompleted: () => {
+        const propsFormCategoriesNew = formCategoriesPropsDefault
+        propsFormCategoriesNew.categoriesOptions = QueryCategories?.categories
+          ? QueryCategories?.categories?.data.map((c) => ({
+              label: c.attributes?.name || '',
+              value: c.id || ''
+            }))
+          : []
+        QueryCategories?.categories &&
+          setCategoriesToVerify(
+            QueryCategories?.categories?.data.map((c) => ({
+              id: c.id || '',
+              name: c.attributes?.name || ''
+            }))
+          )
+        propsFormCategoriesNew.categoriesOfKnowledge = values.categories
+          ? values.categories.map((c) => ({
+              label: c.name,
+              value: c.id
+            }))
+          : []
+
+        setPropsFormCategories(propsFormCategoriesNew)
+      }
+    })
+
+  const openFormCategories = async () => {
     await getKnowledgeGraphql({
       variables: {
         id: values.id
       },
       fetchPolicy: 'no-cache'
     })
+    await getCategoriesGraphQL({
+      fetchPolicy: 'no-cache'
+    })
+
+    setIsOpenFormCategories(true)
   }
 
   return (
     <>
+      <Dialog
+        fullWidth={true}
+        maxWidth="xs"
+        open={isOpenFormCategories}
+        onClose={handleClose}
+      >
+        <FormCategories {...propsFormCategories} />
+      </Dialog>
       <Dialog
         fullWidth={true}
         maxWidth="xs"
@@ -295,8 +404,20 @@ const FormKnowledge = ({
             </Button>
           </S.Left>
           <S.Right>
-            {isEdit && permited && (
+            {(isAdmin || (!isAdmin && values.author.id == user.id)) && (
               <Button
+                minimal
+                size="small"
+                padding={false}
+                onClick={openFormCategories}
+                icon={<CategoryIcon />}
+              >
+                Categorias
+              </Button>
+            )}
+            {isEdit && (
+              <Button
+                style={{ marginLeft: '10px' }}
                 minimal
                 size="small"
                 padding={false}

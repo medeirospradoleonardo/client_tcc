@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import Select, {
+  CreatableSelect,
   OptionType,
   components,
   DropdownIndicatorProps
@@ -28,6 +29,7 @@ type SelectChipsProps = {
   }>
   maxMenuHeight?: number
   isMulti?: any
+  isCreatable?: boolean
   placeholder: string
   getData?: () => Promise<MultiValue<OptionType>>
 }
@@ -82,6 +84,7 @@ export default function SelectChips({
   defaultValues = [],
   maxMenuHeight,
   isMulti = true,
+  isCreatable = false,
   placeholder,
   getData
 }: SelectChipsProps) {
@@ -92,24 +95,44 @@ export default function SelectChips({
       {!!label && (
         <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
       )}
-      <Select
-        inputId={`indicators-dropdown${label}`}
-        closeMenuOnSelect={false}
-        components={{ DropdownIndicator }}
-        defaultValue={defaultValues}
-        isMulti={isMulti}
-        options={optionsData}
-        placeholder={placeholder}
-        styles={customStyles}
-        maxMenuHeight={maxMenuHeight || 100}
-        noOptionsMessage={({ inputValue }) =>
-          !inputValue ? 'Sem resultados' : 'Sem resultados'
-        }
-        onChange={(e) => setData(e)}
-        onMenuOpen={
-          getData ? async () => setOptionsData(await getData()) : undefined
-        }
-      />
+      {!isCreatable ? (
+        <Select
+          inputId={`indicators-dropdown${label}`}
+          closeMenuOnSelect={false}
+          components={{ DropdownIndicator }}
+          defaultValue={defaultValues}
+          isMulti={isMulti}
+          options={optionsData}
+          placeholder={placeholder}
+          styles={customStyles}
+          maxMenuHeight={maxMenuHeight || 100}
+          noOptionsMessage={({ inputValue }) =>
+            !inputValue ? 'Sem resultados' : 'Sem resultados'
+          }
+          onChange={(e) => setData(e)}
+          onMenuOpen={
+            getData ? async () => setOptionsData(await getData()) : undefined
+          }
+        />
+      ) : (
+        <CreatableSelect
+          inputId={`indicators-dropdown${label}`}
+          closeMenuOnSelect={false}
+          components={{ DropdownIndicator }}
+          defaultValue={defaultValues}
+          isMulti={isMulti}
+          options={optionsData}
+          placeholder={placeholder}
+          styles={customStyles}
+          maxMenuHeight={maxMenuHeight || 100}
+          formatCreateLabel={(inputVaLue) => `Criar ${inputVaLue}`}
+          noOptionsMessage={({ inputValue }) => !inputValue && 'Sem resultados'}
+          onChange={(e) => setData(e)}
+          onMenuOpen={
+            getData ? async () => setOptionsData(await getData()) : undefined
+          }
+        />
+      )}
     </>
   )
 }
