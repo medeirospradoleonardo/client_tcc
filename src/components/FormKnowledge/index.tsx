@@ -336,6 +336,7 @@ const FormKnowledge = ({
               name: c.attributes?.name || ''
             }))
           )
+
         propsFormCategoriesNew.categoriesOfKnowledge = values.categories
           ? values.categories.map((c) => ({
               label: c.name,
@@ -348,12 +349,13 @@ const FormKnowledge = ({
     })
 
   const openFormCategories = async () => {
-    await getKnowledgeGraphql({
-      variables: {
-        id: values.id
-      },
-      fetchPolicy: 'no-cache'
-    })
+    isEdit &&
+      (await getKnowledgeGraphql({
+        variables: {
+          id: values.id
+        },
+        fetchPolicy: 'no-cache'
+      }))
     await getCategoriesGraphQL({
       fetchPolicy: 'no-cache'
     })
