@@ -51,14 +51,16 @@ const HistoryKnowledge = ({ closeModal, stories }: HistoryKnowledgeProps) => {
 
       <S.Content>
         {stories.map((s, index) => (
-          <>
-            <S.ContainerStory key={`${formatDate(new Date(s.date))}-${index}`}>
+          <div
+            key={`historyKnowledge-${formatDate(new Date(s.date))}-${index}`}
+          >
+            <S.ContainerStory>
               <S.Date>{formatDate(new Date(s.date))} </S.Date>
               <S.Author>
                 {index == 0 ? 'Criado por' : 'Editado por'} {s.author}
               </S.Author>
             </S.ContainerStory>
-          </>
+          </div>
         ))}
       </S.Content>
     </Container>

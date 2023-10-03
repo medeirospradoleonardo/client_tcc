@@ -154,7 +154,7 @@ const FormKnowledge = ({
         })
       )
     }
-    console.log(ids)
+
     return ids
   }
   const createKnowledge = async () => {
