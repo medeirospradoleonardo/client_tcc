@@ -59,6 +59,8 @@ const FormResetPassword = () => {
               ''
             )} caracteres`
           )
+        : data.error.message == 'Incorrect code provided'
+        ? setFormError('Código incorreto')
         : setFormError(data.error.message)
 
       setLoading(false)

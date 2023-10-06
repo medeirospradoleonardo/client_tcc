@@ -102,7 +102,7 @@ export default function SelectChips({
           components={{ DropdownIndicator }}
           defaultValue={defaultValues}
           isMulti={isMulti}
-          options={optionsData}
+          options={getData ? optionsData : options}
           placeholder={placeholder}
           styles={customStyles}
           maxMenuHeight={maxMenuHeight || 100}
