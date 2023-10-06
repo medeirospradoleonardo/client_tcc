@@ -8,7 +8,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown'
 import Dropdown from 'components/Dropdown'
 
 import * as S from './styles'
-import Link from 'next/link'
+
 import { signOut } from 'next-auth/client'
 import { useRouter } from 'next/router'
 
@@ -45,7 +45,7 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
         <S.Link
           onClick={() =>
             router.push({
-              pathname: '/',
+              pathname: `${process.env.NEXT_PUBLIC_API_URL}/`,
               query: { confirm: true }
             })
           }
@@ -58,7 +58,10 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
           role="button"
           title="Sair"
           onClick={async () => {
-            const data = await signOut({ redirect: false, callbackUrl: '/' })
+            const data = await signOut({
+              redirect: false,
+              callbackUrl: `${process.env.NEXT_PUBLIC_API_URL}/`
+            })
             push(data.url)
           }}
         >
