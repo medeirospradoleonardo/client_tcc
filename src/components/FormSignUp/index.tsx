@@ -45,7 +45,7 @@ const FormSignUp = () => {
         signIn('credentials', {
           email: values.email,
           password: values.password,
-          callbackUrl: `${process.env.NEXT_PUBLIC_API_URL}/`
+          callbackUrl: '/'
         })
     }
   })

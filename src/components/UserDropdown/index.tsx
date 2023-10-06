@@ -45,7 +45,7 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
         <S.Link
           onClick={() =>
             router.push({
-              pathname: `${process.env.NEXT_PUBLIC_API_URL}/`,
+              pathname: '/',
               query: { confirm: true }
             })
           }
@@ -58,10 +58,7 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
           role="button"
           title="Sair"
           onClick={async () => {
-            const data = await signOut({
-              redirect: false,
-              callbackUrl: `${process.env.NEXT_PUBLIC_API_URL}/`
-            })
+            const data = await signOut({ redirect: false, callbackUrl: '/' })
             push(data.url)
           }}
         >
