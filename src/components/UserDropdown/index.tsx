@@ -45,7 +45,7 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
         <S.Link
           onClick={() =>
             router.push({
-              pathname: `${process.env.NEXTAUTH_URL}/`,
+              pathname: '/',
               query: { confirm: true }
             })
           }

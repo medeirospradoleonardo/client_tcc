@@ -35,7 +35,7 @@ const FormResetPassword = () => {
     setFieldError({})
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`,
       {
         method: 'POST',
         headers: {
@@ -52,7 +52,15 @@ const FormResetPassword = () => {
     const data = await response.json()
 
     if (data.error) {
-      setFormError(data.message[0].messages[0].message)
+      data.error.message.includes('password must be at least')
+        ? setFormError(
+            `A senha deve ter no mínimo ${data.error.message.replace(
+              /[^0-9]/g,
+              ''
+            )} caracteres`
+          )
+        : setFormError(data.error.message)
+
       setLoading(false)
     } else {
       signIn('credentials', {

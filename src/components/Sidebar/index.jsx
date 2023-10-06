@@ -211,12 +211,12 @@ const linksArray = [
     to: '/panel',
     notification: 0
   },
-  {
-    label: 'Gráfico Burndown',
-    icon: <MdOutlineAnalytics />,
-    to: '/burndownChart',
-    notification: 0
-  },
+  // {
+  //   label: 'Gráfico Burndown',
+  //   icon: <MdOutlineAnalytics />,
+  //   to: '/burndownChart',
+  //   notification: 0
+  // },
   {
     label: 'Base de conhecimento',
     icon: <AiOutlineBulb />,

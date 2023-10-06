@@ -46,7 +46,7 @@ const FormForgotPassword = () => {
 
     // enviar um post para /forgot-password pedindo um email
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/forgot-password`,
       {
         method: 'POST',
         headers: {
