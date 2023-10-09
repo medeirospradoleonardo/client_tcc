@@ -6,23 +6,30 @@ import Joi from 'joi'
 
 const fieldsValidationsSignUp = {
   username: Joi.string().min(5).required().messages({
-    'string.empty': `O campo nome não pode ficar vazio`
+    'string.empty': `O campo Nome não pode ficar vazio`,
+    'any.required': `O campo Nome não pode ficar vazio`,
+    'string.min': `O campo Nome precisa ter no mínimo 5 caracteres`
   }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
     .required()
     .messages({
-      'string.empty': `O campo Email não pode ficar vazio`
+      'string.empty': `O campo Email não pode ficar vazio`,
+      'any.required': `O campo Email não pode ficar vazio`,
+      'string.email': `O campo Email precisa estar adequado a um email válido`
     }),
-  password: Joi.string().required().messages({
-    'string.empty': `O campo Senha não pode ficar vazio`
+  password: Joi.string().min(5).required().messages({
+    'string.empty': `O campo Senha não pode ficar vazio`,
+    'string.min': `O campo Senha precisa ter no mínimo 5 caracteres`,
+    'any.required': `O campo Senha não pode ficar vazio`
   }),
   confirm_password: Joi.string()
     .valid(Joi.ref('password'))
     .required()
     .messages({
       'any.only': 'A senha de confirmação não e a mesma que a senha escolhida',
-      'string.empty': `O campo Confirmar senha não pode ficar vazio`
+      'string.empty': `O campo Confirmar senha não pode ficar vazio`,
+      'any.required': `O campo Confirmar senha não pode ficar vazio`
     })
 }
 
