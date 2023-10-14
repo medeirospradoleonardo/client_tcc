@@ -55,7 +55,7 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           </SSidebarButton>
         </>
 
-        <>
+        {/* <>
           <SProjectTitleContainer>
             <SLinkIcon>
               <AiOutlineCodepen />
@@ -77,41 +77,10 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
           </SProjectTitleContainer>
           <SDividerContainer>
             <SDivider />
-            {/* <SDividerTitle>Projeto</SDividerTitle> */}
             <SDivider />
           </SDividerContainer>
-        </>
+        </> */}
         {linksArray.map(({ icon, label, to }) => (
-          <SLinkContainer
-            key={label}
-            isActive={pathname === to}
-            session={session}
-            title={!session ? 'Você precisa estar logado' : ''}
-            onClick={
-              session
-                ? () =>
-                    router.push({
-                      pathname: to,
-                      query: { confirm: true }
-                    })
-                : () => {
-                    return
-                  }
-            }
-          >
-            <SLink session={session}>
-              <SLinkIcon>{icon}</SLinkIcon>
-              {sidebarOpen && (
-                <>
-                  <SLinkLabel session={session}>{label}</SLinkLabel>
-                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
-                </>
-              )}
-            </SLink>
-          </SLinkContainer>
-        ))}
-        <SDivider />
-        {secondaryLinksArray.map(({ icon, label, to }) => (
           <SLinkContainer
             key={label}
             isActive={pathname === to}
@@ -139,10 +108,43 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
                   </>
                 )}
 
-                {sidebarOpen && !!session && projectsQuantity >= 0 && (
-                  <SLinkNotification>{projectsQuantity}</SLinkNotification>
-                )}
+                {sidebarOpen &&
+                  to == '/' &&
+                  !!session &&
+                  projectsQuantity >= 0 && (
+                    <SLinkNotification>{projectsQuantity}</SLinkNotification>
+                  )}
               </>
+            </SLink>
+          </SLinkContainer>
+        ))}
+        <SDivider />
+        {secondaryLinksArray.map(({ icon, label, to }) => (
+          <SLinkContainer
+            key={label}
+            isActive={pathname === to}
+            session={session}
+            title={!session ? 'Você precisa estar logado' : ''}
+            onClick={
+              session
+                ? () =>
+                    router.push({
+                      pathname: to,
+                      query: { confirm: true }
+                    })
+                : () => {
+                    return
+                  }
+            }
+          >
+            <SLink session={session}>
+              <SLinkIcon>{icon}</SLinkIcon>
+              {sidebarOpen && (
+                <>
+                  <SLinkLabel session={session}>{label}</SLinkLabel>
+                  {!session && <SNaoLogado>Não logado</SNaoLogado>}
+                </>
+              )}
             </SLink>
           </SLinkContainer>
         ))}
@@ -193,11 +195,16 @@ const Sidebar = ({ session, projectsQuantity, activeProject }) => {
 }
 
 const linksArray = [
+  // {
+  //   label: 'Home',
+  //   icon: <AiOutlineHome />,
+  //   to: '/',
+  //   notification: 0
+  // },
   {
-    label: 'Home',
+    label: 'Meus Projetos',
     icon: <AiOutlineHome />,
-    to: '/',
-    notification: 0
+    to: '/'
   },
   {
     label: 'Backlog do produto',
@@ -210,26 +217,27 @@ const linksArray = [
     icon: <AiOutlineGroup />,
     to: '/panel',
     notification: 0
-  },
+  }
   // {
   //   label: 'Gráfico Burndown',
   //   icon: <MdOutlineAnalytics />,
   //   to: '/burndownChart',
   //   notification: 0
   // },
+  // {
+  //   label: 'Base de conhecimento',
+  //   icon: <AiOutlineBulb />,
+  //   to: '/knowledgeBase',
+  //   notification: 0
+  // }
+]
+
+const secondaryLinksArray = [
   {
     label: 'Base de conhecimento',
     icon: <AiOutlineBulb />,
     to: '/knowledgeBase',
     notification: 0
-  }
-]
-
-const secondaryLinksArray = [
-  {
-    label: 'Meus Projetos',
-    icon: <AiOutlineSetting />,
-    to: '/projects'
   }
 ]
 

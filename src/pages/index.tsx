@@ -1,31 +1,30 @@
-import Logo from 'components/Logo'
+import { GetServerSidePropsContext } from 'next'
+
+import { QUERY_PROJECT_USER_ROLES_FULL } from 'graphql/queries/projectUserRole'
+import React from 'react'
+import Projects, { ProjectsTemplateProps } from 'templates/Projects'
+import { initializeApollo } from 'utils/apollo'
+import protectedRoutes from 'utils/protected-routes'
+
+import {
+  QueryProjectUserRolesFull,
+  QueryProjectUserRolesFullVariables
+} from 'graphql/generated/QueryProjectUserRolesFull'
+import { projectsMapper } from 'utils/mappers'
 import {
   QueryProfileMe,
   QueryProfileMeVariables
 } from 'graphql/generated/QueryProfileMe'
-import {
-  QueryProjectUserRolesLight,
-  QueryProjectUserRolesLightVariables
-} from 'graphql/generated/QueryProjectUserRolesLight'
-import { QUERY_PROJECT_USER_ROLES_LIGHT } from 'graphql/queries/projectUserRole'
 import { QUERY_PROFILE_ME } from 'graphql/queries/user'
-import { GetServerSidePropsContext } from 'next'
-import React from 'react'
-import Home, { HomeTemplateProps } from 'templates/Home'
-import { initializeApollo } from 'utils/apollo'
-import protectedRoutes from 'utils/protected-routes'
 
-export default function HomePage(props: HomeTemplateProps) {
+export default function MyProjects(props: ProjectsTemplateProps) {
   return (
-    <Home
+    <Projects
       projectUserRoles={props?.projectUserRoles}
-      activeProject={props?.activeProject}
-    >
-      <Logo color="black" />
-      <h1 style={{ marginLeft: '20px' }}>
-        A sua ferramenta de gestão ágil de conhecimento
-      </h1>
-    </Home>
+      user={props.user}
+      session={props.session}
+      activeProject={props.activeProject}
+    />
   )
 }
 
@@ -53,13 +52,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     fetchPolicy: 'no-cache'
   })
 
-  const {
-    data: { projectUserRoles }
-  } = await apolloClient.query<
-    QueryProjectUserRolesLight,
-    QueryProjectUserRolesLightVariables
+  const { data } = await apolloClient.query<
+    QueryProjectUserRolesFull,
+    QueryProjectUserRolesFullVariables
   >({
-    query: QUERY_PROJECT_USER_ROLES_LIGHT,
+    query: QUERY_PROJECT_USER_ROLES_FULL,
     variables: {
       email: session?.user?.email as string
     },
@@ -68,7 +65,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   return {
     props: {
-      projectUserRoles: projectUserRoles?.data,
+      session,
+      projectUserRoles: projectsMapper(data),
+      user: {
+        id: usersPermissionsUser?.data?.id,
+        activeProjectId:
+          usersPermissionsUser?.data?.attributes?.activeProject?.data?.id || '',
+        name: usersPermissionsUser?.data?.attributes?.username || '',
+        type: usersPermissionsUser?.data?.attributes?.type
+      },
       activeProject: usersPermissionsUser?.data?.attributes?.activeProject?.data
         ? {
             id:

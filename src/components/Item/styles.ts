@@ -59,7 +59,7 @@ export const TimeEstimated = styled.div`
   ${({ theme }) => css`
     &:hover {
       position: relative;
-      transform: translateY(-5px);
+      /* transform: translateY(-5px); */
 
       .title {
         border: #c0c0c0 1px;
@@ -114,7 +114,7 @@ export const Status = styled.div`
   ${({ theme }) => css`
     &:hover {
       position: relative;
-      transform: translateY(-5px);
+      /* transform: translateY(-5px); */
 
       .title {
         border: #c0c0c0 1px;
@@ -151,7 +151,7 @@ export const AvatarContainer = styled.div`
   ${({ theme }) => css`
     &:hover {
       position: relative;
-      transform: translateY(-5px);
+      /* transform: translateY(-5px); */
 
       .title {
         border: #c0c0c0 1px;
@@ -163,9 +163,9 @@ export const AvatarContainer = styled.div`
         background: ${theme.colors.darkGray};
         border-radius: 5px;
         border-bottom: 1px solid rgb(178, 185, 197);
-        right: -130px;
+        right: -60px;
         margin: 10px;
-        width: 250px;
+        width: 150px;
         position: absolute;
         text-decoration: none;
       }

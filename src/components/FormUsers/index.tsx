@@ -62,30 +62,38 @@ const FormUsers = ({
           placeholder="Selecione"
         />
         <S.ButtonContainer>
-          <Button
-            minimal
-            size="small"
-            style={{ marginBottom: '10px' }}
-            onClick={closeModal}
-          >
-            Cancelar
-          </Button>
-          <Button
-            size="small"
-            style={{ marginBottom: '10px' }}
-            onClick={() => {
-              handleInput(
-                'usersCanEdit',
-                usersCanEditData.map((u) => ({
-                  id: u.value,
-                  name: u.label
-                }))
-              )
-              closeModal()
-            }}
-          >
-            Salvar
-          </Button>
+          <S.Info>
+            Atenção: So será feita a alteração clicando no botao &quot;Editar
+            documento&quot;
+          </S.Info>
+          <S.Button>
+            <Button
+              minimal
+              size="small"
+              style={{ marginBottom: '10px' }}
+              onClick={closeModal}
+            >
+              Cancelar
+            </Button>
+          </S.Button>
+          <S.Button>
+            <Button
+              size="small"
+              style={{ marginBottom: '10px' }}
+              onClick={() => {
+                handleInput(
+                  'usersCanEdit',
+                  usersCanEditData.map((u) => ({
+                    id: u.value,
+                    name: u.label
+                  }))
+                )
+                closeModal()
+              }}
+            >
+              Salvar
+            </Button>
+          </S.Button>
         </S.ButtonContainer>
       </S.Content>
     </Container>

@@ -44,7 +44,7 @@ const Item: React.FC<ItemProps> = ({
   title = title.trim()
   return (
     <S.Container panel={!status}>
-      <S.Id concluded={status == 'concluded' ? true : false}>{id}</S.Id>
+      {/* <S.Id concluded={status == 'concluded' ? true : false}>{id}</S.Id> */}
       <S.Title>
         {title.length > 60 ? `${title.slice(0, 60)}...` : title}
       </S.Title>

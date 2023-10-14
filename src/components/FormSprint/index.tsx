@@ -87,11 +87,11 @@ const FormSprint = ({
 
     if (values.initialDate >= values.finalDate) {
       setFormError(
-        'A data inicial nao pode ser maior ou igual que a data final'
+        'A data inicial não pode ser maior ou igual que a data final'
       )
       return
     } else if (new Date(values.initialDate) < new Date(dateTodayString)) {
-      setFormError('A data inicial nao pode ser mais antiga que a atual')
+      setFormError('A data inicial deve ser a partir de hoje')
       return
     }
 
