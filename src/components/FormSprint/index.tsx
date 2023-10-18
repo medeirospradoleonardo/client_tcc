@@ -32,6 +32,18 @@ export type SprintValues = {
   finalDate: string
 }
 
+function convertDate(date: Date) {
+  const d = new Date(date),
+    year = d.getFullYear()
+  let day = '' + d.getDate(),
+    month = '' + (d.getMonth() + 1)
+
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  return [year, month, day].join('-')
+}
+
 const FormSprint = ({
   initialSprint,
   session,
@@ -77,20 +89,14 @@ const FormSprint = ({
 
     setFieldError({})
 
-    const dateToday = new Date()
-    const dateTodayString =
-      dateToday.getFullYear() +
-      '-' +
-      (dateToday.getMonth() + 1) +
-      '-' +
-      (dateToday.getDate() - 1)
+    const dateTodayString = convertDate(new Date())
 
     if (values.initialDate >= values.finalDate) {
       setFormError(
         'A data inicial não pode ser maior ou igual que a data final'
       )
       return
-    } else if (new Date(values.initialDate) < new Date(dateTodayString)) {
+    } else if (values.initialDate < dateTodayString) {
       setFormError('A data inicial deve ser a partir de hoje')
       return
     }

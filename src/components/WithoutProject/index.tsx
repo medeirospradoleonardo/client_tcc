@@ -5,7 +5,7 @@ const WithoutProject = () => {
     <>
       <Logo color="black" />
       <h1 style={{ marginLeft: '20px' }}>
-        Você precisa ter um projeto selecionado para acessar essa seção
+        Você precisa ter um projeto ativado para acessar essa seção
       </h1>
     </>
   )

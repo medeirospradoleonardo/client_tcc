@@ -25,11 +25,15 @@ export function padTo2Digits(num: number) {
 }
 
 export function formatDate(date: Date) {
-  return [
-    padTo2Digits(date.getDate() + 1),
-    padTo2Digits(date.getMonth() + 1),
-    date.getFullYear()
-  ].join('/')
+  const d = new Date(date),
+    year = d.getFullYear()
+  let day = '' + d.getDate(),
+    month = '' + (d.getMonth() + 1)
+
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  return [day, month, year].join('/')
 }
 
 export type SprintProps = {

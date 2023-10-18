@@ -100,6 +100,8 @@ export const projectsToTableMapper = (
     active: projectUserRole.project.id == activeProjectId ? true : false,
     options: [
       <IconButton
+        title="Editar"
+        aria-label="Editar"
         key={`edit${projectUserRole.id}`}
         size="small"
         disabled={
@@ -119,6 +121,8 @@ export const projectsToTableMapper = (
         />
       </IconButton>,
       <IconButton
+        title="Deletar"
+        aria-label="Deletar"
         key={`delete${projectUserRole.id}`}
         size="small"
         disabled={
@@ -138,6 +142,8 @@ export const projectsToTableMapper = (
         />
       </IconButton>,
       <IconButton
+        title="Ativar"
+        aria-label="Ativar"
         key={`active${projectUserRole.id}`}
         size="small"
         onClick={() => activeFunction(projectUserRole.project.id)}
@@ -180,7 +186,8 @@ export const pathToSelectMapper = (
   sprints: QuerySprintsInProject_sprints_data[],
   projectId: string
 ) => {
-  return [{ label: 'Backlog do produto', value: projectId }].concat(
+  console.log(sprints)
+  return [{ label: 'Backlog do produto', value: `p-${projectId}` }].concat(
     sprints.map((sprint) => ({
       label: `${sprint.attributes?.name}`,
       value: `${sprint.id}`

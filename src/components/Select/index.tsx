@@ -59,7 +59,7 @@ const SelectComponent = ({
   }
 
   return (
-    <>
+    <S.Wrapper disabled={isDisabled}>
       <S.Label htmlFor={`indicators-dropdown${label}`}>{label}</S.Label>
 
       <Select
@@ -75,7 +75,7 @@ const SelectComponent = ({
         onChange={(e) => setData(e)}
         noOptionsMessage={() => noOptionsMessage}
       />
-    </>
+    </S.Wrapper>
   )
 }
 

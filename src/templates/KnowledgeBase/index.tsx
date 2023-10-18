@@ -409,13 +409,13 @@ const KnowledgeBase = ({
                           size="small"
                           color="black"
                         >
-                          Ordenar por
+                          Ordenar de
                         </Heading>
                         <Radio
                           id={'asc'}
                           value={'asc'}
                           name={'sort'}
-                          label="Ascendente"
+                          label="A-Z"
                           labelFor="asc"
                           labelColor="black"
                           defaultChecked={sort == 'asc'}
@@ -430,7 +430,7 @@ const KnowledgeBase = ({
                           id={'desc'}
                           value={'desc'}
                           name={'sort'}
-                          label="Decrescente"
+                          label="Z-A"
                           labelFor="desc"
                           labelColor="black"
                           defaultChecked={sort == 'desc'}

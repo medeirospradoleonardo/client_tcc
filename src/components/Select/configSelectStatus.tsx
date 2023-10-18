@@ -65,15 +65,15 @@ export const Option = (props: OptionProps<OptionType>) => {
   return (
     <components.Option {...props}>
       <div
-        style={{
-          backgroundColor: props.data.color,
-          alignItems: 'center',
-          color: '#FFF',
-          display: 'flex',
-          paddingLeft: 10,
-          paddingRight: 10,
-          justifyContent: 'center'
-        }}
+      // style={{
+      //   backgroundColor: props.data.color,
+      //   alignItems: 'center',
+      //   color: '#FFF',
+      //   display: 'flex',
+      //   paddingLeft: 10,
+      //   paddingRight: 10,
+      //   justifyContent: 'center'
+      // }}
       >
         {props.label}
       </div>

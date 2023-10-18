@@ -89,6 +89,7 @@ export default function SelectChips({
   getData
 }: SelectChipsProps) {
   const [optionsData, setOptionsData] = useState(options)
+  const [menuIsOpen, setMenuIsOpen] = useState(false)
 
   return (
     <>
@@ -97,6 +98,8 @@ export default function SelectChips({
       )}
       {!isCreatable ? (
         <Select
+          openMenuOnClick
+          menuIsOpen={menuIsOpen}
           inputId={`indicators-dropdown${label}`}
           closeMenuOnSelect={false}
           components={{ DropdownIndicator }}
@@ -109,9 +112,18 @@ export default function SelectChips({
           noOptionsMessage={({ inputValue }) =>
             !inputValue ? 'Sem resultados' : 'Sem resultados'
           }
-          onChange={(e) => setData(e)}
+          onChange={(e) => {
+            setData(e)
+            setMenuIsOpen(false)
+          }}
+          onMenuClose={() => setMenuIsOpen(false)}
           onMenuOpen={
-            getData ? async () => setOptionsData(await getData()) : undefined
+            getData
+              ? async () => {
+                  setMenuIsOpen(true)
+                  setOptionsData(await getData())
+                }
+              : () => setMenuIsOpen(true)
           }
         />
       ) : (

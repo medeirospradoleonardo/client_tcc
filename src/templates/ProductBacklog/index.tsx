@@ -764,11 +764,13 @@ const ProductBacklog = ({
     useLazyQuery<QuerySprintsInProject>(QUERY_SPRINTS_IN_PROJECT, {
       context: { session },
       onCompleted: () => {
+        console.log(QueryAllSprintsInProject?.sprints?.data)
         const modalBoardPropsNew = propsModalBoard
         modalBoardPropsNew.pathOptions = pathToSelectMapper(
           QueryAllSprintsInProject?.sprints?.data || [],
           project.id
         )
+        console.log(modalBoardPropsNew.pathOptions)
         setPropsModalBoard(modalBoardPropsNew)
       }
     })
@@ -870,7 +872,7 @@ const ProductBacklog = ({
             </Dialog>
             <Container>
               <Heading lineLeft lineColor="secondary" color="black">
-                Backlog do produto
+                Backlog do produto - {activeProject.name}
               </Heading>
 
               <S.Main>

@@ -16,11 +16,15 @@ const HistoryKnowledge = ({ closeModal, stories }: HistoryKnowledgeProps) => {
   }
 
   function formatDate(date: Date) {
-    return [
-      padTo2Digits(date.getDate() + 1),
-      padTo2Digits(date.getMonth() + 1),
-      date.getFullYear()
-    ]
+    const d = new Date(date),
+      year = d.getFullYear()
+    let day = '' + d.getDate(),
+      month = '' + (d.getMonth() + 1)
+
+    if (month.length < 2) month = '0' + month
+    if (day.length < 2) day = '0' + day
+
+    return [day, month, year]
       .join('/')
       .concat(
         ` ${padTo2Digits(date.getHours())}:${padTo2Digits(

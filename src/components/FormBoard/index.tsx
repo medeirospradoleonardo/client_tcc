@@ -307,6 +307,7 @@ const FormBoard = ({
                         }
                   }
                   setData={setStatus}
+                  isDisabled={!values.sprint}
                 />
               </div>
             </S.Right>
@@ -319,8 +320,8 @@ const FormBoard = ({
                         value: values.sprint
                       }
                     : {
-                        label: getLabelPathWithId(activeProject.id),
-                        value: activeProject.id
+                        label: getLabelPathWithId(`p-${activeProject.id}`),
+                        value: `p-${activeProject.id}`
                       }
                 }
                 placeholder="Selecione um destino"

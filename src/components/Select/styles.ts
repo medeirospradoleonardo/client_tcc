@@ -7,6 +7,21 @@ export const Label = styled.label`
     cursor: pointer;
   `}
 `
+type WrapperProps = {
+  disabled: boolean
+}
+
+export const wrapperModifiers = {
+  disabled: () => css`
+    cursor: not-allowed;
+  `
+}
+
+export const Wrapper = styled.div<WrapperProps>`
+  ${({ disabled }) => css`
+    ${!!disabled && wrapperModifiers.disabled()};
+  `}
+`
 
 export const Avatar = styled.div`
   width: 25px;

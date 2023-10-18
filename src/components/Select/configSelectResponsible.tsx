@@ -28,7 +28,6 @@ export const colourStylesStatus: StylesConfig<OptionType> = {
       ...styles,
       display: 'flex',
       cursor: 'pointer',
-      // justifyContent: 'center',
       backgroundColor: isSelected ? '#dddcdc' : '#FFF',
       color: '#030517',
 

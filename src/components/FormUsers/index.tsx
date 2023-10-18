@@ -63,7 +63,7 @@ const FormUsers = ({
         />
         <S.ButtonContainer>
           <S.Info>
-            Atenção: So será feita a alteração clicando no botao &quot;Editar
+            Atenção: Só será feita a alteração clicando no botão &quot;Editar
             documento&quot;
           </S.Info>
           <S.Button>

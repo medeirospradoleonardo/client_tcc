@@ -609,7 +609,7 @@ const Panel = ({
       >
         <Container>
           <Heading lineLeft lineColor="secondary" color="black">
-            Painel
+            Painel - {activeProject.name}
           </Heading>
 
           <S.Main>
