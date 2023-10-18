@@ -62,6 +62,7 @@ export interface MutationUpdateKnowledge_updateKnowledge_data_attributes {
   author: MutationUpdateKnowledge_updateKnowledge_data_attributes_author | null;
   usersCanEdit: MutationUpdateKnowledge_updateKnowledge_data_attributes_usersCanEdit | null;
   categories: MutationUpdateKnowledge_updateKnowledge_data_attributes_categories | null;
+  allUsersCanEdit: boolean | null;
 }
 
 export interface MutationUpdateKnowledge_updateKnowledge_data {
@@ -85,4 +86,5 @@ export interface MutationUpdateKnowledgeVariables {
   content?: string | null;
   usersCanEdit?: (string | null)[] | null;
   categories?: (string | null)[] | null;
+  allUsersCanEdit?: boolean | null;
 }

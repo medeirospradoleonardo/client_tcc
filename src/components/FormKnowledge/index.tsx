@@ -38,6 +38,7 @@ import FormCategories, { FormCategoriesProps } from 'components/FormCategories'
 import { QueryGetCategories } from 'graphql/generated/QueryGetCategories'
 import { QUERY_GET_CATEGORIES } from 'graphql/queries/category'
 import { MUTATION_CREATE_CATEGORY } from 'graphql/mutations/category'
+import Confirm from 'components/Confirm'
 
 export type FormKnowledgeProps = {
   permited: boolean
@@ -72,8 +73,12 @@ const FormKnowledge = ({
   const [isOpenFormUsers, setIsOpenFormUsers] = useState(false)
   const [isOpenFormCategories, setIsOpenFormCategories] = useState(false)
   const [isOpenHistoryKnowledge, setIsOpenHistoryKnowledge] = useState(false)
+  const [isOpenAdvice, setIsOpenAdvice] = useState(false)
   const [fieldError, setFieldError] = useState<FieldErrors>({})
-  const [categoriesToVerify, setCategoriesToVerify] = useState<Category[]>([])
+
+  const [categoriesToVerify, setCategoriesToVerify] = useState<Category[]>(
+    initialKnowledge.categories || []
+  )
 
   const handleClose = (event: React.MouseEventHandler, reason: string) => {
     if (reason && reason == 'backdropClick') return
@@ -81,6 +86,7 @@ const FormKnowledge = ({
     setIsOpenFormCategories(false)
     setIsOpenFormUsers(false)
     setIsOpenHistoryKnowledge(false)
+    setIsOpenAdvice(false)
   }
 
   const [values, setValues] = useState<Knowledge>({
@@ -98,12 +104,17 @@ const FormKnowledge = ({
         }))
       : [],
     categories: initialKnowledge.categories,
-    stories: initialKnowledge.stories
+    stories: initialKnowledge.stories,
+    allUsersCanEdit: initialKnowledge.allUsersCanEdit
   })
+
+  const [permitedState, setPermitedState] = useState<boolean>(
+    permited ? true : values.allUsersCanEdit ? true : false
+  )
 
   const handleInput = (
     field: string,
-    value: string | null | User | number | User[]
+    value: string | null | User | number | User[] | boolean | undefined
   ) => {
     if (field == 'content') {
       if (values.content != value) {
@@ -178,7 +189,8 @@ const FormKnowledge = ({
         usersCanEdit: values.usersCanEdit
           ? values.usersCanEdit.map((u) => u.id)
           : null,
-        categories: ids
+        categories: ids,
+        allUsersCanEdit: values.allUsersCanEdit
       }
     })
   }
@@ -213,16 +225,19 @@ const FormKnowledge = ({
         usersCanEdit: values.usersCanEdit
           ? values.usersCanEdit.map((u) => u.id)
           : null,
-        categories: ids
+        categories: ids,
+        allUsersCanEdit: values.allUsersCanEdit
       }
     })
   }
 
   const formUsersPropsDefault = {
     closeModal: () => setIsOpenFormUsers(false),
+    openAdvice: () => setIsOpenAdvice(true),
     usersOptions: [{ label: '', value: '' }],
     usersCanEdit: [] as SelectValue,
-    handleInput: handleInput
+    handleInput: handleInput,
+    allUsersCanEdit: false as boolean | null | undefined
   }
 
   const [propsFormUsers, setPropsFormUsers] = useState<FormUsersProps>(
@@ -231,6 +246,7 @@ const FormKnowledge = ({
 
   const formCategoriesPropsDefault = {
     closeModal: () => setIsOpenFormCategories(false),
+    openAdvice: () => setIsOpenAdvice(true),
     categoriesOptions: [{ label: '', value: '' }],
     categoriesOfKnowledge: [] as SelectValue,
     handleInput: handleInput
@@ -254,6 +270,8 @@ const FormKnowledge = ({
               value: u.id
             }))
           : []
+
+        propsFormUsersNew.allUsersCanEdit = values.allUsersCanEdit
         setPropsFormUsers(propsFormUsersNew)
       }
     }
@@ -368,6 +386,23 @@ const FormKnowledge = ({
       <Dialog
         fullWidth={true}
         maxWidth="xs"
+        open={isOpenAdvice}
+        onClose={handleClose}
+      >
+        <Confirm
+          buttonLabel="Ok"
+          actionFunction={() => setIsOpenAdvice(false)}
+          message={`Atenção: Só será feita a alteração clicando no botão "${
+            isEdit ? 'Editar' : 'Criar'
+          }
+          documento"`}
+          closeModal={() => setIsOpenAdvice(false)}
+          cancelButton={false}
+        />
+      </Dialog>
+      <Dialog
+        fullWidth={true}
+        maxWidth="xs"
         open={isOpenFormCategories}
         onClose={handleClose}
       >
@@ -464,7 +499,7 @@ const FormKnowledge = ({
             error={fieldError?.title}
             onInputChange={(v) => handleInput('title', v)}
             style={{ height: '30px' }}
-            disabled={isEdit && !permited}
+            disabled={isEdit && !permitedState}
           />
           <S.Content>
             <RichText
@@ -477,7 +512,7 @@ const FormKnowledge = ({
 
                 height: '360px'
               }}
-              disabled={isEdit && !permited}
+              disabled={isEdit && !permitedState}
             />
           </S.Content>
           <S.Footer>
@@ -486,7 +521,7 @@ const FormKnowledge = ({
                 <S.CreateBy>Criado por: {values.author.name}</S.CreateBy>
               </S.Left>
             )}
-            {!(isEdit && !permited) && (
+            {!(isEdit && !permitedState) && (
               <S.Right>
                 <Button
                   size="small"

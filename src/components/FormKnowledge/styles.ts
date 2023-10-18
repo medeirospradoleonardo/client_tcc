@@ -4,11 +4,6 @@ export const Heading = styled.div`
   margin-top: auto;
 `
 
-export const Footer = styled.div`
-  display: flex;
-  margin-top: auto;
-`
-
 export const Content = styled.div`
   display: flex;
   height: 88%;
@@ -31,4 +26,9 @@ export const CreateBy = styled.span`
   ${({ theme }) => css`
     color: ${theme.colors.gray};
   `}
+`
+
+export const Footer = styled.div`
+  display: flex;
+  margin-top: 10px;
 `

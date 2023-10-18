@@ -55,6 +55,7 @@ export type Knowledge = {
   usersCanEdit: User[] | null
   categories: Category[] | null
   stories: Story[] | null
+  allUsersCanEdit: boolean | null | undefined
 }
 
 export type KnowledgeBaseTemplateProps = {
@@ -89,6 +90,9 @@ const KnowledgeBase = ({
 
   const [pageActive, setPageActive] = useState(0)
   const [pageCount, setPageCount] = useState(Math.ceil(total / itemsPerPage))
+  const [defaultCategories, setDefaultCategories] = useState<
+    MultiValue<{ label: string; value: string }> | undefined
+  >(undefined)
 
   const [values, setValues] = useState<KnowledgeBaseValues>({
     title: '',
@@ -170,6 +174,12 @@ const KnowledgeBase = ({
     //   ['categories']: value.map((category) => `${category.value}`)
     // }))
 
+    setDefaultCategories(
+      value.map((category) => ({
+        label: category.label,
+        value: category.value
+      })) as MultiValue<{ label: string; value: string }>
+    )
     refreshKnowledges({
       categories: value.map((category) => `${category.value}`)
     })
@@ -194,8 +204,9 @@ const KnowledgeBase = ({
       },
       usersCanEdit: [] as User[],
       categories: [] as Category[],
-      stories: [] as Story[]
-    }
+      stories: [] as Story[],
+      allUsersCanEdit: false
+    } as Knowledge
   }
 
   const [propsFormKnowledge, setPropsFormKnowledge] =
@@ -276,7 +287,9 @@ const KnowledgeBase = ({
                   date: story.attributes?.date || ''
                 })
               )
-            : []
+            : [],
+          allUsersCanEdit:
+            dataQueryKnowledge?.knowledge?.data?.attributes?.allUsersCanEdit
         }
 
         setPropsFormKnowledge(propsFormKnowledgeNew)
@@ -492,6 +505,7 @@ const KnowledgeBase = ({
                         <SelectChips
                           placeholder="Selecione as categorias"
                           isMulti={true}
+                          defaultValues={defaultCategories}
                           setData={setData}
                           options={[]}
                           getData={getCategoriesToSelect}

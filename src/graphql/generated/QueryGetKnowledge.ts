@@ -79,6 +79,7 @@ export interface QueryGetKnowledge_knowledge_data_attributes {
   usersCanEdit: QueryGetKnowledge_knowledge_data_attributes_usersCanEdit | null;
   categories: QueryGetKnowledge_knowledge_data_attributes_categories | null;
   stories: QueryGetKnowledge_knowledge_data_attributes_stories | null;
+  allUsersCanEdit: boolean | null;
 }
 
 export interface QueryGetKnowledge_knowledge_data {

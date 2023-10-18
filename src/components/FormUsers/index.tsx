@@ -11,25 +11,47 @@ import { OptionType } from '@atlaskit/select'
 import { SelectValue } from 'components/FormProject'
 import { User } from 'templates/ProductBacklog'
 
+import Switch from '@mui/material/Switch'
+import { alpha, styled } from '@mui/material'
+
+const PrimaryColorSwitch = styled(Switch)(({ theme }) => ({
+  '& .MuiSwitch-switchBase.Mui-checked': {
+    color: '#F26122',
+    '&:hover': {
+      backgroundColor: alpha('#F26122', theme.palette.action.hoverOpacity)
+    }
+  },
+  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+    backgroundColor: '#F26122'
+  }
+}))
+
 export type FormUsersProps = {
   closeModal: () => void
+  openAdvice: () => void
   usersOptions: MultiValue<OptionType>
   usersCanEdit: SelectValue
   handleInput: (
     field: string,
-    value: string | null | User | number | User[]
+    value: string | null | User | number | User[] | boolean | undefined
   ) => void
+  allUsersCanEdit: boolean | null | undefined
 }
 
 const FormUsers = ({
   closeModal,
+  openAdvice,
   usersOptions,
   usersCanEdit,
-  handleInput
+  handleInput,
+  allUsersCanEdit
 }: FormUsersProps) => {
   const [users, setUsers] = useState<MultiValue<OptionType>>(usersOptions)
   const [usersCanEditData, setUsersCanEditData] =
     useState<SelectValue>(usersCanEdit)
+
+  const [allUsersCanEditData, setAllUsersCanEditData] =
+    useState(allUsersCanEdit)
 
   const editUsers = () => {
     //
@@ -61,11 +83,20 @@ const FormUsers = ({
           maxMenuHeight={150}
           placeholder="Selecione"
         />
+        <S.SwitchContainer>
+          <S.SwitchLabel>Todos usuários do sistema</S.SwitchLabel>
+          <S.Switch>
+            <PrimaryColorSwitch
+              checked={!!allUsersCanEditData}
+              onChange={() => setAllUsersCanEditData(!allUsersCanEditData)}
+            />
+          </S.Switch>
+        </S.SwitchContainer>
         <S.ButtonContainer>
-          <S.Info>
+          {/* <S.Info>
             Atenção: Só será feita a alteração clicando no botão &quot;Editar
             documento&quot;
-          </S.Info>
+          </S.Info> */}
           <S.Button>
             <Button
               minimal
@@ -88,7 +119,9 @@ const FormUsers = ({
                     name: u.label
                   }))
                 )
+                handleInput('allUsersCanEdit', allUsersCanEditData)
                 closeModal()
+                openAdvice()
               }}
             >
               Salvar

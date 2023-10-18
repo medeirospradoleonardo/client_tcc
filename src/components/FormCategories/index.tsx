@@ -13,6 +13,7 @@ import { User } from 'templates/ProductBacklog'
 
 export type FormCategoriesProps = {
   closeModal: () => void
+  openAdvice: () => void
   categoriesOptions: MultiValue<OptionType>
   categoriesOfKnowledge: SelectValue
   handleInput: (
@@ -23,6 +24,7 @@ export type FormCategoriesProps = {
 
 const FormCategories = ({
   closeModal,
+  openAdvice,
   categoriesOptions,
   categoriesOfKnowledge,
   handleInput
@@ -64,10 +66,10 @@ const FormCategories = ({
           isCreatable={true}
         />
         <S.ButtonContainer>
-          <S.Info>
+          {/* <S.Info>
             Atenção: Só será feita a alteração clicando no botão &quot;Editar
             documento&quot;
-          </S.Info>
+          </S.Info> */}
           <S.Button>
             <Button
               minimal
@@ -91,6 +93,7 @@ const FormCategories = ({
                   }))
                 )
                 closeModal()
+                openAdvice()
               }}
             >
               Salvar

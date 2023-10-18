@@ -58,8 +58,11 @@ const UserDropdown = ({ username }: UserDropdownProps) => {
           role="button"
           title="Sair"
           onClick={async () => {
-            const data = await signOut({ redirect: false, callbackUrl: '/' })
-            push(data.url)
+            const data = await signOut({
+              redirect: false,
+              callbackUrl: '/sign-in'
+            })
+            push('/sign-in')
           }}
         >
           <ExitToApp />

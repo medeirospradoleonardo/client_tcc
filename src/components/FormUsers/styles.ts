@@ -31,6 +31,16 @@ export const Button = styled.div`
   margin-bottom: 10px;
 `
 
-export const Content = styled.div`
-  /* height: 300px; */
+export const Content = styled.div``
+
+export const SwitchLabel = styled.div`
+  display: flex;
+  align-items: center;
+`
+export const Switch = styled.div`
+  display: flex;
+  align-items: center;
+`
+export const SwitchContainer = styled.div`
+  display: flex;
 `

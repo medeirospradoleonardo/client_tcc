@@ -16,6 +16,7 @@ export const MUTATION_CREATE_KNOWLEDGE = gql`
     $authorId: ID!
     $usersCanEdit: [ID]
     $categories: [ID]
+    $allUsersCanEdit: Boolean
   ) {
     createKnowledge(
       data: {
@@ -24,6 +25,7 @@ export const MUTATION_CREATE_KNOWLEDGE = gql`
         author: $authorId
         usersCanEdit: $usersCanEdit
         categories: $categories
+        allUsersCanEdit: $allUsersCanEdit
       }
     ) {
       data {
@@ -55,6 +57,7 @@ export const MUTATION_CREATE_KNOWLEDGE = gql`
               }
             }
           }
+          allUsersCanEdit
         }
       }
     }
@@ -68,6 +71,7 @@ export const MUTATION_UPDATE_KNOWLEDGE = gql`
     $content: String
     $usersCanEdit: [ID]
     $categories: [ID]
+    $allUsersCanEdit: Boolean
   ) {
     updateKnowledge(
       id: $knowledgeId
@@ -76,6 +80,7 @@ export const MUTATION_UPDATE_KNOWLEDGE = gql`
         content: $content
         usersCanEdit: $usersCanEdit
         categories: $categories
+        allUsersCanEdit: $allUsersCanEdit
       }
     ) {
       data {
@@ -107,6 +112,7 @@ export const MUTATION_UPDATE_KNOWLEDGE = gql`
               }
             }
           }
+          allUsersCanEdit
         }
       }
     }

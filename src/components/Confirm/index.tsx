@@ -9,13 +9,15 @@ export type ConfirmProps = {
   buttonLabel: string
   closeModal: () => void
   actionFunction: () => void
+  cancelButton?: boolean
 }
 
 const FormProject = ({
   message,
   buttonLabel,
   closeModal,
-  actionFunction
+  actionFunction,
+  cancelButton = true
 }: ConfirmProps) => {
   return (
     <>
@@ -28,14 +30,16 @@ const FormProject = ({
 
         <S.Content>
           <S.ButtonContainer>
-            <Button
-              minimal
-              size="small"
-              style={{ marginBottom: '10px' }}
-              onClick={closeModal}
-            >
-              Cancelar
-            </Button>
+            {cancelButton && (
+              <Button
+                minimal
+                size="small"
+                style={{ marginBottom: '10px' }}
+                onClick={closeModal}
+              >
+                Cancelar
+              </Button>
+            )}
             <Button
               size="small"
               style={{ marginBottom: '10px' }}

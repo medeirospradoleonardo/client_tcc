@@ -709,6 +709,7 @@ type BoardRelationResponseCollection {
 input CategoryFiltersInput {
   id: IDFilterInput
   name: StringFilterInput
+  knowledges: KnowledgeFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [CategoryFiltersInput]
@@ -718,10 +719,12 @@ input CategoryFiltersInput {
 
 input CategoryInput {
   name: String
+  knowledges: [ID]
 }
 
 type Category {
   name: String!
+  knowledges(filters: KnowledgeFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): KnowledgeRelationResponseCollection
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -796,6 +799,7 @@ input KnowledgeFiltersInput {
   author: UsersPermissionsUserFiltersInput
   usersCanEdit: UsersPermissionsUserFiltersInput
   stories: StoryFiltersInput
+  allUsersCanEdit: BooleanFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   and: [KnowledgeFiltersInput]
@@ -810,6 +814,7 @@ input KnowledgeInput {
   author: ID
   usersCanEdit: [ID]
   stories: [ID]
+  allUsersCanEdit: Boolean
 }
 
 type Knowledge {
@@ -819,6 +824,7 @@ type Knowledge {
   author: UsersPermissionsUserEntityResponse
   usersCanEdit(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserRelationResponseCollection
   stories(filters: StoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): StoryRelationResponseCollection
+  allUsersCanEdit: Boolean
   createdAt: DateTime
   updatedAt: DateTime
 }

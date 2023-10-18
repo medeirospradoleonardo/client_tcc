@@ -62,6 +62,7 @@ export interface MutationCreateKnowledge_createKnowledge_data_attributes {
   author: MutationCreateKnowledge_createKnowledge_data_attributes_author | null;
   usersCanEdit: MutationCreateKnowledge_createKnowledge_data_attributes_usersCanEdit | null;
   categories: MutationCreateKnowledge_createKnowledge_data_attributes_categories | null;
+  allUsersCanEdit: boolean | null;
 }
 
 export interface MutationCreateKnowledge_createKnowledge_data {
@@ -85,4 +86,5 @@ export interface MutationCreateKnowledgeVariables {
   authorId: string;
   usersCanEdit?: (string | null)[] | null;
   categories?: (string | null)[] | null;
+  allUsersCanEdit?: boolean | null;
 }

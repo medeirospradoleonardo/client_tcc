@@ -18,7 +18,7 @@ export const Body = styled.div`
 `
 export const Container = styled.div`
   display: flex;
-  height: 600px;
+  height: 100%;
 `
 export const Items = styled.div`
   ${({ theme }) => css`
@@ -52,7 +52,8 @@ export const Content = styled.div`
     background-color: ${theme.colors.white};
     color: ${theme.colors.black};
     padding: ${theme.spacings.xsmall};
-    height: 734px;
+    /* height: 734px; */
+    height: 100%;
   `}
 `
 export const Knowledges = styled.div`

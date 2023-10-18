@@ -105,6 +105,7 @@ export const QUERY_GET_KNOWLEDGE = gql`
               }
             }
           }
+          allUsersCanEdit
         }
       }
     }
