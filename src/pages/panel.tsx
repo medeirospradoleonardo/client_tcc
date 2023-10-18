@@ -27,6 +27,7 @@ import {
   QuerySprintBoards,
   QuerySprintBoardsVariables
 } from 'graphql/generated/QuerySprintBoards'
+import { resetServerContext } from 'react-beautiful-dnd'
 
 export default function PanelPage(props: PanelTemplateProps) {
   return (
@@ -56,7 +57,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       props: {}
     }
   }
-
+  resetServerContext()
   const {
     data: { usersPermissionsUser }
   } = await apolloClient.query<QueryProfileMe, QueryProfileMeVariables>({

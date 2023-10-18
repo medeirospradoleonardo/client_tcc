@@ -186,7 +186,6 @@ export const pathToSelectMapper = (
   sprints: QuerySprintsInProject_sprints_data[],
   projectId: string
 ) => {
-  console.log(sprints)
   return [{ label: 'Backlog do produto', value: `p-${projectId}` }].concat(
     sprints.map((sprint) => ({
       label: `${sprint.attributes?.name}`,
