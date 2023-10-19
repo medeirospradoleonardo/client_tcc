@@ -118,9 +118,13 @@ export default function SprintComponent({
             </S.Title>
           </S.ContainerTitle>
           <S.ContainerDate>
-            <h4>{formatDate(new Date(sprint.initialDate))}</h4>
+            <h4>{`${sprint.initialDate?.split('-')[2]}/${
+              sprint.initialDate?.split('-')[1]
+            }/${sprint.initialDate?.split('-')[0]}`}</h4>
             <ArrowRightAltOutlinedIcon style={{ marginTop: '5px' }} />
-            <h4>{formatDate(new Date(sprint.finalDate))}</h4>
+            <h4>{`${sprint.finalDate?.split('-')[2]}/${
+              sprint.finalDate?.split('-')[1]
+            }/${sprint.finalDate?.split('-')[0]}`}</h4>
           </S.ContainerDate>
           <S.Right>
             {permited && (
