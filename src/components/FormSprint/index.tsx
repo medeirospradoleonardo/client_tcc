@@ -125,9 +125,25 @@ const FormSprint = ({
         initialDate: data.updateSprint.data.attributes.initialDate,
         finalDate: data.updateSprint.data.attributes.finalDate,
         expand: data.updateSprint.data.attributes.expand,
-        boards: []
+        boards: data.updateSprint.data.attributes.boards.data.map((b: any) => ({
+          id: b.id,
+          title: b.attributes.title,
+          timeEstimated: b.attributes.timeEstimated,
+          description: b.attributes.description,
+          author: {
+            id: b.attributes.author.data.id,
+            name: b.attributes.author.data.attributes.username
+          },
+          responsible: {
+            id: b.attributes.responsible.data.id,
+            name: b.attributes.responsible.data.attributes.username
+          },
+          sprint: b.attributes.sprint.data?.id,
+          status: b.attributes.status
+        }))
       })
 
+      console.log('dada')
       closeModal()
     }
   })

@@ -100,19 +100,20 @@ const ProductBacklog = ({
 
   const refreshSprints = (sprint: Sprint) => {
     let edit = false
-    sprints.map((s) => {
+    const sprintsNew = sprints.slice()
+    sprintsNew.map((s) => {
       if (s.id == sprint.id) {
         s.name = sprint.name
         s.initialDate = sprint.initialDate
         s.finalDate = sprint.finalDate
         s.expand = sprint.expand
-        setSprints(sprints)
+        s.boards = sprint.boards
         edit = true
-        return
       }
     })
 
-    !edit && setSprints(sprints.concat([sprint]))
+    edit && setSprints(sprintsNew)
+    !edit && setSprints(sprintsNew.concat([sprint]))
   }
 
   const modalSprintPropsDefault = {

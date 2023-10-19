@@ -82,6 +82,38 @@ export const MUTATION_UPDATE_SPRINT = gql`
           initialDate
           finalDate
           expand
+          boards {
+            data {
+              id
+              attributes {
+                title
+                timeEstimated
+                description
+                author {
+                  data {
+                    id
+                    attributes {
+                      username
+                    }
+                  }
+                }
+                responsible {
+                  data {
+                    id
+                    attributes {
+                      username
+                    }
+                  }
+                }
+                status
+                sprint {
+                  data {
+                    id
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
